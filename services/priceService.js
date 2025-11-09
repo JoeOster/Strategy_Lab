@@ -13,11 +13,13 @@ let currentKeyIndex = 0;
 
 // --- Adjust API Calls per Minute ---
 const TOTAL_API_CALLS_PER_MINUTE =
-  API_KEYS.length > 1 && parseInt(process.env.API_CALLS_PER_MINUTE, 10)
-    ? parseInt(process.env.API_CALLS_PER_MINUTE, 10)
+  API_KEYS.length > 1 && Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
+    ? Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
     : 60;
 
-const CACHE_EXPIRATION_MS = 60 * 1000;
+// --- FIX: Cache expiration updated to 130 seconds ---
+// This ensures the cache is still valid for the 120-second high-priority cron job.
+const CACHE_EXPIRATION_MS = 130 * 1000;
 
 const priceCache = new Map();
 const getTimestamp = () => new Date().toISOString();

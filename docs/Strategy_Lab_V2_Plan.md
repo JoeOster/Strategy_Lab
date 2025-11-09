@@ -8,12 +8,39 @@ This plan is built on the lessons learned from the flawed V3 -> V4 refactor. Its
 
 These principles are the foundational contract for our collaboration.
 
-1.  **Servant-Led Execution:** The user (Leader) provides explicit, step-by-step approval for all tasks. The agent (GCA/Servant) executes those tasks precisely.
-2.  **The Plan is the Source of Truth:** This document, and its supporting `docs/` files, are our external brain. GCA's memory is irrelevant; these files are its instructions.
-3.  **Task Execution Log Workflow:** All code-related work **must** follow the protocol defined in `docs/GCA_Execution_Protocol.md`. This workflow (Log Generation -> Atomic Execution -> State Update) is our primary defense against LLM errors and "garbage code."
-4.  **Use Dedicated State Libraries:** We will use modern, dedicated libraries (e.g., TanStack Query for server state, Zustand for client state) to manage application state. This replaces the manual "State Read/Write Separation" rule from the V4 plan and is designed to eliminate "stale data" bugs.
-5.  **Always Pass IDs:** Functions that act on an existing entity (e.g., `openEditModal`) **must** only accept its primary `ID` (e.g., `transactionId`). This prevents stale data bugs by forcing the function to retrieve fresh data.
-6.  **Self-Contained `strategy_lab` Folder:** All work, file references, and dependencies will occur exclusively within the `strategy_lab` folder.
+1. **Servant-Led Execution:** The user (Leader) provides explicit, step-by-step approval for all tasks. The agent (GCA/Servant) executes those tasks precisely.
+2. **The Plan is the Source of Truth:** This document, and its supporting `docs/` files, are our external brain. GCA's memory is irrelevant; these files are its instructions.
+3. **Task Execution Log Workflow:** All code-related work **must** follow the protocol defined in `docs/GCA_Execution_Protocol.md`. This workflow (Log Generation -> Atomic Execution -> State Update) is our primary defense against LLM errors and "garbage code."
+4. **Use Dedicated State Libraries:** We will use modern, dedicated libraries (**@tanstack/query-core** for server state, **zustand** for client state) to manage application state. This replaces the manual "State Read/Write Separation" rule from the V4 plan and is designed to eliminate "stale data" bugs.
+5. **Always Pass IDs:** Functions that act on an existing entity (e.g., `openEditModal`) **must** only accept its primary `ID` (e.g., `transactionId`). This prevents stale data bugs by forcing the function to retrieve fresh data.
+6. **Self-Contained `strategy_lab` Folder:** All work, file references, and dependencies will occur exclusively within the `strategy_lab` folder.
+
+## 1.5. Core Data Definitions
+
+This section defines the three core data types in the application and how they map to the database.
+
+1. **Real Executed Trade (Dashboard)**
+    - **Definition:** A real-money ticker purchase or sale that has been executed. This is a "real position."
+    - **UI Location:** Displayed on the **Dashboard** (Module D) and in the **Ledger** (Module C).
+    - **Database Table:** `transactions`
+    - **Database Flag:** `is_paper_trade = 0`
+
+2. **Real Watched Order (Orders)**
+    - **Definition:** A real-money $order (e.g., "Buy Limit") that is being watched but is _not yet executed_. This is the item that triggers a "Global Alert".
+    - **UI Location:** Created and managed on the **Orders** tab (Module B).
+    - **Database Table:** `watched_items`
+    - **Database Flag:** `is_paper_trade = 0`
+
+3. **Strategy Lab Items (Strategy Lab)**
+    - **Definition:** Fully hypothetical items for research and practice.
+    - **UI Location:** Created and managed _only_ within the **Strategy Lab** tab (Module E).
+    - This has two sub-types:
+      - **"Watched Idea":** A simple ticker being watched for info (e.g., "Trade Idea" from a Source).
+        - **Database Table:** `watched_items`
+        - **Database Flag:** `is_paper_trade = 1`
+      - **"Paper Trade":** A theoretical, _executed_ trade.
+        - **Database Table:** `transactions`
+        - **Database Flag:** `is_paper_trade = 1`
 
 ## 2. Key Issues This Plan Solves
 

@@ -94,11 +94,14 @@ This table **replaces** the "tangled" `pending_orders` and `journal_entries` tab
 - `strategy_id` (INTEGER, FOREIGN KEY to `strategies.id`, NULLABLE)
 - `ticker` (TEXT, NOT NULL)
 - `order_type` (TEXT, NOT NULL) -- 'Buy Limit', 'Sell Limit'
+- **`quantity` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
 - `buy_price_high` (REAL)
 - `buy_price_low` (REAL)
 - `take_profit_high` (REAL)
 - `take_profit_low` (REAL)
 - `escape_price` (REAL) -- "Escape Point"
+- **`take_profit_2_high` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
+- **`take_profit_2_low` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
 - `status` (TEXT, NOT NULL, DEFAULT 'WATCHING') -- 'WATCHING', 'ALERT', 'EXECUTED', 'CANCELLED'
 - `created_date` (TEXT)
 - `expiration_date` (TEXT, NULLABLE)

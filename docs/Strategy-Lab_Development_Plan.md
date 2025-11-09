@@ -16,21 +16,20 @@ This document is a living guide for the creation of "Strategy Lab". It outlines 
 
 This document outlines the migration plan for refactoring the current, flawed **V4** application into a new, robust **Strategy Lab** architecture. This plan refactors the existing **V4.0** codebase, using the **V3.0** codebase only as a "blueprint" to find lost logic.
 
+...
+
 ## Guardrails & Sign-off (Master Checklist Definition)
 
 All refactoring tasks will be done on a **per-module basis**. Each module must pass the following checks, which are embedded in the module's plan in **Phase 3**.
 
-1. **Function Migration:** All V3/V4 functions for that module have been mapped in the `V4_Migration_Map.md`.
-2. **Wiring Guide:** All UI interactions for the module are defined in `Strategy-Lab_Wiring_Guide.md`.
-3. **Linting:** The code for the new module (e.g., `public/js/ledger/`) passes all ESLint checks.
-   - Run lint check: `npm run lint -- public/js/ledger/`
-4. **Formatting:** The code has been formatted with Prettier.
-   - Run format check: `npm run format -- public/js/ledger/`
-5. **Unit Test Coverage:** Unit tests have been created for the new module files and meet the **67% or greater** coverage.
-6. **UAC Verification:** The module has passed all its specific test scripts defined in `docs/Strategy-Lab_UAC.md`.
-7. **Smoke Test:** The module passes the full **Refactor Smoke Test** (see below) to ensure no regressions.
-
----
+1.  **Function Migration:** All V3/V4 functions for that module have been mapped in the `V4_Migration_Map.md`.
+2.  **Wiring Guide:** All UI interactions for the module are defined in `Strategy-Lab_Wiring_Guide.md`.
+3.  **Quality:** The code for the new module (e.g., `public/js/ledger/`) passes all **Biome** checks.
+    - Run check: `npm run check -- public/js/ledger/`
+4.  **E2E Test:** All **Playwright** tests for the module, based on `docs/Strategy-Lab_V2_UAC.md`, must pass.
+    - Run check: `npm test -- --grep "@ledger"` (This assumes tests are tagged, e.g., `@ledger`, `@dashboard`).
+5.  **Smoke Test:** The module passes the full **Refactor Smoke Test** (see below) to ensure no regressions.
+    ...
 
 ## Key Issues to Address
 

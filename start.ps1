@@ -65,16 +65,18 @@ if (-not (Test-Path "node_modules")) {
     npm install *>&1 | Write-Log
 }
 
+# --- UPDATED QUALITY CHECKS ---
 if (-not $skipChecks) {
     Clear-Host
-    npm run format:fix *>&1 | Write-Log
-    npm run lint:fix *>&1 | Write-Log
+    Write-Log "Running Biome to format and lint all files..."
+    npm run fix *>&1 | Write-Log  # This runs 'biome check --apply .'
     Clear-Host
-    npm run format *>&1 | Write-Log
-    npm run lint *>&1 | Write-Log
+    Write-Log "Verifying Biome checks..."
+    npm run check *>&1 | Write-Log # This runs 'biome check .'
 } else {
     Clear-Host
 }
+# --- END UPDATED BLOCK ---
 
 Write-Log "Starting 'node server.js' as a background process..."
 $serverProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $serverStdoutFile -RedirectStandardError $serverStderrFile
