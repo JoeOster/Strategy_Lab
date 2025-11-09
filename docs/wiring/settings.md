@@ -153,7 +153,7 @@ This is a separate modal, triggered by `handleEditSourceClick()`.
 | `#edit-source-book-author`        | Input: Book's Author                             | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-book-isbn`          | Input: Book's ISBN                               | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-book-websites`      | Input: Book's Website Links                      | (Loaded by `openEditSourceModal`)        |
-| `#edit-s-book-pdfs`               | Input: Book's PDF Links                          | (Loaded by `openEditSourceModal`)        |
+| `#edit-source-book-pdfs`               | Input: Book's PDF Links                          | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-panel-website`      | Panel: Fields for "Website" type.                | (Controlled by `handleSourceTypeChange`) |
 | `#edit-source-website-websites`   | Input: Website's Relevant Links                  | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-website-pdfs`       | Input: Website's Saved Docs                      | (Loaded by `openEditSourceModal`)        |
