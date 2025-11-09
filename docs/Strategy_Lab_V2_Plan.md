@@ -15,7 +15,24 @@ These principles are the foundational contract for our collaboration.
 5. **Always Pass IDs:** Functions that act on an existing entity (e.g., `openEditModal`) **must** only accept its primary `ID` (e.g., `transactionId`). This prevents stale data bugs by forcing the function to retrieve fresh data.
 6. **Self-Contained `strategy_lab` Folder:** All work, file references, and dependencies will occur exclusively within the `strategy_lab` folder.
 
-## 1.5. Core Data Definitions
+## 1.5. Development Workflow
+
+To ensure consistency, quality, and resilience against context loss, all development will adhere to a Git-based feature branch workflow.
+
+### Branching & Commits
+
+1.  **Main as Truth:** The `main` branch is the single source of truth and must always be in a stable, deployable state. Direct commits to `main` are forbidden post-setup.
+2.  **Temporary Feature Branches:** All new work (features, bug fixes) **must** be done on a temporary feature branch, created from `main` (e.g., `feature/add-settings-modal`).
+3.  **Atomic Commits:** Each logical step of a task will be committed individually. This creates a granular history and allows for easy rollbacks.
+4.  **Merge and Delete:** Once a feature is complete and verified, the branch will be merged into `main`. The feature branch will then be deleted.
+
+### Task Management (The "Issue Tracker")
+
+1.  **The Plan:** For each task, a detailed, step-by-step technical plan will be generated.
+2.  **Local Task Log:** Due to the agent's limitations in accessing the GitHub web UI, we will use the `docs/CURRENT_TASK_LOG.md` file as a local substitute for a GitHub Issue. This file will contain the checklist for the active task.
+3.  **Execution:** The agent will execute the steps from the task log and make a corresponding Git commit for each completed step.
+
+## 2. Core Data Definitions
 
 This section defines the three core data types in the application and how they map to the database.
 
@@ -42,7 +59,7 @@ This section defines the three core data types in the application and how they m
         - **Database Table:** `transactions`
         - **Database Flag:** `is_paper_trade = 1`
 
-## 2. Key Issues This Plan Solves
+## 3. Key Issues This Plan Solves
 
 This refactor is specifically designed to fix the critical issues from the V4 refactor:
 
@@ -51,7 +68,7 @@ This refactor is specifically designed to fix the critical issues from the V4 re
 - **Nomenclature Confusion:** Ambiguous terms ("Watchlist," "Orders") will be clarified in the UI and codebase.
 - **Unlinked Strategies:** A "Strategy" (journal entry) will be programmatically linked to the "Limit Orders" it generates.
 
-## 3. Core V2 Architecture: The "LLM Survival" Pattern
+## 4. Core V2 Architecture: The "LLM Survival" Pattern
 
 This is our primary architectural rule, designed to prevent "tangled" code and LLM failures. The "Tab Monoliths" of the V4 app and large, multi-purpose files are a direct cause of LLM errors.
 
