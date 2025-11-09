@@ -104,7 +104,7 @@ while (-not $serverReady -and $attempt -lt $maxAttempts) {
 
 if (-not $serverReady) {
     Write-Log "Server failed to start after $maxAttempts attempts. Stopping script."
-    Stop-Process -Id $serverPid -Force -Recurse
+    Stop-Process -Id $serverPid -Force
     return # Exit the script
 }
 

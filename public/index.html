@@ -18,11 +18,72 @@
             <button type="button" class="nav-btn" data-tab="strategy-lab">Strategy Lab</button>
             <button type="button" class="nav-btn" data-tab="imports">Imports</button>
             <button type="button" class="nav-btn" data-tab="daily-report">Daily Report</button>
+            <button type="button" class="nav-btn" data-tab="settings">Settings</button>
         </nav>
         <main id="app-content" class="main-content">
             <!-- Page content will be loaded here -->
         </main>
     </div>
-    <script src="js/app-main.js"></script>
+
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Settings</h2>
+
+        <div class="settings-tabs">
+            <button class="settings-tab active" data-tab="general">General</button>
+            <button class="settings-tab" data-tab="appearance">Appearance</button>
+            <button class="settings-tab" data-tab="data-management">Data Management</button>
+            <button class="settings-tab" data-tab="user-management">User Management</button>
+        </div>
+
+        <div id="general-settings-panel" class="settings-panel active">
+            <h3>General Settings</h3>
+            <p>General settings content goes here.</p>
+        </div>
+
+        <div id="appearance-settings-panel" class="settings-panel">
+            <h3>Appearance Settings</h3>
+            <p>Appearance settings content goes here.</p>
+        </div>
+
+        <div id="data-management-settings-panel" class="settings-panel">
+            <h3>Data Management</h3>
+            <div class="data-management-subtabs">
+                <button class="data-sub-tab active" data-sub-tab="sources-panel">Sources</button>
+                <button class="data-sub-tab" data-sub-tab="exchanges-panel">Exchanges</button>
+            </div>
+            <div id="sources-panel" class="sub-panel active">
+                <h4>Sources Management</h4>
+                <p>Sources management content goes here.</p>
+            </div>
+            <div id="exchanges-panel" class="sub-panel">
+                <h4>Exchanges Management</h4>
+                <p>Exchanges management content goes here.</p>
+            </div>
+        </div>
+
+        <div id="user-management-settings-panel" class="settings-panel">
+            <h3>User Management</h3>
+            <div class="user-management-subtabs">
+                <button class="user-sub-tab active" data-sub-tab="users-panel">Users</button>
+                <button class="user-sub-tab" data-sub-tab="subscriptions-panel">Subscriptions</button>
+            </div>
+            <div id="users-panel" class="sub-panel active">
+                <h4>Users Management</h4>
+                <p>Users management content goes here.</p>
+            </div>
+            <div id="subscriptions-panel" class="sub-panel">
+                <h4>Subscriptions Management</h4>
+                <p>Subscriptions management content goes here.</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button id="save-settings-button">Save & Close</button>
+        </div>
+    </div>
+</div>
+    <script type="module" src="js/app-main.js"></script>
 </body>
 </html>

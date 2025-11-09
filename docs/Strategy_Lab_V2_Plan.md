@@ -38,27 +38,29 @@ To ensure consistency, quality, and resilience against context loss, all develop
 This section defines the three core data types in the application and how they map to the database.
 
 1. **Real Executed Trade (Dashboard)**
-    - **Definition:** A real-money ticker purchase or sale that has been executed. This is a "real position."
-    - **UI Location:** Displayed on the **Dashboard** (Module D) and in the **Ledger** (Module C).
-    - **Database Table:** `transactions`
-    - **Database Flag:** `is_paper_trade = 0`
+
+   - **Definition:** A real-money ticker purchase or sale that has been executed. This is a "real position."
+   - **UI Location:** Displayed on the **Dashboard** (Module D) and in the **Ledger** (Module C).
+   - **Database Table:** `transactions`
+   - **Database Flag:** `is_paper_trade = 0`
 
 2. **Real Watched Order (Orders)**
-    - **Definition:** A real-money $order (e.g., "Buy Limit") that is being watched but is _not yet executed_. This is the item that triggers a "Global Alert".
-    - **UI Location:** Created and managed on the **Orders** tab (Module B).
-    - **Database Table:** `watched_items`
-    - **Database Flag:** `is_paper_trade = 0`
+
+   - **Definition:** A real-money $order (e.g., "Buy Limit") that is being watched but is _not yet executed_. This is the item that triggers a "Global Alert".
+   - **UI Location:** Created and managed on the **Orders** tab (Module B).
+   - **Database Table:** `watched_items`
+   - **Database Flag:** `is_paper_trade = 0`
 
 3. **Strategy Lab Items (Strategy Lab)**
-    - **Definition:** Fully hypothetical items for research and practice.
-    - **UI Location:** Created and managed _only_ within the **Strategy Lab** tab (Module E).
-    - This has two sub-types:
-      - **"Watched Idea":** A simple ticker being watched for info (e.g., "Trade Idea" from a Source).
-        - **Database Table:** `watched_items`
-        - **Database Flag:** `is_paper_trade = 1`
-      - **"Paper Trade":** A theoretical, _executed_ trade.
-        - **Database Table:** `transactions`
-        - **Database Flag:** `is_paper_trade = 1`
+   - **Definition:** Fully hypothetical items for research and practice.
+   - **UI Location:** Created and managed _only_ within the **Strategy Lab** tab (Module E).
+   - This has two sub-types:
+     - **"Watched Idea":** A simple ticker being watched for info (e.g., "Trade Idea" from a Source).
+       - **Database Table:** `watched_items`
+       - **Database Flag:** `is_paper_trade = 1`
+     - **"Paper Trade":** A theoretical, _executed_ trade.
+       - **Database Table:** `transactions`
+       - **Database Flag:** `is_paper_trade = 1`
 
 ## 3. Key Issues This Plan Solves
 
@@ -80,14 +82,17 @@ To solve this, all modules **must** be broken down into the following file struc
 Every module (e.g., `settings`, `ledger`, `dashboard`) will have its own folder inside `public/js/modules/`. That folder **must** contain the following files:
 
 - **`index.js` (The "Conductor")**
+
   - **Purpose:** The _only_ file the rest of the app can import.
   - **Logic:** Contains the main `initializeModule()` function. It imports from its siblings (`handlers.js`, `api.js`) and attaches listeners to the HTML elements defined in the `Wiring_Guide`.
 
 - **`handlers.js` (The "Listeners & Buttons")**
+
   - **Purpose:** Contains all UI event handler functions.
   - **Logic:** All functions related to user interaction (e.g., `handleSaveClick()`, `handleThemeChange()`). This file _calls_ functions from `api.js` and `render.js`.
 
 - **`api.js` (The "Data" File)**
+
   - **Purpose:** Handles all server communication (fetch, TanStack Query, etc.).
   - **Logic:** Contains all functions that get or send data (e.g., `fetchSettings()`, `updateSettings(data)`). It _never_ touches the DOM.
 
