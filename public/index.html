@@ -25,63 +25,253 @@
         </main>
     </div>
 
+<!-- Main Settings Modal -->
 <div id="settings-modal" class="modal">
     <div class="modal-content">
         <span class="close-button">&times;</span>
         <h2>Settings</h2>
 
         <div class="settings-tabs">
-            <button class="settings-tab active" data-tab="general">General</button>
-            <button class="settings-tab" data-tab="appearance">Appearance</button>
-            <button class="settings-tab" data-tab="data-management">Data Management</button>
-            <button class="settings-tab" data-tab="user-management">User Management</button>
+            <button class="settings-tab active" data-tab="general-settings-panel">General</button>
+            <button class="settings-tab" data-tab="appearance-settings-panel">Appearance</button>
+            <button class="settings-tab" data-tab="data-management-settings-panel">Data Management</button>
+            <button class="settings-tab" data-tab="user-management-settings-panel">User Management</button>
         </div>
 
+        <!-- General Settings Panel -->
         <div id="general-settings-panel" class="settings-panel active">
-            <h3>General Settings</h3>
-            <p>General settings content goes here.</p>
+            <h3>General</h3>
+            <form id="general-settings-form">
+                <label for="family-name">App Title:</label>
+                <input type="text" id="family-name" name="family-name">
+                <label for="take-profit-percent">Default Take Profit %:</label>
+                <input type="number" id="take-profit-percent" name="take-profit-percent">
+                <label for="stop-loss-percent">Default Stop Loss %:</label>
+                <input type="number" id="stop-loss-percent" name="stop-loss-percent">
+                <label for="notification-cooldown">Notification Cooldown (Min):</label>
+                <input type="number" id="notification-cooldown" name="notification-cooldown">
+            </form>
         </div>
 
+        <!-- Appearance Settings Panel -->
         <div id="appearance-settings-panel" class="settings-panel">
-            <h3>Appearance Settings</h3>
-            <p>Appearance settings content goes here.</p>
+            <h3>Appearance</h3>
+            <form id="appearance-settings-form">
+                <label for="theme-selector">Theme:</label>
+                <select id="theme-selector" name="theme-selector">
+                    <!-- Options will be loaded dynamically -->
+                </select>
+                <label for="font-selector">Font:</label>
+                <select id="font-selector" name="font-selector">
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </form>
         </div>
 
+        <!-- Data Management Panel -->
         <div id="data-management-settings-panel" class="settings-panel">
             <h3>Data Management</h3>
             <div class="data-management-subtabs">
-                <button class="data-sub-tab active" data-sub-tab="sources-panel">Sources</button>
+                <button class="data-sub-tab active" data-sub-tab="sources-panel">Advice Sources</button>
                 <button class="data-sub-tab" data-sub-tab="exchanges-panel">Exchanges</button>
             </div>
+
+            <!-- Sources Sub-Panel -->
             <div id="sources-panel" class="sub-panel active">
-                <h4>Sources Management</h4>
-                <p>Sources management content goes here.</p>
+                <h4>Add New Advice Source</h4>
+                <form id="add-new-source-form">
+                    <label for="new-source-name">Name:</label>
+                    <input type="text" id="new-source-name" required>
+                    <label for="new-source-type">Type:</label>
+                    <select id="new-source-type">
+                        <option value="person">Person</option>
+                        <option value="group">Group</option>
+                        <option value="book">Book</option>
+                        <option value="website">Website</option>
+                    </select>
+                    <label for="new-source-url">URL:</label>
+                    <input type="url" id="new-source-url">
+                    <label for="new-source-description">Description:</label>
+                    <textarea id="new-source-description"></textarea>
+                    <label for="new-source-image-path">Image Path:</label>
+                    <input type="text" id="new-source-image-path">
+
+                    <!-- Dynamic Panels for Source Type -->
+                    <div id="new-source-panel-person" class="source-type-panel">
+                        <h5>Person Details</h5>
+                        <label for="new-source-contact-email">Email:</label>
+                        <input type="email" id="new-source-contact-email">
+                        <label for="new-source-contact-phone">Phone:</label>
+                        <input type="tel" id="new-source-contact-phone">
+                        <label for="new-source-contact-app-type">Contact App:</label>
+                        <input type="text" id="new-source-contact-app-type">
+                        <label for="new-source-contact-app-handle">App Handle:</label>
+                        <input type="text" id="new-source-contact-app-handle">
+                    </div>
+                    <div id="new-source-panel-group" class="source-type-panel" style="display:none;">
+                        <h5>Group Details</h5>
+                        <label for="new-source-group-person">Primary Contact:</label>
+                        <input type="text" id="new-source-group-person">
+                        <label for="new-source-group-email">Group Email:</label>
+                        <input type="email" id="new-source-group-email">
+                        <label for="new-source-group-phone">Group Phone:</label>
+                        <input type="tel" id="new-source-group-phone">
+                        <label for="new-source-group-app-type">Group App:</label>
+                        <input type="text" id="new-source-group-app-type">
+                        <label for="new-source-group-app-handle">Group App Handle:</label>
+                        <input type="text" id="new-source-group-app-handle">
+                    </div>
+                    <div id="new-source-panel-book" class="source-type-panel" style="display:none;">
+                        <h5>Book Details</h5>
+                        <label for="new-source-book-author">Author:</label>
+                        <input type="text" id="new-source-book-author">
+                        <label for="new-source-book-isbn">ISBN:</label>
+                        <input type="text" id="new-source-book-isbn">
+                        <label for="new-source-book-websites">Websites (comma-separated):</label>
+                        <input type="text" id="new-source-book-websites">
+                        <label for="new-source-book-pdfs">PDFs (comma-separated):</label>
+                        <input type="text" id="new-source-book-pdfs">
+                    </div>
+                    <div id="new-source-panel-website" class="source-type-panel" style="display:none;">
+                        <h5>Website Details</h5>
+                        <label for="new-source-website-websites">Relevant Links (comma-separated):</label>
+                        <input type="text" id="new-source-website-websites">
+                        <label for="new-source-website-pdfs">Saved Docs (comma-separated):</label>
+                        <input type="text" id="new-source-website-pdfs">
+                    </div>
+                    <button type="submit">Add Source</button>
+                </form>
+                <hr>
+                <h4>Existing Sources</h4>
+                <div id="advice-source-list">
+                    <!-- Source list will be loaded dynamically -->
+                </div>
             </div>
+
+            <!-- Exchanges Sub-Panel -->
             <div id="exchanges-panel" class="sub-panel">
-                <h4>Exchanges Management</h4>
-                <p>Exchanges management content goes here.</p>
+                <h4>Add New Exchange</h4>
+                <form id="add-exchange-form">
+                    <label for="new-exchange-name">Exchange Name:</label>
+                    <input type="text" id="new-exchange-name" required>
+                    <button type="submit" id="add-exchange-btn">Add Exchange</button>
+                </form>
+                <hr>
+                <h4>Existing Exchanges</h4>
+                <div id="exchange-list">
+                    <!-- Exchange list will be loaded dynamically -->
+                </div>
             </div>
         </div>
 
+        <!-- User Management Panel -->
         <div id="user-management-settings-panel" class="settings-panel">
             <h3>User Management</h3>
             <div class="user-management-subtabs">
                 <button class="user-sub-tab active" data-sub-tab="users-panel">Users</button>
                 <button class="user-sub-tab" data-sub-tab="subscriptions-panel">Subscriptions</button>
             </div>
+
+            <!-- Users Sub-Panel -->
             <div id="users-panel" class="sub-panel active">
-                <h4>Users Management</h4>
-                <p>Users management content goes here.</p>
+                <h4>Add New Account Holder</h4>
+                <form id="add-holder-form">
+                    <label for="new-holder-name">Name:</label>
+                    <input type="text" id="new-holder-name" required>
+                    <button type="submit" id="add-account-holder-btn">Add Holder</button>
+                </form>
+                <hr>
+                <h4>Account Holders</h4>
+                <div id="account-holder-list">
+                    <!-- Account holder list will be loaded dynamically -->
+                </div>
             </div>
+
+            <!-- Subscriptions Sub-Panel -->
             <div id="subscriptions-panel" class="sub-panel">
-                <h4>Subscriptions Management</h4>
-                <p>Subscriptions management content goes here.</p>
+                <h4 id="subscriptions-panel-title">Manage Subscriptions</h4>
+                <div id="subscriptions-panel-list-container">
+                    <!-- Subscription list will be loaded dynamically -->
+                </div>
             </div>
         </div>
 
         <div class="modal-footer">
             <button id="save-settings-button">Save & Close</button>
         </div>
+    </div>
+</div>
+
+<!-- Edit Source Modal (Initially Hidden) -->
+<div id="edit-source-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit Advice Source</h2>
+        <form id="edit-source-form">
+            <input type="hidden" id="edit-source-id">
+            <label for="edit-source-name">Name:</label>
+            <input type="text" id="edit-source-name" required>
+            <label for="edit-source-type">Type:</label>
+            <select id="edit-source-type">
+                <option value="person">Person</option>
+                <option value="group">Group</option>
+                <option value="book">Book</option>
+                <option value="website">Website</option>
+            </select>
+            <label for="edit-source-url">URL:</label>
+            <input type="url" id="edit-source-url">
+            <label for="edit-source-description">Description:</label>
+            <textarea id="edit-source-description"></textarea>
+            <label for="edit-source-image-path">Image Path:</label>
+            <input type="text" id="edit-source-image-path">
+
+            <!-- Dynamic Panels for Source Type -->
+            <div id="edit-source-panel-person" class="source-type-panel">
+                <h5>Person Details</h5>
+                <label for="edit-source-contact-email">Email:</label>
+                <input type="email" id="edit-source-contact-email">
+                <label for="edit-source-contact-phone">Phone:</label>
+                <input type="tel" id="edit-source-contact-phone">
+                <label for="edit-source-contact-app-type">Contact App:</label>
+                <input type="text" id="edit-source-contact-app-type">
+                <label for="edit-source-contact-app-handle">App Handle:</label>
+                <input type="text" id="edit-source-contact-app-handle">
+            </div>
+            <div id="edit-source-panel-group" class="source-type-panel" style="display:none;">
+                <h5>Group Details</h5>
+                <label for="edit-source-group-person">Primary Contact:</label>
+                <input type="text" id="edit-source-group-person">
+                <label for="edit-source-group-email">Group Email:</label>
+                <input type="email" id="edit-source-group-email">
+                <label for="edit-source-group-phone">Group Phone:</label>
+                <input type="tel" id="edit-source-group-phone">
+                <label for="edit-source-group-app-type">Group App:</label>
+                <input type="text" id="edit-source-group-app-type">
+                <label for="edit-source-group-app-handle">Group App Handle:</label>
+                <input type="text" id="edit-source-group-app-handle">
+            </div>
+            <div id="edit-source-panel-book" class="source-type-panel" style="display:none;">
+                <h5>Book Details</h5>
+                <label for="edit-source-book-author">Author:</label>
+                <input type="text" id="edit-source-book-author">
+                <label for="edit-source-book-isbn">ISBN:</label>
+                <input type="text" id="edit-source-book-isbn">
+                <label for="edit-source-book-websites">Websites (comma-separated):</label>
+                <input type="text" id="new-source-book-websites">
+                <label for="edit-source-book-pdfs">PDFs (comma-separated):</label>
+                <input type="text" id="edit-source-book-pdfs">
+            </div>
+            <div id="edit-source-panel-website" class="source-type-panel" style="display:none;">
+                <h5>Website Details</h5>
+                <label for="edit-source-website-websites">Relevant Links (comma-separated):</label>
+                <input type="text" id="edit-source-website-websites">
+                <label for="edit-source-website-pdfs">Saved Docs (comma-separated):</label>
+                <input type="text" id="edit-source-website-pdfs">
+            </div>
+            <div class="modal-footer">
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
     </div>
 </div>
     <script type="module" src="js/app-main.js"></script>

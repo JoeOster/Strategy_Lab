@@ -1,14 +1,9 @@
-# Task: Set up Settings Tab Content
+# Task: Fix Settings Modal Content
 
 ## Plan
 
-1.  **[x]** Read the wiring documentation for settings at `docs/wiring/settings.md`.
-2.  **[x]** Read the existing `public/_settings.html` file to understand its current structure.
-3.  **[x]** Create the main modal structure with tabs for "General", "Appearance", "Data Management", and "User Management".
-4.  **[x]** Implement the "General" settings panel with its form inputs.
-5.  **[x]** Implement the "Appearance" settings panel with its form inputs.
-6.  **[x]** Implement the "Data Management" panel, including the sub-tabs and forms for "Advice Sources" and "Exchanges".
-7.  **[x]** Implement the "User Management" panel, including the sub-tabs and forms for "Users" and "Subscriptions".
-8.  **[x]** Create the separate "Edit Source" modal structure.
-9.  **[x]** Replace the content of `public/_settings.html` with the new, combined HTML.
-10. **[x]** Record this plan in `docs/CURRENT_TASK_LOG.md`.
+1.  **[x]** Identify that `index.html` contains a placeholder settings modal, and the detailed content in `_settings.html` is not being used.
+2.  **[x]** Read the content of `public/_settings.html` and `public/index.html`.
+3.  **[x]** Replace the placeholder modal in `index.html` with the detailed modal content.
+4.  **[x]** Delete the redundant `public/_settings.html` file.
+5.  **[ ]** Commit the changes.
