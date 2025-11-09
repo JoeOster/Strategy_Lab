@@ -20,3 +20,31 @@ body {
   margin: 0;
   font-size: 2rem;
 }
+
+.main-nav {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+.nav-btn {
+    background-color: transparent;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-btn:hover {
+    background-color: #333;
+}
+
+.nav-btn.active {
+    background-color: #555;
+    color: #fff;
+    border-color: #777;
+}
