@@ -12,8 +12,13 @@ export function handleMainTabClick(event) {
 
   // Activate the clicked tab and its corresponding panel
   event.target.classList.add('active');
-  const targetPanelId = event.target.dataset.tab + '-settings-panel';
-  document.getElementById(targetPanelId).classList.add('active');
+  const targetPanelId = event.target.dataset.tab;
+  const panel = document.getElementById(targetPanelId);
+  if (panel) {
+    panel.classList.add('active');
+  } else {
+    console.error(`Settings panel not found: ${targetPanelId}`);
+  }
 }
 
 export function handleDataSubTabClick(event) {

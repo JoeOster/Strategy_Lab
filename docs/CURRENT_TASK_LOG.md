@@ -1,9 +1,8 @@
-# Task: Fix Settings Modal Content
+# Task: Fix Settings Tab Content Disappearing
 
 ## Plan
 
-1.  **[x]** Identify that `index.html` contains a placeholder settings modal, and the detailed content in `_settings.html` is not being used.
-2.  **[x]** Read the content of `public/_settings.html` and `public/index.html`.
-3.  **[x]** Replace the placeholder modal in `index.html` with the detailed modal content.
-4.  **[x]** Delete the redundant `public/_settings.html` file.
-5.  **[ ]** Commit the changes.
+1.  **[x]** Analyze user report: content disappears from settings tabs after clicking away and back.
+2.  **[x]** Identify bug in `public/js/modules/settings/handlers.js` where the `handleMainTabClick` function was creating an incorrect panel ID.
+3.  **[x]** Correct the logic to use the `data-tab` attribute directly as the panel ID.
+4.  **[ ]** Commit the fix.
