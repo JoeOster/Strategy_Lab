@@ -1,1 +1,1 @@
-console.log("Strategy Lab App Main script loaded.");
+console.log('Strategy Lab App Main script loaded.');
