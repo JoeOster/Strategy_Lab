@@ -29,4 +29,15 @@ export function initializeSettingsModule() {
   document
     .getElementById('save-settings-button')
     .addEventListener('click', handlers.handleSaveAllSettings);
+
+  // Source type dropdowns
+  const newSourceType = document.getElementById('new-source-type');
+  if (newSourceType) {
+    newSourceType.addEventListener('change', (event) => handlers.handleSourceTypeChange(event, 'new'));
+  }
+
+  const editSourceType = document.getElementById('edit-source-type');
+  if (editSourceType) {
+    editSourceType.addEventListener('change', (event) => handlers.handleSourceTypeChange(event, 'edit'));
+  }
 }

@@ -86,11 +86,32 @@ export function handleAddNewSourceSubmit(event) {
   console.log('handleAddNewSourceSubmit called (placeholder)');
   event.preventDefault();
 }
-export function handleSourceTypeChange(event, type) {
-  console.log(
-    `handleSourceTypeChange called (placeholder) for ${type}:`,
-    event.target.value
-  );
+export function handleSourceTypeChange(event, prefix) {
+  const selectedType = event.target.value;
+  const form = prefix === 'new' 
+    ? document.getElementById('add-new-source-form')
+    : document.getElementById('edit-source-form');
+
+  if (!form) {
+    console.error(`Form not found for prefix: ${prefix}`);
+    return;
+  }
+
+  console.log(`Source type changed for '${prefix}' to: ${selectedType}`);
+
+  // Hide all dynamic panels within the correct form
+  form.querySelectorAll('.source-type-panel').forEach(panel => {
+    panel.style.display = 'none';
+  });
+
+  // Show the selected panel
+  const panelId = `${prefix}-source-panel-${selectedType}`;
+  const panelToShow = form.querySelector(`#${panelId}`);
+  if (panelToShow) {
+    panelToShow.style.display = 'block';
+  } else {
+    console.error(`Panel not found with ID: ${panelId}`);
+  }
 }
 export function loadSourcesList() {
   console.log('loadSourcesList called (placeholder)');
