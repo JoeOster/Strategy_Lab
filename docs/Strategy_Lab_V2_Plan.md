@@ -24,7 +24,8 @@ To ensure consistency, quality, and resilience against context loss, all develop
 1.  **Main as Truth:** The `main` branch is the single source of truth and must always be in a stable, deployable state. Direct commits to `main` are forbidden post-setup.
 2.  **Temporary Feature Branches:** All new work (features, bug fixes) **must** be done on a temporary feature branch, created from `main` (e.g., `feature/add-settings-modal`).
 3.  **Atomic Commits:** Each logical step of a task will be committed individually. This creates a granular history and allows for easy rollbacks.
-4.  **Merge and Delete:** Once a feature is complete and verified, the branch will be merged into `main`. The feature branch will then be deleted.
+4.  **Pre-Merge Verification:** Before a branch can be merged, it must pass all automated quality checks (e.g., `npm run check`).
+5.  **Merge and Delete:** Once a feature is complete and verified, the branch will be merged into `main`. The feature branch will then be deleted.
 
 ### Task Management (The "Issue Tracker")
 
