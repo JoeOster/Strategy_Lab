@@ -13,7 +13,7 @@ export async function getDb() {
 
       // Run migrations or initial setup
       await db.exec(`
-        DROP TABLE IF EXISTS sources;
+
         CREATE TABLE IF NOT EXISTS advice_sources (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
@@ -37,6 +37,7 @@ export async function getDb() {
           website_websites TEXT,
           website_pdfs TEXT
         );
+        INSERT OR IGNORE INTO advice_sources (id, name, type, description) VALUES (1, 'Dummy Source', 'person', 'This is a dummy source for testing purposes.');
       `);
     } catch (err) {
       console.error('Error connecting to the database:', err);
