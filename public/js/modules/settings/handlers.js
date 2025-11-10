@@ -1,4 +1,5 @@
 // public/js/modules/settings/handlers.js
+import { addSource, deleteSource, getSources } from './api.js';
 
 export function handleMainTabClick(event) {
   console.log('Main tab clicked:', event.target.dataset.tab);
@@ -82,10 +83,39 @@ export function handleThemeChange(event) {
 export function handleFontChange(event) {
   console.log('handleFontChange called (placeholder)', event.target.value);
 }
-export function handleAddNewSourceSubmit(event) {
-  console.log('handleAddNewSourceSubmit called (placeholder)');
+
+export async function handleAddNewSourceSubmit(event) {
   event.preventDefault();
+  console.log('handleAddNewSourceSubmit called');
+
+  const form = event.target;
+  const formData = new FormData(form);
+  const sourceData = Object.fromEntries(formData.entries());
+
+  // The form gives us 'new-source-type' but the API expects 'type'
+  // and 'new-source-name' but API expects 'name' etc.
+  // We need to rename the keys.
+  const renamedSourceData = {};
+  for (const key in sourceData) {
+    renamedSourceData[key.replace('new-source-', '')] = sourceData[key];
+  }
+
+  try {
+    const newSource = await addSource(renamedSourceData);
+    console.log('Source added successfully:', newSource);
+    form.reset();
+    // Hide the dynamic fields again
+    const fieldsContainer = form.querySelector('#new-source-fields-container');
+    if (fieldsContainer) {
+      fieldsContainer.style.display = 'none';
+    }
+    await loadSourcesList(); // Refresh the list
+  } catch (error) {
+    console.error('Failed to add source:', error);
+    alert('Failed to add source. Please check the console for details.');
+  }
 }
+
 export function handleSourceTypeChange(event, prefix) {
   const selectedType = event.target.value;
   const form =
@@ -141,16 +171,16 @@ export function handleSourceTypeChange(event, prefix) {
   if (nameLabel) {
     switch (selectedType) {
       case 'group':
-        nameLabel.textContent = 'Group Name';
+        nameLabel.textContent = 'Group Name:';
         break;
       case 'book':
-        nameLabel.textContent = 'Title';
+        nameLabel.textContent = 'Title:';
         break;
       case 'website':
-        nameLabel.textContent = 'Website URL';
+        nameLabel.textContent = 'Website:';
         break;
       default:
-        nameLabel.textContent = 'Name';
+        nameLabel.textContent = 'Name:';
         break;
     }
   }
@@ -175,21 +205,70 @@ export function handleSourceTypeChange(event, prefix) {
     }
   }
 }
-export function loadSourcesList() {
-  console.log('loadSourcesList called (placeholder)');
+
+export async function loadSourcesList() {
+  console.log('loadSourcesList called');
+  try {
+    const sources = await getSources();
+    const listContainer = document.getElementById('advice-source-list');
+    if (!listContainer) {
+      console.error('Source list container not found!');
+      return;
+    }
+    listContainer.innerHTML = ''; // Clear existing list
+
+    if (sources.length === 0) {
+      listContainer.innerHTML = '<p>No advice sources found.</p>';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'sources-list';
+
+    sources.forEach((source) => {
+      const li = document.createElement('li');
+      li.className = 'sources-list-item';
+      li.innerHTML = `
+        <span>${source.name} (${source.type})</span>
+        <button class="delete-source-btn" data-id="${source.id}">Delete</button>
+      `;
+      ul.appendChild(li);
+    });
+
+    listContainer.appendChild(ul);
+  } catch (error) {
+    console.error('Failed to load sources list:', error);
+    const listContainer = document.getElementById('sources-list-container');
+    if (listContainer) {
+      listContainer.innerHTML =
+        '<p class="error">Error loading sources. Please try again.</p>';
+    }
+  }
 }
+
 export function handleEditSourceClick(sourceId) {
   console.log(
     'handleEditSourceClick called (placeholder) for sourceId:',
     sourceId
   );
 }
-export function handleDeleteSourceClick(sourceId) {
-  console.log(
-    'handleDeleteSourceClick called (placeholder) for sourceId:',
-    sourceId
-  );
+
+export async function handleDeleteSourceClick(sourceId) {
+  console.log('handleDeleteSourceClick called for sourceId:', sourceId);
+  if (!confirm('Are you sure you want to delete this source?')) {
+    return;
+  }
+
+  try {
+    await deleteSource(sourceId);
+    // Refresh the list to show the source has been removed
+    await loadSourcesList();
+  } catch (error) {
+    console.error(`Failed to delete source with ID ${sourceId}:`, error);
+    alert('Failed to delete source. Please check the console for details.');
+  }
 }
+
 export function handleAddExchangeSubmit(event) {
   console.log('handleAddExchangeSubmit called (placeholder)');
   event.preventDefault();

@@ -36,6 +36,8 @@ export function initializeSettingsModule() {
     newSourceType.addEventListener('change', (event) =>
       handlers.handleSourceTypeChange(event, 'new')
     );
+    // Trigger once to set initial state
+    handlers.handleSourceTypeChange({ target: newSourceType }, 'new');
   }
 
   const editSourceType = document.getElementById('edit-source-type');
@@ -44,4 +46,27 @@ export function initializeSettingsModule() {
       handlers.handleSourceTypeChange(event, 'edit')
     );
   }
+
+  // Add new source form submission
+  const addNewSourceForm = document.getElementById('add-new-source-form');
+  if (addNewSourceForm) {
+    addNewSourceForm.addEventListener(
+      'submit',
+      handlers.handleAddNewSourceSubmit
+    );
+  }
+
+  // Event delegation for deleting sources
+  const sourcesContainer = document.getElementById('advice-source-list');
+  if (sourcesContainer) {
+    sourcesContainer.addEventListener('click', (event) => {
+      if (event.target.classList.contains('delete-source-btn')) {
+        const sourceId = event.target.dataset.id;
+        handlers.handleDeleteSourceClick(sourceId);
+      }
+    });
+  }
+
+  // Initial load of the sources list
+  handlers.loadSourcesList();
 }

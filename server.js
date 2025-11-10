@@ -1,11 +1,145 @@
-const express = require('express');
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import express from 'express';
+import { getDb } from './services/database.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// API route to get all sources
+app.get('/api/sources', async (req, res) => {
+  try {
+    const db = await getDb();
+    const sources = await db.all('SELECT * FROM advice_sources ORDER BY name');
+    res.json(sources);
+  } catch (err) {
+    console.error('Failed to get sources:', err);
+    res.status(500).json({ error: 'Failed to get sources' });
+  }
+});
+
+// API route to add a new source
+app.post('/api/sources', async (req, res) => {
+  try {
+    const db = await getDb();
+    const {
+      name,
+      type,
+      url,
+      description,
+      image_path,
+      person_email,
+      person_phone,
+      person_app_type,
+      person_app_handle,
+      group_primary_contact,
+      group_email,
+      group_phone,
+      group_app_type,
+      group_app_handle,
+      book_author,
+      book_isbn,
+      book_websites,
+      book_pdfs,
+      website_websites,
+      website_pdfs,
+    } = req.body;
+
+    // The column names in the table
+    const columns = [
+      'name',
+      'type',
+      'url',
+      'description',
+      'image_path',
+      'person_email',
+      'person_phone',
+      'person_app_type',
+      'person_app_handle',
+      'group_primary_contact',
+      'group_email',
+      'group_phone',
+      'group_app_type',
+      'group_app_handle',
+      'book_author',
+      'book_isbn',
+      'book_websites',
+      'book_pdfs',
+      'website_websites',
+      'website_pdfs',
+    ];
+
+    // The values from the request body
+    const values = [
+      name,
+      type,
+      url,
+      description,
+      image_path,
+      person_email,
+      person_phone,
+      person_app_type,
+      person_app_handle,
+      group_primary_contact,
+      group_email,
+      group_phone,
+      group_app_type,
+      group_app_handle,
+      book_author,
+      book_isbn,
+      book_websites,
+      book_pdfs,
+      website_websites,
+      website_pdfs,
+    ];
+
+    const sql = `INSERT INTO advice_sources (${columns.join(
+      ', '
+    )}) VALUES (${columns.map(() => '?').join(', ')})`;
+
+    const result = await db.run(sql, values);
+
+    // Get the newly created source
+    const newSource = await db.get(
+      'SELECT * FROM advice_sources WHERE id = ?',
+      result.lastID
+    );
+
+    res.status(201).json(newSource);
+  } catch (err) {
+    console.error('Failed to add source:', err);
+    res.status(500).json({ error: 'Failed to add source' });
+  }
+});
+
+// API route to delete a source
+app.delete('/api/sources/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+
+    const result = await db.run('DELETE FROM advice_sources WHERE id = ?', id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Source not found' });
+    }
+
+    res.status(204).send();
+  } catch (err) {
+    console.error('Failed to delete source:', err);
+    res.status(500).json({ error: 'Failed to delete source' });
+  }
+});
 
 // Catch-all for HTML5 pushState routing
 app.use((req, res) => {
