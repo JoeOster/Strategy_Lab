@@ -55,7 +55,7 @@ Handles the sub-tabs for Data Management.
 | Element ID / Selector            | Purpose (Human-Readable)                         | Handler Function (for GCA)               |
 | :------------------------------- | :----------------------------------------------- | :--------------------------------------- |
 | `#add-new-source-form`           | Form to add a new advice source.                 | `handleAddNewSourceSubmit(event)`        |
-| `#new-source-name`               | Input: Source Name                               | (Managed by form submit)                 |
+| `#new-source-name`               | Input: Source Name (label changes dynamically)   | (Managed by form submit)                 |
 | `#new-source-type`               | Input: Selects source type (Person, Book, etc.). | `handleSourceTypeChange(event, 'new')`   |
 | `#new-source-url`                | Input: URL (Optional)                            | (Managed by form submit)                 |
 | `#new-source-description`        | Input: Description (Optional)                    | (Managed by form submit)                 |
@@ -133,7 +133,7 @@ This is a separate modal, triggered by `handleEditSourceClick()`.
 | `#edit-source-modal`              | The "Edit Source" modal container.               | `openEditSourceModal(sourceId)`          |
 | `#edit-source-form`               | Form to edit an existing source.                 | `handleEditSourceSubmit(event)`          |
 | `#edit-source-id`                 | Hidden Input: The ID of the source being edited. | (Populated by `openEditSourceModal`)     |
-| `#edit-source-name`               | Input: Source Name                               | (Loaded by `openEditSourceModal`)        |
+| `#edit-source-name`               | Input: Source Name (label changes dynamically)   | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-type`               | Input: Selects source type.                      | `handleSourceTypeChange(event, 'edit')`  |
 | `#edit-source-url`                | Input: URL (Optional)                            | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-description`        | Input: Description (Optional)                    | (Loaded by `openEditSourceModal`)        |

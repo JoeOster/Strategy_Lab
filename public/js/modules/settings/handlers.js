@@ -88,29 +88,91 @@ export function handleAddNewSourceSubmit(event) {
 }
 export function handleSourceTypeChange(event, prefix) {
   const selectedType = event.target.value;
-  const form = prefix === 'new' 
-    ? document.getElementById('add-new-source-form')
-    : document.getElementById('edit-source-form');
+  const form =
+    prefix === 'new'
+      ? document.getElementById('add-new-source-form')
+      : document.getElementById('edit-source-form');
 
   if (!form) {
     console.error(`Form not found for prefix: ${prefix}`);
     return;
   }
 
-  console.log(`Source type changed for '${prefix}' to: ${selectedType}`);
+  const fieldsContainer = form.querySelector(
+    `#${prefix}-source-fields-container`
+  );
+  if (fieldsContainer) {
+    fieldsContainer.style.display = 'block';
+  }
 
-  // Hide all dynamic panels within the correct form
-  form.querySelectorAll('.source-type-panel').forEach(panel => {
+  const sourceFieldConfig = {
+    person: {
+      common: ['name', 'description', 'image-path'],
+      panel: 'person',
+    },
+    group: {
+      common: ['name', 'description', 'image-path'],
+      panel: 'group',
+    },
+    book: {
+      common: ['name', 'description', 'image-path'],
+      panel: 'book',
+    },
+    website: {
+      common: ['name', 'url', 'description', 'image-path'],
+      panel: 'website',
+    },
+  };
+
+  // Hide all common fields first
+  ['name', 'url', 'description', 'image-path'].forEach((field) => {
+    const wrapper = form.querySelector(`#${prefix}-source-${field}-wrapper`);
+    if (wrapper) {
+      wrapper.style.display = 'none';
+    }
+  });
+
+  // Hide all dynamic panels
+  form.querySelectorAll('.source-type-panel').forEach((panel) => {
     panel.style.display = 'none';
   });
 
-  // Show the selected panel
-  const panelId = `${prefix}-source-panel-${selectedType}`;
-  const panelToShow = form.querySelector(`#${panelId}`);
-  if (panelToShow) {
-    panelToShow.style.display = 'block';
-  } else {
-    console.error(`Panel not found with ID: ${panelId}`);
+  const nameLabel = form.querySelector(`label[for="${prefix}-source-name"]`);
+  if (nameLabel) {
+    switch (selectedType) {
+      case 'group':
+        nameLabel.textContent = 'Group Name';
+        break;
+      case 'book':
+        nameLabel.textContent = 'Title';
+        break;
+      case 'website':
+        nameLabel.textContent = 'Website URL';
+        break;
+      default:
+        nameLabel.textContent = 'Name';
+        break;
+    }
+  }
+
+  if (selectedType && sourceFieldConfig[selectedType]) {
+    const config = sourceFieldConfig[selectedType];
+
+    // Show configured common fields
+    config.common.forEach((field) => {
+      const wrapper = form.querySelector(`#${prefix}-source-${field}-wrapper`);
+      if (wrapper) {
+        wrapper.style.display = 'block';
+      }
+    });
+
+    // Show the configured panel
+    const panelToShow = form.querySelector(
+      `#${prefix}-source-panel-${config.panel}`
+    );
+    if (panelToShow) {
+      panelToShow.style.display = 'block';
+    }
   }
 }
 export function loadSourcesList() {
