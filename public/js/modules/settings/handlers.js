@@ -4,12 +4,12 @@ import { addSource, deleteSource, getSources } from './api.js';
 export function handleMainTabClick(event) {
   console.log('Main tab clicked:', event.target.dataset.tab);
   // Deactivate all main tabs and panels
-  document
-    .querySelectorAll('.settings-tab')
-    .forEach((tab) => tab.classList.remove('active'));
-  document
-    .querySelectorAll('.settings-panel')
-    .forEach((panel) => panel.classList.remove('active'));
+  for (const tab of document.querySelectorAll('.settings-tab')) {
+    tab.classList.remove('active');
+  }
+  for (const panel of document.querySelectorAll('.settings-panel')) {
+    panel.classList.remove('active');
+  }
 
   // Activate the clicked tab and its corresponding panel
   event.target.classList.add('active');
@@ -25,28 +25,31 @@ export function handleMainTabClick(event) {
 export function handleDataSubTabClick(event) {
   console.log('Data sub-tab clicked:', event.target.dataset.subTab);
   // Deactivate all data sub-tabs and panels
-  document
-    .querySelectorAll('.data-sub-tab')
-    .forEach((tab) => tab.classList.remove('active'));
-  document
-    .querySelectorAll('#data-management-settings-panel .sub-panel')
-    .forEach((panel) => panel.classList.remove('active'));
-
+  for (const tab of document.querySelectorAll('.data-sub-tab')) {
+    tab.classList.remove('active');
+  }
   // Activate the clicked sub-tab and its corresponding panel
   event.target.classList.add('active');
   const targetPanelId = event.target.dataset.subTab;
   document.getElementById(targetPanelId).classList.add('active');
+
+  // If the Advice Sources panel is activated, load the sources list
+  if (targetPanelId === 'advice-sources-panel') {
+    loadSourcesList();
+  }
 }
 
 export function handleUserSubTabClick(event) {
   console.log('User sub-tab clicked:', event.target.dataset.subTab);
   // Deactivate all user sub-tabs and panels
-  document
-    .querySelectorAll('.user-sub-tab')
-    .forEach((tab) => tab.classList.remove('active'));
-  document
-    .querySelectorAll('#user-management-settings-panel .sub-panel')
-    .forEach((panel) => panel.classList.remove('active'));
+  for (const tab of document.querySelectorAll('.user-sub-tab')) {
+    tab.classList.remove('active');
+  }
+  for (const panel of document.querySelectorAll(
+    '#user-management-settings-panel .sub-panel'
+  )) {
+    panel.classList.remove('active');
+  }
 
   // Activate the clicked sub-tab and its corresponding panel
   event.target.classList.add('active');
@@ -155,17 +158,17 @@ export function handleSourceTypeChange(event, prefix) {
   };
 
   // Hide all common fields first
-  ['name', 'url', 'description', 'image-path'].forEach((field) => {
+  for (const field of ['name', 'url', 'description', 'image-path']) {
     const wrapper = form.querySelector(`#${prefix}-source-${field}-wrapper`);
     if (wrapper) {
       wrapper.style.display = 'none';
     }
-  });
+  }
 
   // Hide all dynamic panels
-  form.querySelectorAll('.source-type-panel').forEach((panel) => {
+  for (const panel of form.querySelectorAll('.source-type-panel')) {
     panel.style.display = 'none';
-  });
+  }
 
   const nameLabel = form.querySelector(`label[for="${prefix}-source-name"]`);
   if (nameLabel) {
@@ -189,12 +192,12 @@ export function handleSourceTypeChange(event, prefix) {
     const config = sourceFieldConfig[selectedType];
 
     // Show configured common fields
-    config.common.forEach((field) => {
+    for (const field of config.common) {
       const wrapper = form.querySelector(`#${prefix}-source-${field}-wrapper`);
       if (wrapper) {
         wrapper.style.display = 'block';
       }
-    });
+    }
 
     // Show the configured panel
     const panelToShow = form.querySelector(
@@ -225,7 +228,7 @@ export async function loadSourcesList() {
     const ul = document.createElement('ul');
     ul.className = 'sources-list';
 
-    sources.forEach((source) => {
+    for (const source of sources) {
       const li = document.createElement('li');
       li.className = 'sources-list-item';
       li.innerHTML = `
@@ -233,7 +236,7 @@ export async function loadSourcesList() {
         <button class="delete-source-btn" data-id="${source.id}">Delete</button>
       `;
       ul.appendChild(li);
-    });
+    }
 
     listContainer.appendChild(ul);
   } catch (error) {

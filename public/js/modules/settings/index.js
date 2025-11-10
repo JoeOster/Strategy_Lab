@@ -6,24 +6,32 @@ export function initializeSettingsModule() {
   console.log('Settings module initialized.');
 
   // Main tab navigation
-  document.querySelectorAll('.settings-tab').forEach((button) => {
+  for (const button of document.querySelectorAll('.settings-tab')) {
     button.addEventListener('click', handlers.handleMainTabClick);
-  });
+  }
 
   // Data Management sub-tab navigation
-  document.querySelectorAll('.data-sub-tab').forEach((button) => {
+  for (const button of document.querySelectorAll('.data-sub-tab')) {
     button.addEventListener('click', handlers.handleDataSubTabClick);
-  });
+  }
 
   // User Management sub-tab navigation
-  document.querySelectorAll('.user-sub-tab').forEach((button) => {
+  for (const button of document.querySelectorAll('.user-sub-tab')) {
     button.addEventListener('click', handlers.handleUserSubTabClick);
-  });
+  }
 
   // Close button
-  document
-    .querySelector('.close-button')
-    .addEventListener('click', handlers.handleCloseModal);
+  const settingsModal = document.getElementById('settings-modal');
+  if (settingsModal) {
+    const closeButton = settingsModal.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', handlers.handleCloseModal);
+    } else {
+      console.error('Close button not found within settings modal.');
+    }
+  } else {
+    console.error('Settings modal not found.');
+  }
 
   // Save settings button
   document
