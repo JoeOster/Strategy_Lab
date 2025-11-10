@@ -4,7 +4,7 @@ This document is the "contract" for all UI interactions, as defined in our `Stra
 
 ## Module A: Settings (Modal)
 
-This module is a "conductor" that controls several sub-modules. The HTML blueprint is `_modal_settings.html`.
+This module is a "conductor" that controls several sub-modules. The HTML blueprint is `public/index.html`.
 
 ### A1: Main Modal Conductor
 
@@ -55,6 +55,7 @@ Handles the sub-tabs for Data Management.
 | Element ID / Selector            | Purpose (Human-Readable)                         | Handler Function (for GCA)               |
 | :------------------------------- | :----------------------------------------------- | :--------------------------------------- |
 | `#add-new-source-form`           | Form to add a new advice source.                 | `handleAddNewSourceSubmit(event)`        |
+| **Backend API:** `POST /api/sources` (expects JSON body matching `advice_sources` table schema) |
 | `#new-source-name`               | Input: Source Name (label changes dynamically)   | (Managed by form submit)                 |
 | `#new-source-type`               | Input: Selects source type (Person, Book, etc.). | `handleSourceTypeChange(event, 'new')`   |
 | `#new-source-url`                | Input: URL (Optional)                            | (Managed by form submit)                 |
@@ -82,6 +83,35 @@ Handles the sub-tabs for Data Management.
 | `#advice-source-list`            | Container: List of all existing sources.         | `loadSourcesList()`                      |
 | `(list item button)`             | (Dynamic) Button to edit a source.               | `handleEditSourceClick(sourceId)`        |
 | `(list item button)`             | (Dynamic) Button to delete a source.             | `handleDeleteSourceClick(sourceId)`      |
+| **Note:** The `handleSourceTypeChange` function should be called on initial load (e.g., when the settings modal opens or the "Advice Sources" sub-tab is activated) to ensure the correct dynamic fields are displayed based on the default or previously selected source type. |
+
+#### Database Schema: `advice_sources` table
+```sql
+CREATE TABLE IF NOT EXISTS advice_sources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  url TEXT,
+  description TEXT,
+  image_path TEXT,
+  person_email TEXT,
+  person_phone TEXT,
+  person_app_type TEXT,
+  person_app_handle TEXT,
+  group_primary_contact TEXT,
+  group_email TEXT,
+  group_phone TEXT,
+  group_app_type TEXT,
+  group_app_handle TEXT,
+  book_author TEXT,
+  book_isbn TEXT,
+  book_websites TEXT,
+  book_pdfs TEXT,
+  website_websites TEXT,
+  website_pdfs TEXT
+);
+```
+
 
 #### A4.2: Exchanges Sub-Module
 
@@ -132,6 +162,8 @@ This is a separate modal, triggered by `handleEditSourceClick()`.
 | :-------------------------------- | :----------------------------------------------- | :--------------------------------------- |
 | `#edit-source-modal`              | The "Edit Source" modal container.               | `openEditSourceModal(sourceId)`          |
 | `#edit-source-form`               | Form to edit an existing source.                 | `handleEditSourceSubmit(event)`          |
+| **Backend API:** `PUT /api/sources/:id` (expects JSON body matching `advice_sources` table schema) |
+| **Backend API:** `PUT /api/sources/:id` (expects JSON body matching `advice_sources` table schema) |
 | `#edit-source-id`                 | Hidden Input: The ID of the source being edited. | (Populated by `openEditSourceModal`)     |
 | `#edit-source-name`               | Input: Source Name (label changes dynamically)   | (Loaded by `openEditSourceModal`)        |
 | `#edit-source-type`               | Input: Selects source type.                      | `handleSourceTypeChange(event, 'edit')`  |
