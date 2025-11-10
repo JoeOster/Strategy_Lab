@@ -24,7 +24,9 @@ app.get('/api/sources', async (req, res) => {
     res.json(sources);
   } catch (err) {
     console.error('Failed to get sources:', err);
-    res.status(500).json({ error: 'Failed to get sources' });
+    res
+      .status(500)
+      .json({ error: 'Failed to get sources', details: err.message });
   }
 });
 
@@ -79,7 +81,103 @@ app.post('/api/sources', async (req, res) => {
       'website_pdfs',
     ];
 
-    // The values from the request body
+    // The values from the request body, ensuring undefined values are converted to null
+    const values = columns.map((col) => {
+      const value = req.body[col];
+      return value !== undefined ? value : null;
+    });
+
+    const sql = `INSERT INTO advice_sources (${columns.join(
+      ', '
+    )}) VALUES (${columns.map(() => '?').join(', ')})`;
+
+    const result = await db.run(sql, values);
+
+    // Get the newly created source
+    const newSource = await db.get(
+      'SELECT * FROM advice_sources WHERE id = ?',
+      result.lastID
+    );
+
+    res.status(201).json(newSource);
+  } catch (err) {
+    console.error('Failed to add source:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to add source', details: err.message });
+  }
+});
+
+// API route to get a single source by ID
+app.get('/api/sources/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const source = await db.get(
+      'SELECT * FROM advice_sources WHERE id = ?',
+      id
+    );
+    if (!source) {
+      return res.status(404).json({ error: 'Source not found' });
+    }
+    res.json(source);
+  } catch (err) {
+    console.error(`Failed to get source with ID ${req.params.id}:`, err);
+    res.status(500).json({ error: 'Failed to get source' });
+  }
+});
+
+// API route to update a source
+app.put('/api/sources/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const {
+      name,
+      type,
+      url,
+      description,
+      image_path,
+      person_email,
+      person_phone,
+      person_app_type,
+      person_app_handle,
+      group_primary_contact,
+      group_email,
+      group_phone,
+      group_app_type,
+      group_app_handle,
+      book_author,
+      book_isbn,
+      book_websites,
+      book_pdfs,
+      website_websites,
+      website_pdfs,
+    } = req.body;
+
+    const columns = [
+      'name',
+      'type',
+      'url',
+      'description',
+      'image_path',
+      'person_email',
+      'person_phone',
+      'person_app_type',
+      'person_app_handle',
+      'group_primary_contact',
+      'group_email',
+      'group_phone',
+      'group_app_type',
+      'group_app_handle',
+      'book_author',
+      'book_isbn',
+      'book_websites',
+      'book_pdfs',
+      'website_websites',
+      'website_pdfs',
+    ];
+
     const values = [
       name,
       type,
@@ -101,24 +199,28 @@ app.post('/api/sources', async (req, res) => {
       book_pdfs,
       website_websites,
       website_pdfs,
+      id, // ID for the WHERE clause
     ];
 
-    const sql = `INSERT INTO advice_sources (${columns.join(
-      ', '
-    )}) VALUES (${columns.map(() => '?').join(', ')})`;
+    const setClauses = columns.map((col) => `${col} = ?`).join(', ');
+    const sql = `UPDATE advice_sources SET ${setClauses} WHERE id = ?`;
 
     const result = await db.run(sql, values);
 
-    // Get the newly created source
-    const newSource = await db.get(
-      'SELECT * FROM advice_sources WHERE id = ?',
-      result.lastID
-    );
+    if (result.changes === 0) {
+      return res
+        .status(404)
+        .json({ error: 'Source not found or no changes made' });
+    }
 
-    res.status(201).json(newSource);
+    const updatedSource = await db.get(
+      'SELECT * FROM advice_sources WHERE id = ?',
+      id
+    );
+    res.json(updatedSource);
   } catch (err) {
-    console.error('Failed to add source:', err);
-    res.status(500).json({ error: 'Failed to add source' });
+    console.error(`Failed to update source with ID ${req.params.id}:`, err);
+    res.status(500).json({ error: 'Failed to update source' });
   }
 });
 
