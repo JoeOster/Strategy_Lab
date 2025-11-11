@@ -1,0 +1,12 @@
+node_modules
+log
+package.json
+package-lock.json
+
+# Let Biome handle all code and config files
+*.js
+*.mjs
+*.ts
+*.tsx
+*.jsx
+*.json

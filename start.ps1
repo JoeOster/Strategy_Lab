@@ -3,7 +3,7 @@ param (
     [switch]$rm,
     [switch]$skipChecks
 )
-
+$OutputEncoding = [System.Text.Encoding]::UTF8
 # --- Define Log Paths and Clean Previous Log ---
 $logDir = "$PSScriptRoot\log"
 $termLogFile = "$logDir\term.log"
@@ -15,10 +15,17 @@ if (-not (Test-Path $logDir)) {
     New-Item -Path $logDir -ItemType Directory -Force | Out-Null
 }
 
-# Clear previous term log if it exists
+# --- UPDATED: Clear ALL previous logs ---
 if (Test-Path $termLogFile) {
     Remove-Item $termLogFile -ErrorAction SilentlyContinue
 }
+if (Test-Path $serverStdoutFile) {
+    Remove-Item $serverStdoutFile -ErrorAction SilentlyContinue
+}
+if (Test-Path $serverStderrFile) {
+    Remove-Item $serverStderrFile -ErrorAction SilentlyContinue
+}
+# --- END UPDATED ---
 
 # Redirect all subsequent output to term.log
 function Write-Log {
@@ -26,8 +33,6 @@ function Write-Log {
     Write-Host $Message
     $Message | Out-File -FilePath $termLogFile -Append
 }
-
-
 
 # --- Define Log Paths and Clean Previous Log ---
 $filteredLogFile = "$logDir\frontend-session.log"
@@ -62,25 +67,44 @@ if (Test-Path $dbFile) {
 
 if (-not (Test-Path "node_modules")) {
     Write-Log "Node modules not found. Running 'npm install'..."
-    npm install *>&1 | Write-Log
+    npm install *>&1 | Tee-Object -FilePath $termLogFile -Append # Use Tee
 }
 
-# --- UPDATED QUALITY CHECKS ---
+# --- UPDATED QUALITY CHECKS (Visible Output + Fail Check) ---
 if (-not $skipChecks) {
     Clear-Host
     Write-Log "Running Biome to format and lint all files..."
-    npm run fix *>&1 | Write-Log  # This runs 'biome check --apply .'
+    # Use Tee-Object to see output in real-time AND log it
+    npm run fix *>&1 | Tee-Object -FilePath $termLogFile -Append
+    Write-Log "Checking for any remaining Biome errors..."
+    
+    # Run the check and also tee the output
+    npm run check *>&1 | Tee-Object -FilePath $termLogFile -Append
+    
+    # Check the exit code of the last command
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host ""
+        Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
+        Write-Host "!!! Biome check FAILED. Please fix the errors above. !!!" -ForegroundColor Red
+        Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
+        Write-Log "Biome check FAILED. Stopping script."
+        Read-Host -Prompt "Press Enter to exit"
+        return # Exit the script
+    }
+    
+    Write-Log "Biome checks passed. Continuing..."
+    Start-Sleep -Seconds 2 # Give a moment to read the "passed" message
     Clear-Host
-    Write-Log "Verifying Biome checks..."
-    npm run check *>&1 | Write-Log # This runs 'biome check .'
 } else {
     Clear-Host
 }
 # --- END UPDATED BLOCK ---
 
-Write-Log "Starting 'node server.js' as a background process..."
-$serverProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $serverStdoutFile -RedirectStandardError $serverStderrFile
+# --- UPDATED: Start server with 'npm run dev' (which uses --watch) ---
+Write-Log "Starting 'npm run dev' as a background process..."
+$serverProcess = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $serverStdoutFile -RedirectStandardError $serverStderrFile
 $serverPid = $serverProcess.Id
+# --- END UPDATED ---
 
 Write-Log "Server job 'DevServer' started."
 
@@ -108,10 +132,14 @@ if (-not $serverReady) {
     return # Exit the script
 }
 
-# --- Browser Launch and Log Setup ---
+# --- Browser Launch and Log Setup (NEW FIX for 2-TABS) ---
 $edgePath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 $edgeProfileDir = "$env:TEMP\edge_profile"
 $edgeLogFile = "$edgeProfileDir\chrome_debug.log"
+
+Write-Log "Wiping old Edge temporary profile to ensure a clean session..."
+Remove-Item -Path $edgeProfileDir -Recurse -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 500 # Give OS a moment to release file handles
 
 if (Test-Path $edgeLogFile) {
     Write-Log "Removing old browser log file..."
@@ -122,8 +150,15 @@ $edgeArgs = @(
     "--remote-debugging-port=9222",
     "--user-data-dir=`"$edgeProfileDir`"",
     "--enable-logging",
-    "--v=1"
+    "--v=1",
+    "--disable-features=StartupBoost" # Prevents "zombie" processes
+    "--no-first-run",                  # <-- ADDED: Skips the setup screen
+    "--no-default-browser-check"       # <-- ADDED: Skips the "make default browser" popup
+    "--disable-account-consistency"    # <-- ADDED: Stops auto-sign-in popups
+    "--disable-sync",                  # <-- ADDED: Disables all sync functionality
+    "--disable-features=AutomaticSignIn" # <-- ADDED: Disables "sign in with this account?"
 )
+
 
 Write-Log "Launching Edge. The script will wait for you to close the browser."
 Write-Log "Browser console logs will be saved to: $edgeLogFile"
@@ -158,32 +193,9 @@ if (Test-Path $edgeLogFile) {
     Write-Log "Could not find log file to filter: $edgeLogFile"
 }
 
-# 2. Stop the dev server
-Write-Log "Stopping 'DevServer' background job..."
-    # Attempt to stop the server process if it started
-    if ($serverPid) {
-        # Attempt to gracefully terminate the Node.js server by sending a SIGINT-like signal
-        # This allows the Node.js process to execute its shutdown hooks (e.g., stopCronJobs)
-        try {
-            # On Windows, taskkill without /F can send a termination signal that Node.js can catch
-            taskkill /PID ${serverPid} /F | Out-Null
-            Write-Log "Sent forceful termination signal to server process ${serverPid}."
-            # Wait for the process to actually exit
-        try {
-            Wait-Process -Id $serverPid -Timeout 30 # Wait up to 30 seconds for graceful shutdown
-            Write-Log "Server process ${serverPid} has exited."
-        } catch [System.Diagnostics.ProcessCommandException] {
-            Write-Log "Server process ${serverPid} was already terminated or exited before Wait-Process could attach."
-        } catch {
-            Write-Log "An unexpected error occurred while waiting for server process ${serverPid} to exit: $_"
-        }
-        } catch {
-            Write-Log "Failed to send termination signal to server process ${serverPid}: $_"
-            # Fallback to forceful termination if graceful fails
-            Stop-Process -Id $serverPid -Force -ErrorAction SilentlyContinue
-            Write-Log "Forcefully stopped server process $serverPid."
-        }
-    }
+
+    # --- END UPDATED ---
+
 Write-Log "Server job stopped."
 
 # Append server logs to term.log

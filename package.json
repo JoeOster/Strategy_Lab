@@ -6,9 +6,15 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "playwright test",
-    "check": "biome check .",
-    "fix": "biome check --apply ."
+    "dev": "node --watch server.js",
+    "test": "npm run test:e2e >log/npm_e2e.log",
+    "test:e2e": "playwright test",
+    "check:biome": "biome check .",
+    "check:md": "eslint . --ext .md && prettier --check \"**/*.md\"",
+    "check": "npm run check:biome && npm run check:md",
+    "fix:biome": "biome check --write .",
+    "fix:md": "eslint . --ext .md --fix && prettier --write \"**/*.md\"",
+    "fix": "npm run fix:biome && npm run fix:md"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +23,14 @@
     "@biomejs/biome": "^1.8.3",
     "@playwright/test": "^1.56.1",
     "@types/node": "^24.10.0",
-    "live-server": "^1.2.0"
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-markdown": "^5.1.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "cross-env": "^7.0.3",
+    "live-server": "^1.2.0",
+    "playwright": "^1.56.1",
+    "prettier": "^3.6.2"
   },
   "dependencies": {
     "@tanstack/query-core": "^5.51.1",
@@ -25,7 +38,6 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
-    "playwright": "^1.56.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "zustand": "^4.5.4"
