@@ -95,6 +95,7 @@ the relevant `load...List()` functions for those panels.
 the appropriate data loading functions for each settings panel. For example:
 
 ```javascript
+/* eslint-disable */
 export function handleMainTabClick(event) {
   // ... (existing code for tab/panel activation) ...
 
@@ -115,6 +116,7 @@ export function handleMainTabClick(event) {
     console.error(`Settings panel not found: ${targetPanelId}`);
   }
 }
+/* eslint-enable */
 ```
 
 By ensuring these `load...List()` calls are present, the content for each tab
