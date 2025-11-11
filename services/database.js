@@ -1,9 +1,9 @@
+import fsSync from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
-import fs from 'node:fs/promises';
-import fsSync from 'node:fs';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -82,14 +82,18 @@ export async function clearDb() {
         return; // Success, exit function
       } catch (err) {
         if (err.code === 'EBUSY' && process.platform === 'win32') {
-          console.warn(`Attempt ${retries + 1} to unlink database failed (EBUSY). Retrying...`);
-          await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
+          console.warn(
+            `Attempt ${retries + 1} to unlink database failed (EBUSY). Retrying...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms
           retries++;
         } else {
           throw err; // Re-throw other errors
         }
       }
     }
-    throw new Error(`Failed to unlink database after ${maxRetries} retries: ${dbPath}`);
+    throw new Error(
+      `Failed to unlink database after ${maxRetries} retries: ${dbPath}`
+    );
   }
 }

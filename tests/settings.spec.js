@@ -44,7 +44,9 @@ test.describe('Settings Module - Advice Sources', () => {
     // Clean up: Delete the added source
     await page.locator('.delete-source-btn[data-id]').first().click();
     await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
-    await expect(page.locator(`li:has-text("${sourceName} (person)")`)).not.toBeAttached();
+    await expect(
+      page.locator(`li:has-text("${sourceName} (person)")`)
+    ).not.toBeAttached();
     await expect(page.locator('#advice-source-list')).not.toContainText(
       `${sourceName} (person)`
     );
@@ -73,7 +75,9 @@ test.describe('Settings Module - Advice Sources', () => {
     // Clean up: Delete the added source
     await page.locator('.delete-source-btn[data-id]').first().click();
     await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
-    await expect(page.locator(`li:has-text("${sourceTitle} (book)")`)).not.toBeAttached();
+    await expect(
+      page.locator(`li:has-text("${sourceTitle} (book)")`)
+    ).not.toBeAttached();
     await expect(page.locator('#advice-source-list')).not.toContainText(
       `${sourceTitle} (book)`
     );
@@ -97,8 +101,12 @@ test.describe('Settings Module - Advice Sources', () => {
     await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
 
     // Assert source is deleted
-    await expect(page.locator(`text=${sourceName} (person)`)).not.toBeAttached();
-    await expect(page.locator(`li:has-text("${sourceName} (person)")`)).not.toBeAttached();
+    await expect(
+      page.locator(`text=${sourceName} (person)`)
+    ).not.toBeAttached();
+    await expect(
+      page.locator(`li:has-text("${sourceName} (person)")`)
+    ).not.toBeAttached();
     await expect(page.locator('#advice-source-list')).not.toContainText(
       `${sourceName} (person)`
     );

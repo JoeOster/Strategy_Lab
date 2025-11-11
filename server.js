@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
-import { getDb, clearDb } from './services/database.js'; // Import clearDb
+import { clearDb, getDb } from './services/database.js'; // Import clearDb
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -186,7 +186,9 @@ if (process.env.TEST_ENV) {
       res.status(200).json({ message: 'Database cleared successfully.' });
     } catch (err) {
       console.error('Failed to clear database:', err);
-      res.status(500).json({ error: 'Failed to clear database', details: err.message });
+      res
+        .status(500)
+        .json({ error: 'Failed to clear database', details: err.message });
     }
   });
 }

@@ -60,7 +60,8 @@ export default defineConfig({
     //    to pipe the output to your log files.
     // 3. We DO NOT add '&' or 'wait-on'. Playwright will run this command
     //    in the foreground and manage it.
-    command: 'cross-env PORT=3113 TEST_ENV=true node server.js > log/playwright_server_stdout.log 2> log/playwright_server_stderr.log',
+    command:
+      'cross-env PORT=3113 TEST_ENV=true node server.js > log/playwright_server_stdout.log 2> log/playwright_server_stderr.log',
 
     // Playwright will use this URL to poll the server.
     // This replaces the need for 'wait-on'.
