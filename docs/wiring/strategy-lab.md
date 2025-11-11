@@ -2,7 +2,10 @@
 
 # Module E: Strategy Lab (Tab)
 
-This document is the "contract" for all UI interactions for **Module E: Strategy Lab**, as defined in our `Strategy_Lab_V2_Plan.md`. This module is a "conductor" module that manages several sub-tabs: **Sources**, **Watched List**, and **Paper Trades**.
+This document is the "contract" for all UI interactions for **Module E: Strategy
+Lab**, as defined in our `Strategy_Lab_V2_Plan.md`. This module is a "conductor"
+module that manages several sub-tabs: **Sources**, **Watched List**, and **Paper
+Trades**.
 
 ## E1: Main Conductor
 
@@ -19,7 +22,8 @@ Handles the initialization of the page and controls the main sub-tabs.
 
 ## E2: "Sources" Sub-Tab
 
-This is the "Strategy & Advice Journal". It manages "Strategies" (from Books/Websites) and "Ideas" (from all sources).
+This is the "Strategy & Advice Journal". It manages "Strategies" (from
+Books/Websites) and "Ideas" (from all sources).
 
 | (Invented) Element ID / Selector | Purpose (Human-Readable)                     | Handler Function (for GCA)                  |
 | :------------------------------- | :------------------------------------------- | :------------------------------------------ |
@@ -62,7 +66,8 @@ This is the "Strategy & Advice Journal". It manages "Strategies" (from Books/Web
 
 ## E3: "Watched List" Sub-Tab (was Alerts)
 
-This tab lists all "Ideas" (tickers) that have been generated from the "Sources" tab. This is the new "Alerts" page.
+This tab lists all "Ideas" (tickers) that have been generated from the "Sources"
+tab. This is the new "Alerts" page.
 
 | (Invented) Element ID / Selector | Purpose (Human-Readable)                                                                   | Handler Function (for GCA)         |
 | :------------------------------- | :----------------------------------------------------------------------------------------- | :--------------------------------- |
@@ -79,7 +84,8 @@ This tab lists all "Ideas" (tickers) that have been generated from the "Sources"
 
 ## E4: "Paper Trades" Sub-Tab
 
-This tab shows all "theoretical trades" that were initiated from the Watched List.
+This tab shows all "theoretical trades" that were initiated from the Watched
+List.
 
 | (Invented) Element ID / Selector | Purpose (Human-Readable)                                                                                                          | Handler Function (for GCA)            |
 | :------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |

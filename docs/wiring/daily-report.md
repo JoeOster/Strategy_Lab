@@ -2,13 +2,17 @@
 
 # Module G: Daily Report (Tab)
 
-This document is the "contract" for all UI interactions for **Module G: Daily Report**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for this module is `_dailyReport.html`.
+This document is the "contract" for all UI interactions for **Module G: Daily
+Report**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for
+this module is `_dailyReport.html`.
 
-This module is **read-only** and provides a daily snapshot of transactions and open positions. It is a heavy user of our global, reusable rendering utilities.
+This module is **read-only** and provides a daily snapshot of transactions and
+open positions. It is a heavy user of our global, reusable rendering utilities.
 
 ## G1: Module Loader
 
-Handles the initialization of the entire page and loads all data for the current day.
+Handles the initialization of the entire page and loads all data for the current
+day.
 
 | Element ID / Selector        | Purpose (Human-Readable)                        | Handler Function (for GCA)           |
 | :--------------------------- | :---------------------------------------------- | :----------------------------------- |
@@ -21,7 +25,8 @@ Handles the initialization of the entire page and loads all data for the current
 
 ## G2: Daily Transaction Log Table
 
-This table displays all transactions (BUY/SELL) that occurred on the report's date.
+This table displays all transactions (BUY/SELL) that occurred on the report's
+date.
 
 | Element ID / Selector | Purpose (Human-Readable)                                                                            | Handler Function (for GCA)           |
 | :-------------------- | :-------------------------------------------------------------------------------------------------- | :----------------------------------- |

@@ -9,8 +9,12 @@ test.describe('Settings Module - Advice Sources', () => {
     await page.click('button[data-sub-tab="sources-panel"]'); // Click Advice Sources sub-tab
   });
 
-  test('should display "No advice sources found." initially', async ({ page }) => {
-    await expect(page.locator('#advice-source-list')).toContainText('No advice sources found.');
+  test('should display "No advice sources found." initially', async ({
+    page,
+  }) => {
+    await expect(page.locator('#advice-source-list')).toContainText(
+      'No advice sources found.'
+    );
   });
 
   test('should add a new person advice source', async ({ page }) => {
@@ -29,12 +33,16 @@ test.describe('Settings Module - Advice Sources', () => {
     await page.click('#add-new-source-form button[type="submit"]');
 
     // Assert source is added
-    await expect(page.locator('#advice-source-list')).toContainText(`${sourceName} (person)`);
+    await expect(page.locator('#advice-source-list')).toContainText(
+      `${sourceName} (person)`
+    );
 
     // Clean up: Delete the added source
-    await page.locator(`.delete-source-btn[data-id]`).first().click();
-    await page.on('dialog', dialog => dialog.accept()); // Accept the confirmation dialog
-    await expect(page.locator('#advice-source-list')).not.toContainText(`${sourceName} (person)`);
+    await page.locator('.delete-source-btn[data-id]').first().click();
+    await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      `${sourceName} (person)`
+    );
   });
 
   test('should add a new book advice source', async ({ page }) => {
@@ -53,12 +61,16 @@ test.describe('Settings Module - Advice Sources', () => {
     await page.click('#add-new-source-form button[type="submit"]');
 
     // Assert source is added
-    await expect(page.locator('#advice-source-list')).toContainText(`${sourceTitle} (book)`);
+    await expect(page.locator('#advice-source-list')).toContainText(
+      `${sourceTitle} (book)`
+    );
 
     // Clean up: Delete the added source
-    await page.locator(`.delete-source-btn[data-id]`).first().click();
-    await page.on('dialog', dialog => dialog.accept()); // Accept the confirmation dialog
-    await expect(page.locator('#advice-source-list')).not.toContainText(`${sourceTitle} (book)`);
+    await page.locator('.delete-source-btn[data-id]').first().click();
+    await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      `${sourceTitle} (book)`
+    );
   });
 
   test('should delete an advice source', async ({ page }) => {
@@ -70,13 +82,17 @@ test.describe('Settings Module - Advice Sources', () => {
     await page.fill('#new-source-name', sourceName);
     await page.fill('#new-source-contact-email', sourceEmail);
     await page.click('#add-new-source-form button[type="submit"]');
-    await expect(page.locator('#advice-source-list')).toContainText(`${sourceName} (person)`);
+    await expect(page.locator('#advice-source-list')).toContainText(
+      `${sourceName} (person)`
+    );
 
     // Delete the source
-    await page.locator(`.delete-source-btn[data-id]`).first().click();
-    await page.on('dialog', dialog => dialog.accept()); // Accept the confirmation dialog
+    await page.locator('.delete-source-btn[data-id]').first().click();
+    await page.on('dialog', (dialog) => dialog.accept()); // Accept the confirmation dialog
 
     // Assert source is deleted
-    await expect(page.locator('#advice-source-list')).not.toContainText(`${sourceName} (person)`);
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      `${sourceName} (person)`
+    );
   });
 });

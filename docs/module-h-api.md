@@ -2,11 +2,14 @@
 
 # Module H: API Data Feeding & Cron Jobs
 
-This document is the "contract" for the **backend services** that power the application. This module's code will live in the `strategy_lab/services/` directory.
+This document is the "contract" for the **backend services** that power the
+application. This module's code will live in the `strategy_lab/services/`
+directory.
 
 ## H1: Price Service (`priceService.js`)
 
-This file is responsible for all communication with external price APIs. It will be based on the existing `priceService.js` blueprint.
+This file is responsible for all communication with external price APIs. It will
+be based on the existing `priceService.js` blueprint.
 
 | Service / Function   | Purpose (Human-Readable)                                    |
 | :------------------- | :---------------------------------------------------------- |
@@ -17,7 +20,8 @@ This file is responsible for all communication with external price APIs. It will
 
 ## H2: Cron Job Service (`cronJobs.js`)
 
-This file schedules all automated backend tasks, "untangled" from the old `cronJobs.js` blueprint and following our new priority rules.
+This file schedules all automated backend tasks, "untangled" from the old
+`cronJobs.js` blueprint and following our new priority rules.
 
 | Service / Function            | Purpose (Human-Readable)                                                                                                                              |
 | :---------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -34,11 +38,16 @@ This is the "contract" for our new, "untangled" watchers.
 1.  **`runHighPriorityWatcher()` (Priority 1)**
     - Gets targets from `pending_orders` and `journal_entries`.
     - Gets prices using `priceService.js` (this will be a high-priority call).
-    - If a price is met, it sets the item's `status` to `ALERT` and sets the global `state.hasNewAlerts` flag to `true`.
+    - If a price is met, it sets the item's `status` to `ALERT` and sets the
+      global `state.hasNewAlerts` flag to `true`.
 2.  **`runStaticDataPull()` (Priority 2)**
-    - Gets all unique tickers from the `transactions` and `journal_entries` tables.
-    - Calls the appropriate `priceService.js` function to fetch non-static data (e.g., EOD prices, etc.).
+    - Gets all unique tickers from the `transactions` and `journal_entries`
+      tables.
+    - Calls the appropriate `priceService.js` function to fetch non-static data
+      (e.g., EOD prices, etc.).
     - Saves this data to the database (e.g., `historical_prices`).
 3.  **`runCompanyProfileBackfill()` (Priority 3)**
-    - Finds any ticker in the database that does _not_ have an entry in the `company_profile` table.
-    - Uses a (low-priority) `priceService.js` call to fetch and save the static profile data for these new tickers.
+    - Finds any ticker in the database that does _not_ have an entry in the
+      `company_profile` table.
+    - Uses a (low-priority) `priceService.js` call to fetch and save the static
+      profile data for these new tickers.

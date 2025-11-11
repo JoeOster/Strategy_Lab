@@ -2,7 +2,9 @@
 
 ## Module I: Global Alert Icon
 
-This document is the "contract" for **Module I**, a small, globally-active UI module. Its purpose is to solve the "buried tab" problem by providing a "pop up" icon when a backend "buy trigger" has been hit.
+This document is the "contract" for **Module I**, a small, globally-active UI
+module. Its purpose is to solve the "buried tab" problem by providing a "pop up"
+icon when a backend "buy trigger" has been hit.
 
 ## I1: Module Logic
 

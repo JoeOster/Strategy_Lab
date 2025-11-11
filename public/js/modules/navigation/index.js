@@ -30,7 +30,7 @@ export const loadPageContent = async (tab) => {
 
 export const initializeNavigation = () => {
   const navButtons = document.querySelectorAll('.main-nav .nav-btn');
-  navButtons.forEach((button) => {
+  for (const button of navButtons) {
     button.addEventListener('click', (event) => {
       const tab = event.target.dataset.tab;
       if (tab === 'settings') {
@@ -39,7 +39,7 @@ export const initializeNavigation = () => {
         loadPageContent(tab);
       }
     });
-  });
+  }
 
   // Load the default tab
   loadPageContent('dashboard');

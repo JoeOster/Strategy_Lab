@@ -2,9 +2,13 @@
 
 # Module B: Orders (Tab)
 
-This document is the "contract" for all UI interactions for **Module B: Orders**, as defined in our `Strategy_Lab_V2_Plan.md`. It assumes the two forms from the original `_orders.html` blueprint have been **merged into a single, unified "Log Order" form**.
+This document is the "contract" for all UI interactions for **Module B:
+Orders**, as defined in our `Strategy_Lab_V2_Plan.md`. It assumes the two forms
+from the original `_orders.html` blueprint have been **merged into a single,
+unified "Log Order" form**.
 
-This module is responsible for logging both executed trades and creating new "watched" orders.
+This module is responsible for logging both executed trades and creating new
+"watched" orders.
 
 ## B1: Module Loader
 
@@ -51,7 +55,8 @@ This single "smart form" handles all order entry.
 
 ## B3: Watched Orders Table
 
-This table displays all "Buy Limit (Watch)" and "Sell Limit (Watch)" orders that are being monitored by the system.
+This table displays all "Buy Limit (Watch)" and "Sell Limit (Watch)" orders that
+are being monitored by the system.
 
 | Element ID / Selector                | Purpose (Human-Readable)                           | Handler Function (for GCA)               |
 | :----------------------------------- | :------------------------------------------------- | :--------------------------------------- |
@@ -64,7 +69,9 @@ This table displays all "Buy Limit (Watch)" and "Sell Limit (Watch)" orders that
 
 ## B4: Alert Workflow (New)
 
-This new workflow is triggered by the "Watcher" service. When an order's state changes to "Alert," these buttons will appear in its row in the "Watched Orders Table."
+This new workflow is triggered by the "Watcher" service. When an order's state
+changes to "Alert," these buttons will appear in its row in the "Watched Orders
+Table."
 
 | Element ID / Selector | Purpose (Human-Readable)                               | Handler Function (for GCA)    |
 | :-------------------- | :----------------------------------------------------- | :---------------------------- |

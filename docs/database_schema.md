@@ -1,6 +1,8 @@
 # Strategy Lab V2: Database Schema
 
-This document is the "contract" for the database, based on our `docs/wiring/` guides and `docs/service-guides/`. This is the primary "source of truth" GCA (the Servant) will use to write all `api.js` files.
+This document is the "contract" for the database, based on our `docs/wiring/`
+guides and `docs/service-guides/`. This is the primary "source of truth" GCA
+(the Servant) will use to write all `api.js` files.
 
 ---
 
@@ -81,12 +83,14 @@ This document is the "contract" for the database, based on our `docs/wiring/` gu
 
 (Based on `docs/wiring/orders.md` and `docs/wiring/strategy-lab.md`)
 
-This table **replaces** the "tangled" `pending_orders` and `journal_entries` tables. It holds _all_ hypothetical trades.
+This table **replaces** the "tangled" `pending_orders` and `journal_entries`
+tables. It holds _all_ hypothetical trades.
 
 ### `watched_items`
 
 - `id` (INTEGER, PRIMARY KEY)
-- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no toggle"._
+- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no
+  toggle"._
   - `0` = "Real Watched Order" (from Module B: Orders)
   - `1` = "Trade Idea" (from Module E: Strategy Lab)
 - `user_id` (INTEGER, FOREIGN KEY to `users.id`)
@@ -100,9 +104,12 @@ This table **replaces** the "tangled" `pending_orders` and `journal_entries` tab
 - `take_profit_high` (REAL)
 - `take_profit_low` (REAL)
 - `escape_price` (REAL) -- "Escape Point"
-- **`take_profit_2_high` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
-- **`take_profit_2_low` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
-- `status` (TEXT, NOT NULL, DEFAULT 'WATCHING') -- 'WATCHING', 'ALERT', 'EXECUTED', 'CANCELLED'
+- **`take_profit_2_high` (REAL, NULLABLE)** -- _(Added) For "Real Watched
+  Orders"_
+- **`take_profit_2_low` (REAL, NULLABLE)** -- _(Added) For "Real Watched
+  Orders"_
+- `status` (TEXT, NOT NULL, DEFAULT 'WATCHING') -- 'WATCHING', 'ALERT',
+  'EXECUTED', 'CANCELLED'
 - `created_date` (TEXT)
 - `expiration_date` (TEXT, NULLABLE)
 - `notes` (TEXT)
@@ -111,19 +118,23 @@ This table **replaces** the "tangled" `pending_orders` and `journal_entries` tab
 
 ## 4. UNIFIED "Transactions" Table
 
-(Based on `docs/wiring/ledger.md`, `docs/wiring/dashboard.md`, `docs/wiring/strategy-lab.md`)
+(Based on `docs/wiring/ledger.md`, `docs/wiring/dashboard.md`,
+`docs/wiring/strategy-lab.md`)
 
-This table holds _all_ executed trades (real and paper) in one "untangled" location.
+This table holds _all_ executed trades (real and paper) in one "untangled"
+location.
 
 ### `transactions`
 
 - `id` (INTEGER, PRIMARY KEY)
-- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no toggle"._
+- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no
+  toggle"._
   - `0` = "Real Money Transaction" (for Ledger & Dashboard)
   - `1` = "Paper Trade" (for Strategy Lab)
 - `user_id` (INTEGER, FOREIGN KEY to `users.id`)
 - `source_id` (INTEGER, FOREIGN KEY to `advice_sources.id`, NULLABLE)
-- `watched_item_id` (INTEGER, FOREIGN KEY to `watched_items.id`, NULLABLE) -- Links to the "Idea" that started it
+- `watched_item_id` (INTEGER, FOREIGN KEY to `watched_items.id`, NULLABLE) --
+  Links to the "Idea" that started it
 - `transaction_date` (TEXT, NOT NULL)
 - `ticker` (TEXT, NOT NULL)
 - `exchange_id` (INTEGER, FOREIGN KEY to `exchanges.id`)

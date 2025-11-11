@@ -101,9 +101,9 @@ async function getPrices(tickers, priority = 5) {
     );
     /** @type {{[ticker: string]: PriceData}} */
     const results = {};
-    tickers.forEach((ticker) => {
+    for (const ticker of tickers) {
       results[ticker] = { price: null, timestamp: Date.now() };
-    });
+    }
     return results;
   }
 
@@ -140,13 +140,13 @@ async function getPrices(tickers, priority = 5) {
 
     const prices = await Promise.all(fetchPromises);
 
-    tickersToFetch.forEach((ticker, index) => {
+    for (const [index, ticker] of tickersToFetch.entries()) {
       const price = prices[index];
       /** @type {PriceData} */
       const cacheEntry = { price: price, timestamp: newCacheTimestamp };
       priceCache.set(ticker, cacheEntry);
       results[ticker] = cacheEntry;
-    });
+    }
   }
 
   return results;

@@ -2,9 +2,12 @@
 
 # Module F: Imports (Tab)
 
-This document is the "contract" for all UI interactions for **Module F: Imports**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for this module is `_imports.html`.
+This document is the "contract" for all UI interactions for **Module F:
+Imports**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for
+this module is `_imports.html`.
 
-This module is a two-step "wizard" for uploading and reconciling brokerage CSV files.
+This module is a two-step "wizard" for uploading and reconciling brokerage CSV
+files.
 
 ## F1: Module Loader
 
@@ -33,7 +36,8 @@ This form handles the initial file selection and upload.
 
 ## F3: Step 2 - Reconciliation
 
-This section is shown after a file is processed and handles displaying new items and resolving duplicates.
+This section is shown after a file is processed and handles displaying new items
+and resolving duplicates.
 
 | Element ID / Selector          | Purpose (Human-Readable)                                                | Handler Function (for GCA)                         |
 | :----------------------------- | :---------------------------------------------------------------------- | :------------------------------------------------- |

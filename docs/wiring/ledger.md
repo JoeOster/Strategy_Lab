@@ -2,9 +2,12 @@
 
 # Module C: Ledger (Tab)
 
-This document is the "contract" for all UI interactions for **Module C: Ledger**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for this module is `_ledger.html`.
+This document is the "contract" for all UI interactions for **Module C:
+Ledger**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for
+this module is `_ledger.html`.
 
-This module is **read-only** (it has no data _entry_ forms). Its purpose is to display, filter, and summarize all executed transactions from the database.
+This module is **read-only** (it has no data _entry_ forms). Its purpose is to
+display, filter, and summarize all executed transactions from the database.
 
 ## C1: Module Loader
 
@@ -22,7 +25,8 @@ Handles the initialization of the entire page and loads all initial data.
 
 ## C2: Ranged P&L Summary
 
-This panel is interactive and fetches P&L data based on the user's selected date range.
+This panel is interactive and fetches P&L data based on the user's selected date
+range.
 
 | Element ID / Selector      | Purpose (Human-Readable)                 | Handler Function (for GCA)          |
 | :------------------------- | :--------------------------------------- | :---------------------------------- |

@@ -2,13 +2,17 @@
 
 # Module D: Dashboard (Tab)
 
-This document is the "contract" for all UI interactions for **Module D: Dashboard**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for this module is `_dashboard.html`.
+This document is the "contract" for all UI interactions for **Module D:
+Dashboard**, as defined in our `Strategy_Lab_V2_Plan.md`. The HTML blueprint for
+this module is `_dashboard.html`.
 
-This module is **read-only** and provides two views for the same "Open Positions" data: a visual "Card View" and a dense "Table View".
+This module is **read-only** and provides two views for the same "Open
+Positions" data: a visual "Card View" and a dense "Table View".
 
 ## D1: Module Loader
 
-Handles the initialization of the entire page and loads the "Open Positions" data.
+Handles the initialization of the entire page and loads the "Open Positions"
+data.
 
 | Element ID / Selector        | Purpose (Human-Readable)                 | Handler Function (for GCA)                                     |
 | :--------------------------- | :--------------------------------------- | :------------------------------------------------------------- |
@@ -21,7 +25,8 @@ Handles the initialization of the entire page and loads the "Open Positions" dat
 
 ## D2: View Toggler & Filters
 
-Handles switching between the Card and Table views, as well as filtering and sorting the data.
+Handles switching between the Card and Table views, as well as filtering and
+sorting the data.
 
 | Element ID / Selector            | Purpose (Human-Readable)                   | Handler Function (for GCA)          |
 | :------------------------------- | :----------------------------------------- | :---------------------------------- |
@@ -47,7 +52,8 @@ This is the visual grid of all open positions.
 
 ## D4: Table View
 
-This is the dense table of all open positions. It uses our **reusable table utility**.
+This is the dense table of all open positions. It uses our **reusable table
+utility**.
 
 | Element ID / Selector             | Purpose (Human-Readable)                          | Handler Function (for GCA)                |
 | :-------------------------------- | :------------------------------------------------ | :---------------------------------------- |

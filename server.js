@@ -34,7 +34,7 @@ app.get('/api/sources', async (req, res) => {
 app.post('/api/sources', async (req, res) => {
   try {
     const db = await getDb();
-    
+
     // The column names in the table
     const columns = [
       'name',
