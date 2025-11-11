@@ -48,7 +48,12 @@ export default [
     },
   },
   {
-    files: ['server.js', 'services/**/*.js', 'playwright.config.js', 'tests/**/*.js'],
+    files: [
+      'server.js',
+      'services/**/*.js',
+      'playwright.config.js',
+      'tests/**/*.js',
+    ],
     languageOptions: {
       globals: {
         ...globals.node,

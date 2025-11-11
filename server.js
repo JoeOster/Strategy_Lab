@@ -1,5 +1,5 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { getDb } from './services/database.js';
 
@@ -34,29 +34,7 @@ app.get('/api/sources', async (req, res) => {
 app.post('/api/sources', async (req, res) => {
   try {
     const db = await getDb();
-    const {
-      name,
-      type,
-      url,
-      description,
-      image_path,
-      person_email,
-      person_phone,
-      person_app_type,
-      person_app_handle,
-      group_primary_contact,
-      group_email,
-      group_phone,
-      group_app_type,
-      group_app_handle,
-      book_author,
-      book_isbn,
-      book_websites,
-      book_pdfs,
-      website_websites,
-      website_pdfs,
-    } = req.body;
-
+    
     // The column names in the table
     const columns = [
       'name',
@@ -132,28 +110,6 @@ app.put('/api/sources/:id', async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params;
-    const {
-      name,
-      type,
-      url,
-      description,
-      image_path,
-      person_email,
-      person_phone,
-      person_app_type,
-      person_app_handle,
-      group_primary_contact,
-      group_email,
-      group_phone,
-      group_app_type,
-      group_app_handle,
-      book_author,
-      book_isbn,
-      book_websites,
-      book_pdfs,
-      website_websites,
-      website_pdfs,
-    } = req.body;
 
     const columns = [
       'name',
@@ -178,29 +134,8 @@ app.put('/api/sources/:id', async (req, res) => {
       'website_pdfs',
     ];
 
-    const values = [
-      name,
-      type,
-      url,
-      description,
-      image_path,
-      person_email,
-      person_phone,
-      person_app_type,
-      person_app_handle,
-      group_primary_contact,
-      group_email,
-      group_phone,
-      group_app_type,
-      group_app_handle,
-      book_author,
-      book_isbn,
-      book_websites,
-      book_pdfs,
-      website_websites,
-      website_pdfs,
-      id, // ID for the WHERE clause
-    ];
+    const values = columns.map((col) => req.body[col]);
+    values.push(id); // Add ID for the WHERE clause
 
     const setClauses = columns.map((col) => `${col} = ?`).join(', ');
     const sql = `UPDATE advice_sources SET ${setClauses} WHERE id = ?`;
