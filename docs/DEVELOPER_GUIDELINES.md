@@ -63,3 +63,15 @@ can be tricky in modular JavaScript applications.
 - **Comments:** Add comments sparingly, focusing on _why_ a piece of code exists
   or _what_ complex logic it performs, rather than simply restating _what_ the
   code does.
+
+## Playwright Testing Best Practices and Debugging
+
+When developing and debugging Playwright end-to-end tests, consider the following best practices and common pitfalls:
+
+-   **Understanding "Hanging" Tests**: If Playwright tests appear to "hang" after execution, it's often due to the test runner keeping the process alive to serve the HTML test report. This is expected behavior and not an indication of a test failure or an actual hang in the test execution itself. You can typically terminate the process with `Ctrl+C` after reviewing the report.
+
+-   **Robust Assertions for Asynchronous UI Updates**: When testing UI changes that occur after asynchronous operations (e.g., API calls), it's crucial to use robust Playwright assertions that wait for the DOM to update.
+    -   **`expect(...).not.toBeAttached()`**: Use this assertion to confirm that an element has been completely removed from the DOM. This is more reliable than `not.toBeVisible()` when an element might become invisible but still exist in the DOM.
+    -   **`expect(...).not.toContainText()` on specific elements**: When asserting the absence of text, target the most specific element possible (e.g., a list item `li:has-text(...)`) rather than a broad container. This helps Playwright accurately wait for the text to disappear from that specific element.
+
+-   **Verifying Tool/Agent Changes**: When using automated tools or agents to modify code, always verify that the changes have been correctly applied to the target files. Do not rely solely on tool output; directly read the modified files to confirm their content. This prevents cascading errors and ensures your understanding of the codebase's state is accurate.
