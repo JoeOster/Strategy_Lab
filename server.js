@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
-import { getDb } from './services/database.js';
+import { getDb, clearDb } from './services/database.js'; // Import clearDb
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -178,11 +178,41 @@ app.delete('/api/sources/:id', async (req, res) => {
   }
 });
 
+// API route to clear the database (for testing purposes)
+if (process.env.TEST_ENV) {
+  app.post('/api/clear-db', async (req, res) => {
+    try {
+      await clearDb();
+      res.status(200).json({ message: 'Database cleared successfully.' });
+    } catch (err) {
+      console.error('Failed to clear database:', err);
+      res.status(500).json({ error: 'Failed to clear database', details: err.message });
+    }
+  });
+}
+
 // Catch-all for HTML5 pushState routing
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  // Ensure the database connection is closed when the server shuts down
+  process.on('SIGINT', async () => {
+    const db = await getDb();
+    if (db) {
+      await db.close();
+      console.log('Database connection closed.');
+    }
+    process.exit(0);
+  });
+  process.on('SIGTERM', async () => {
+    const db = await getDb();
+    if (db) {
+      await db.close();
+      console.log('Database connection closed.');
+    }
+    process.exit(0);
+  });
 });
