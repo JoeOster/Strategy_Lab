@@ -118,6 +118,15 @@ if (-not $skipChecks) {
 # --- END UPDATED BLOCK ---
 
 # --- IMPROVEMENT: Use cross-env to pass the $port variable to the server ---
+Write-Log "Checking for and closing any existing listeners on port $port..."
+(Get-NetTCPConnection -LocalPort $port).OwningProcess | ForEach-Object {
+    try {
+        Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue
+        Write-Log "Closed process $_ listening on port $port."
+    } catch {
+        Write-Log "Could not close process $_ listening on port $port. Error: $_"
+    }
+}
 Write-Log "Starting server with 'npm run dev' on port $port..."
 # We use npx to run cross-env, which sets the PORT env variable
 # Then we run the 'dev' script from package.json
