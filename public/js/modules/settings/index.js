@@ -1,15 +1,15 @@
 // public/js/modules/settings/index.js
 
+import { handleFontChange, handleThemeChange } from './appearance.handlers.js';
 import * as handlers from './handlers.js';
 import {
   handleAddNewSourceSubmit,
-  handleSourceTypeChange,
-  loadSourcesList,
-  handleEditSourceClick,
   handleDeleteSourceClick,
+  handleSourceTypeChange,
 } from './sources.handlers.js';
+import * as usersHandlers from './users.handlers.js';
 
-export { loadUserPreferences } from './handlers.js';
+export { loadAppearanceSettings } from './appearance.handlers.js';
 
 export function initializeSettingsModule() {
   console.log('Settings module initialized.');
@@ -54,6 +54,18 @@ export function initializeSettingsModule() {
     );
   }
 
+  // Theme selection
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', handleThemeChange);
+  }
+
+  // Font selection
+  const fontSelect = document.getElementById('font-select');
+  if (fontSelect) {
+    fontSelect.addEventListener('change', handleFontChange);
+  }
+
   // Source type dropdowns
   const newSourceType = document.getElementById('new-source-type');
   if (newSourceType) {
@@ -74,10 +86,7 @@ export function initializeSettingsModule() {
   // Add new source form submission
   const addNewSourceForm = document.getElementById('add-new-source-form');
   if (addNewSourceForm) {
-    addNewSourceForm.addEventListener(
-      'submit',
-      handleAddNewSourceSubmit
-    );
+    addNewSourceForm.addEventListener('submit', handleAddNewSourceSubmit);
   }
 
   // Clear new source form button
@@ -142,7 +151,10 @@ export function initializeSettingsModule() {
   // Add new holder form submission
   const addHolderForm = document.getElementById('add-holder-form');
   if (addHolderForm) {
-    addHolderForm.addEventListener('submit', handlers.handleAddHolderSubmit);
+    addHolderForm.addEventListener(
+      'submit',
+      usersHandlers.handleAddHolderSubmit
+    );
   }
 
   // Event delegation for deleting holders
@@ -151,11 +163,14 @@ export function initializeSettingsModule() {
     accountHolderList.addEventListener('click', (event) => {
       if (event.target.classList.contains('delete-holder-btn')) {
         const holderId = event.target.dataset.id;
-        handlers.handleDeleteHolderClick(holderId);
+        usersHandlers.handleDeleteHolderClick(holderId);
+      } else if (event.target.classList.contains('set-default-holder-btn')) {
+        const holderId = event.target.dataset.id;
+        usersHandlers.handleSetDefaultHolderClick(event, holderId);
+      } else if (event.target.classList.contains('manage-subscriptions-btn')) {
+        const holderId = event.target.dataset.id;
+        usersHandlers.handleManageSubscriptionsClick(event, holderId);
       }
     });
   }
-
-  // Initial load of the account holders list
-  handlers.loadAccountHoldersList();
 }
