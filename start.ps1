@@ -162,7 +162,7 @@ if (-not $serverReady) {
 
 # --- IMPROVEMENT: Launch in default browser ---
 Write-Log "Launching default browser. The script will wait for you to close the browser."
-Start-Process "http://localhost:$port" -Wait
+Invoke-Item "http://localhost:$port" -Wait
 # --- END IMPROVEMENT ---
 
 
