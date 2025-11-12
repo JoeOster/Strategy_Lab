@@ -126,15 +126,16 @@ will be dynamically loaded when the tab is activated.
 
 ### Add New Advice Source
 
--   **Endpoint:** `POST /api/sources`
--   **Content-Type:** `application/json`
+- **Endpoint:** `POST /api/sources`
+- **Content-Type:** `application/json`
 
-The server expects a JSON payload with the following structure. All fields are optional except for `name` and `type`.
+The server expects a JSON payload with the following structure. All fields are
+optional except for `name` and `type`.
 
 **Base Fields:**
 
 | Key           | Type   | Description                               |
-|---------------|--------|-------------------------------------------|
+| ------------- | ------ | ----------------------------------------- |
 | `name`        | String | The name of the advice source. (Required) |
 | `type`        | String | The type of source. (Required)            |
 | `description` | String | A description of the source.              |
@@ -143,38 +144,38 @@ The server expects a JSON payload with the following structure. All fields are o
 
 **Person Fields (when `type` is 'person'):**
 
-| Key                 | Type   | Description                        |
-|---------------------|--------|------------------------------------|
-| `person_email`      | String | The person's email address.        |
-| `person_phone`      | String | The person's phone number.         |
+| Key                 | Type   | Description                                   |
+| ------------------- | ------ | --------------------------------------------- |
+| `person_email`      | String | The person's email address.                   |
+| `person_phone`      | String | The person's phone number.                    |
 | `person_app_type`   | String | The type of messaging app (e.g., 'Telegram'). |
-| `person_app_handle` | String | The person's handle in the app.    |
+| `person_app_handle` | String | The person's handle in the app.               |
 
 **Group Fields (when `type` is 'group'):**
 
-| Key                     | Type   | Description                               |
-|-------------------------|--------|-------------------------------------------|
-| `group_primary_contact` | String | The primary contact person for the group. |
-| `group_email`           | String | The group's email address.                |
-| `group_phone`           | String | The group's phone number.                 |
+| Key                     | Type   | Description                                  |
+| ----------------------- | ------ | -------------------------------------------- |
+| `group_primary_contact` | String | The primary contact person for the group.    |
+| `group_email`           | String | The group's email address.                   |
+| `group_phone`           | String | The group's phone number.                    |
 | `group_app_type`        | String | The type of messaging app (e.g., 'Discord'). |
-| `group_app_handle`      | String | The group's handle in the app.            |
+| `group_app_handle`      | String | The group's handle in the app.               |
 
 **Book Fields (when `type` is 'book'):**
 
-| Key             | Type   | Description                               |
-|-----------------|--------|-------------------------------------------|
-| `book_author`   | String | The author of the book.                   |
-| `book_isbn`     | String | The ISBN of the book.                     |
+| Key             | Type   | Description                                |
+| --------------- | ------ | ------------------------------------------ |
+| `book_author`   | String | The author of the book.                    |
+| `book_isbn`     | String | The ISBN of the book.                      |
 | `book_websites` | String | Comma-separated list of relevant websites. |
-| `book_pdfs`     | String | Comma-separated list of relevant PDFs.    |
+| `book_pdfs`     | String | Comma-separated list of relevant PDFs.     |
 
 **Website Fields (when `type` is 'website'):**
 
-| Key                | Type   | Description                               |
-|--------------------|--------|-------------------------------------------|
-| `website_websites` | String | Comma-separated list of relevant links.   |
-| `website_pdfs`     | String | Comma-separated list of saved documents.  |
+| Key                | Type   | Description                              |
+| ------------------ | ------ | ---------------------------------------- |
+| `website_websites` | String | Comma-separated list of relevant links.  |
+| `website_pdfs`     | String | Comma-separated list of saved documents. |
 
 **Example Payload (for a 'person' source):**
 

@@ -89,6 +89,40 @@ test.describe('Settings Module - Advice Sources', () => {
     // 4. THE FIX: Wait for the element to be removed from the DOM
     await expect(sourceItemLocator).not.toBeAttached();
   });
+
+  test('should clear the "Add New Advice Source" form', async ({ page }) => {
+    await page.selectOption('#new-source-type', 'person');
+    await page.fill('#new-source-name', 'Temporary Source');
+    await page.fill('#new-source-contact-email', 'temp@example.com');
+    await expect(page.locator('#new-source-name')).toHaveValue('Temporary Source');
+    await expect(page.locator('#new-source-contact-email')).toHaveValue('temp@example.com');
+
+    await page.click('#clear-new-source-btn');
+
+    await expect(page.locator('#new-source-name')).toHaveValue('');
+    await expect(page.locator('#new-source-contact-email')).toHaveValue('');
+    await expect(page.locator('#new-source-fields-container')).not.toBeVisible();
+  });
+
+  test('should clear the "Add New Exchange" form', async ({ page }) => {
+    await page.click('button[data-sub-tab="exchanges-panel"]');
+    await page.fill('#new-exchange-name', 'Temporary Exchange');
+    await expect(page.locator('#new-exchange-name')).toHaveValue('Temporary Exchange');
+
+    await page.click('#clear-exchange-btn');
+
+    await expect(page.locator('#new-exchange-name')).toHaveValue('');
+  });
+
+  test('should clear the "Add New Account Holder" form', async ({ page }) => {
+    await page.click('button[data-tab="user-management-settings-panel"]');
+    await page.fill('#new-holder-name', 'Temporary Holder');
+    await expect(page.locator('#new-holder-name')).toHaveValue('Temporary Holder');
+
+    await page.click('#clear-holder-btn');
+
+    await expect(page.locator('#new-holder-name')).toHaveValue('');
+  });
 });
 
 test.describe('Settings Module - L2 Sub-tab Switching', () => {

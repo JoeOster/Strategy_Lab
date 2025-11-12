@@ -1,82 +1,58 @@
-# Task: Implement L2 Sub-tabs in Settings
+# Task: Implement Clear Buttons and Refine Save Button Behavior in Settings
 
-- [x] **Step 1: Review Existing Code.**
-  - [x] Read `public/js/modules/settings/handlers.js` to understand the existing
-        `handleMainTabClick` logic.
-  - [x] Read `public/index.html` to confirm the HTML structure, IDs, and classes
-        for the L2 tabs and panels in "Data Management" and "User Management".
-  - **Finding:** The handler functions exist, but the HTML for the "Data
-    Management" sub-tabs is incorrect and must be fixed.
+## Phase 1: Implement Clear Buttons for Settings Forms
 
-- [x] **Step 2: Implement "Data Management" Sub-tab Logic.**
-  - [x] In `public/index.html`, replaced the test panels with the correct
-        `sources-panel` and `exchanges-panel`.
-  - [x] In `public/js/modules/settings/handlers.js`, updated the sub-tab click
-        handler to be generic.
-  - [x] The function now correctly activates tabs/panels and calls
-        `loadSourcesList()` or `loadExchangesList()`.
-  - [x] In `public/js/modules/settings/index.js`, updated the event listener to
-        be generic for all sub-tabs.
+- [x] **Step 1: Identify Forms and Add Clear Buttons to HTML.**
+  - [ ] Locate the forms within `public/index.html` that have "Save" buttons and
+        require a "Clear" button (e.g., `#add-new-source-form`,
+        `#add-exchange-form`, `#add-holder-form`).
+  - [ ] For each identified form, add a "Clear" button next to its "Save"
+        button. Assign appropriate IDs or classes for easy selection in
+        JavaScript.
 
-- [x] **Step 3: Implement "User Management" Sub-tab Logic.**
-  - [x] In `public/index.html`, updated the sub-tab classes for consistency.
-  - [x] The generic handler `handleSubTabClick` created in Step 2 now manages
-        the "User Management" sub-tabs.
-  - [x] The generic event listener in `index.js` now attaches to the "User
-        Management" sub-tabs.
+- [x] **Step 2: Implement Clear Button Handlers in `handlers.js`.**
+  - [ ] In `public/js/modules/settings/handlers.js`, create new functions (e.g.,
+        `handleClearSourceForm()`, `handleClearExchangeForm()`,
+        `handleClearHolderForm()`) to clear the input fields of their respective
+        forms.
+  - [ ] These functions should reset the form fields to their initial empty or
+        default states.
 
-- [x] **Step 4: Verify Initial State.**
-  - [x] The new `initializeSubTabs` function in `handlers.js` ensures the first
-        sub-tab is active and its data is loaded by default for both "Data
-        Management" and "User Management" tabs.
+- [x] **Step 3: Attach Event Listeners for Clear Buttons in `index.js`.**
+  - [ ] In `public/js/modules/settings/index.js`, attach event listeners to the
+        newly added "Clear" buttons, linking them to their respective handler
+        functions.
 
-- [x] **Step 5: Create Playwright Test.**
-  - [x] Read `tests/settings.spec.js` to understand the existing test structure.
-  - [x] Added a new test case titled "should switch between L2 sub-tabs in Data
-        Management and User Management".
-  - [x] **Note:** The test runner is not picking up the changes to the test
-        file, and an existing test is failing. I have attempted to fix the
-        issue, but it persists. The new functionality is implemented, but the
-        tests are not in a passing state due to this environmental issue.
-  - [x] The previously failing test (`should delete an advice source`) has been
-        re-inserted into `tests/settings.spec.js` but is commented out with an
-        explanation, as requested by the user.
+## Phase 2: Refine Save Button Behavior
 
----
+- [x] **Step 4: Remove Dashboard Navigation from Save Handlers.**
+  - [ ] In `public/js/modules/settings/handlers.js`, identify functions
+        responsible for handling "Save" button clicks (e.g.,
+        `handleAddSource()`, `handleAddExchange()`, `handleAddHolder()`).
+  - [ ] Remove any code within these functions that navigates the user away from
+        the settings modal (e.g., to the dashboard).
 
-**Summary of UI Fixes and "Exchanges" Tab Functionality (Post-Implementation):**
+- [x] **Step 5: Implement Table Refresh after Save Operations.**
+  - [ ] After a successful save operation in each handler function (e.g.,
+        `handleAddSource()`, `handleAddExchange()`, `handleAddHolder()`), call
+        the appropriate data loading function to refresh the relevant table/list
+        within the settings modal (e.g., `loadSourcesList()`,
+        `loadExchangesList()`, `loadAccountHoldersList()`).
+  - [ ] Ensure that the form fields are cleared after a successful save.
 
-1. **Corrected HTML Structure:** The `public/index.html` file was updated to
-   replace placeholder sub-panels within the "Data Management" section with the
-   correct `sources-panel` and `exchanges-panel` as defined in the wiring guide.
-2. **Standardized CSS Selectors:** The `public/css/main.css` file was modified
-   to update the sub-tab selectors from `.data-management-subtabs` and
-   `.user-management-subtabs` to a unified `.settings-sub-tabs`. This ensures
-   that the correct styling is applied to all L2 sub-tabs.
-3. **Removed Debugging Artifact:** The global red border
-   (`* { border: 1px solid red; }`) was removed from `public/css/main.css`,
-   which was likely contributing to the "pages got way out of whack" appearance.
-4. **Refactored JavaScript Handlers:** The
-   `public/js/modules/settings/handlers.js` and
-   `public/js/modules/settings/index.js` files were refactored to use a single,
-   generic `handleSubTabClick` function for all L2 sub-tabs. This function now
-   correctly activates the selected sub-panel and calls the appropriate data
-   loading function (e.g., `loadSourcesList()` for "Advice Sources" and
-   `loadExchangesList()` for "Exchanges").
-5. **Improved Default State Initialization:** A new `initializeSubTabs` helper
-   function was introduced in `handlers.js` to ensure that when a main tab (like
-   "Data Management" or "User Management") is activated, its default sub-tab is
-   also correctly displayed and its data loaded.
+## Phase 3: Testing and Verification
 
-**Regarding Playwright Tests:**
+- [ ] **Step 6: Manually Test Clear Button Functionality.**
+  - [ ] Open the application, navigate to the Settings modal, and test each
+        "Clear" button to ensure it correctly flushes new entries in its
+        respective form.
 
-Despite multiple attempts to fix the failing test and ensure the new tests are
-run, the Playwright test runner appears to be consistently using an outdated
-version of `tests/settings.spec.js`. This environmental issue prevents reliable
-automated verification of the changes. The failing test
-(`should delete an advice source`) was an existing test that was fixed, but the
-test runner is not picking up this fix. The new tests for L2 sub-tab switching
-are also not being executed.
+- [ ] **Step 7: Manually Test Save Button Functionality.**
+  - [ ] Test each "Save" button to ensure it saves data, refreshes the relevant
+        table/list within the settings modal, and does NOT navigate to the
+        dashboard.
+  - [ ] Verify that form fields are cleared after a successful save.
 
-I believe the UI and "Exchanges" tab functionality should now be working as
-intended based on the code changes.
+- [ ] **Step 8: Update Playwright Tests (if necessary).**
+  - [ ] Review `tests/settings.spec.js` and update or add new tests to cover the
+        new "Clear" button functionality and the refined "Save" button behavior.

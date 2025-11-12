@@ -128,7 +128,10 @@
                         </div>
                         <div id="new-source-panel-website" class="source-type-panel" style="display:none;">
                         </div>
-                        <button type="submit">Add Source</button>
+                        <div class="form-actions">
+                            <button type="submit">Add Source</button>
+                            <button type="button" id="clear-new-source-btn" class="clear-btn">Clear</button>
+                        </div>
                     </div>
                 </form>
                 <hr>
@@ -144,7 +147,10 @@
                 <form id="add-exchange-form">
                     <label for="new-exchange-name">Name:</label>
                     <input type="text" id="new-exchange-name" name="new-exchange-name" required>
-                    <button type="submit" id="add-exchange-btn">Add Exchange</button>
+                    <div class="form-actions">
+                        <button type="submit" id="add-exchange-btn">Add Exchange</button>
+                        <button type="button" id="clear-exchange-btn" class="clear-btn">Clear</button>
+                    </div>
                 </form>
                 <hr>
                 <h4>Exchanges</h4>
@@ -168,7 +174,10 @@
                 <form id="add-holder-form">
                     <label for="new-holder-name">Name:</label>
                     <input type="text" id="new-holder-name" name="new-holder-name" required>
-                    <button type="submit" id="add-account-holder-btn">Add Holder</button>
+                    <div class="form-actions">
+                        <button type="submit" id="add-account-holder-btn">Add Holder</button>
+                        <button type="button" id="clear-holder-btn" class="clear-btn">Clear</button>
+                    </div>
                 </form>
                 <hr>
                 <h4>Account Holders</h4>
@@ -188,6 +197,7 @@
 
         <div class="modal-footer">
             <button type="button" id="save-settings-button">Save Settings</button>
+            <button type="button" id="clear-general-settings-button" class="clear-btn">Clear Settings</button>
         </div>
     </div>
 </div>
@@ -271,6 +281,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit">Save Changes</button>
+                    <button type="button" id="clear-edit-source-button" class="clear-btn">Clear</button>
                 </div>
             </div>
         </form>

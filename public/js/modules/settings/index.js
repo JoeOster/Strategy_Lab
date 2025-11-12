@@ -36,6 +36,12 @@ export function initializeSettingsModule() {
     .getElementById('save-settings-button')
     .addEventListener('click', handlers.handleSaveAllSettings);
 
+  // Clear general settings button
+  const clearGeneralSettingsBtn = document.getElementById('clear-general-settings-button');
+  if (clearGeneralSettingsBtn) {
+    clearGeneralSettingsBtn.addEventListener('click', handlers.handleClearGeneralAndAppearanceForms);
+  }
+
   // Source type dropdowns
   const newSourceType = document.getElementById('new-source-type');
   if (newSourceType) {
@@ -60,6 +66,43 @@ export function initializeSettingsModule() {
       'submit',
       handlers.handleAddNewSourceSubmit
     );
+  }
+
+  // Clear new source form button
+  const clearNewSourceBtn = document.getElementById('clear-new-source-btn');
+  if (clearNewSourceBtn) {
+    clearNewSourceBtn.addEventListener('click', handlers.handleClearNewSourceForm);
+  }
+
+  // Clear exchange form button
+  const clearExchangeBtn = document.getElementById('clear-exchange-btn');
+  if (clearExchangeBtn) {
+    clearExchangeBtn.addEventListener('click', handlers.handleClearExchangeForm);
+  }
+
+  // Clear holder form button
+  const clearHolderBtn = document.getElementById('clear-holder-btn');
+  if (clearHolderBtn) {
+    clearHolderBtn.addEventListener('click', handlers.handleClearHolderForm);
+  }
+
+  // Clear edit source form button
+  const clearEditSourceBtn = document.getElementById('clear-edit-source-button');
+  if (clearEditSourceBtn) {
+    clearEditSourceBtn.addEventListener('click', handlers.handleClearEditSourceForm);
+  }
+
+  // Edit source form submission
+  const editSourceForm = document.getElementById('edit-source-form');
+  if (editSourceForm) {
+    editSourceForm.addEventListener('submit', handlers.handleEditSourceSubmit);
+  }
+
+  // Placeholder for handling the edit source form submission.
+  // This will be replaced with actual logic when the edit modal is properly implemented.
+  // export function handleEditSourceSubmit(event) {
+  //   console.log('handleEditSourceSubmit called (placeholder)');
+  //   event.preventDefault();
   }
 
   // Event delegation for deleting sources
