@@ -47,7 +47,9 @@ function initializeSubTabs(panelElement, defaultPanelId, defaultLoadFunction) {
   }
 
   // Activate the default sub-tab and its panel
-  const defaultTab = panelElement.querySelector(`[data-sub-tab="${defaultPanelId}"]`);
+  const defaultTab = panelElement.querySelector(
+    `[data-sub-tab="${defaultPanelId}"]`
+  );
   if (defaultTab) {
     defaultTab.classList.add('active');
     const defaultPanel = document.getElementById(defaultPanelId);
@@ -59,7 +61,6 @@ function initializeSubTabs(panelElement, defaultPanelId, defaultLoadFunction) {
     }
   }
 }
-
 
 export function handleSubTabClick(event) {
   const clickedTab = event.target.closest('.settings-sub-tab');
@@ -186,7 +187,6 @@ export function loadAppearanceSettings() {
   const savedTheme = localStorage.getItem('theme') || 'light';
   themeSelector.value = savedTheme;
   document.body.dataset.theme = savedTheme;
-
 
   const savedFont = localStorage.getItem('font') || 'var(--font-system)';
   fontSelector.value = savedFont;

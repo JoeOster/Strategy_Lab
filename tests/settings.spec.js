@@ -66,28 +66,29 @@ test.describe('Settings Module - Advice Sources', () => {
       page.locator(`li:has-text("${sourceTitle} (book)")`)
     ).not.toBeAttached();
   });
-test('should delete an advice source', async ({ page }) => {
-  const sourceName = 'Source to Delete';
-  const sourceEmail = 'delete@example.com';
+  test('should delete an advice source', async ({ page }) => {
+    const sourceName = 'Source to Delete';
+    const sourceEmail = 'delete@example.com';
 
-  // 1. Create the source
-  await page.selectOption('#new-source-type', 'person');
-  await page.fill('#new-source-name', sourceName);
-  await page.fill('#new-source-contact-email', sourceEmail);
-  await page.click('#add-new-source-form button[type="submit"]');
+    // 1. Create the source
+    await page.selectOption('#new-source-type', 'person');
+    await page.fill('#new-source-name', sourceName);
+    await page.fill('#new-source-contact-email', sourceEmail);
+    await page.click('#add-new-source-form button[type="submit"]');
 
-  // 2. Locate the specific list item
-  const sourceItemLocator = page.locator(`li:has-text("${sourceName} (person)")`);
-  await expect(sourceItemLocator).toBeVisible();
+    // 2. Locate the specific list item
+    const sourceItemLocator = page.locator(
+      `li:has-text("${sourceName} (person)")`
+    );
+    await expect(sourceItemLocator).toBeVisible();
 
-  // 3. Set up the dialog handler and click delete
-  page.on('dialog', (dialog) => dialog.accept());
-  await sourceItemLocator.getByRole('button', { name: 'Delete' }).click();
+    // 3. Set up the dialog handler and click delete
+    page.on('dialog', (dialog) => dialog.accept());
+    await sourceItemLocator.getByRole('button', { name: 'Delete' }).click();
 
-  // 4. THE FIX: Wait for the element to be removed from the DOM
-  await expect(sourceItemLocator).not.toBeAttached();
-});
-
+    // 4. THE FIX: Wait for the element to be removed from the DOM
+    await expect(sourceItemLocator).not.toBeAttached();
+  });
 });
 
 test.describe('Settings Module - L2 Sub-tab Switching', () => {
@@ -97,7 +98,9 @@ test.describe('Settings Module - L2 Sub-tab Switching', () => {
     await expect(page.locator('#settings-modal')).toBeVisible();
   });
 
-  test('should switch between L2 sub-tabs in Data Management', async ({ page }) => {
+  test('should switch between L2 sub-tabs in Data Management', async ({
+    page,
+  }) => {
     await page.click('button[data-tab="data-management-settings-panel"]');
 
     await expect(page.locator('#sources-panel')).toBeVisible();
@@ -107,21 +110,29 @@ test.describe('Settings Module - L2 Sub-tab Switching', () => {
 
     await expect(page.locator('#sources-panel')).not.toBeVisible();
     await expect(page.locator('#exchanges-panel')).toBeVisible();
-    await expect(page.locator('#exchange-list')).toContainText('No exchanges found.');
+    await expect(page.locator('#exchange-list')).toContainText(
+      'No exchanges found.'
+    );
 
     await page.click('button[data-sub-tab="sources-panel"]');
 
     await expect(page.locator('#sources-panel')).toBeVisible();
     await expect(page.locator('#exchanges-panel')).not.toBeVisible();
-    await expect(page.locator('#advice-source-list')).toContainText('No advice sources found.');
+    await expect(page.locator('#advice-source-list')).toContainText(
+      'No advice sources found.'
+    );
   });
 
-  test('should switch between L2 sub-tabs in User Management', async ({ page }) => {
+  test('should switch between L2 sub-tabs in User Management', async ({
+    page,
+  }) => {
     await page.click('button[data-tab="user-management-settings-panel"]');
 
     await expect(page.locator('#users-panel')).toBeVisible();
     await expect(page.locator('#subscriptions-panel')).not.toBeVisible();
-    await expect(page.locator('#account-holder-list')).toContainText('No account holders found.');
+    await expect(page.locator('#account-holder-list')).toContainText(
+      'No account holders found.'
+    );
 
     await page.click('button[data-sub-tab="subscriptions-panel"]');
 
