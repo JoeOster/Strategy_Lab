@@ -57,6 +57,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node,
+        document: true,
       },
     },
   },

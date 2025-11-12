@@ -1,64 +1,40 @@
+// public/js/modules/settings/sources.api.js
+
 export async function getSources() {
-  try {
-    const response = await fetch('/api/sources');
-    if (!response.ok) {
-      throw new Error('Failed to fetch sources');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching sources:', error);
-    throw error;
-  }
+  console.log('API: getSources called (placeholder)');
+  // Placeholder for fetching sources from the backend
+  return [
+    {
+      id: '1',
+      name: 'Book A',
+      type: 'Book',
+      author: 'Author A',
+      notes: 'Some notes',
+    },
+    {
+      id: '2',
+      name: 'Person B',
+      type: 'Person',
+      contact: 'contact@example.com',
+      notes: 'Other notes',
+    },
+  ];
 }
 
 export async function addSource(source) {
-  try {
-    const response = await fetch('/api/sources', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(source),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to add source');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error adding source:', error);
-    throw error;
-  }
+  console.log('API: addSource called (placeholder)', source);
+  // Placeholder for adding a source to the backend
+  return { ...source, id: Date.now().toString() }; // Simulate ID generation
 }
 
 export async function deleteSource(id) {
-  try {
-    const response = await fetch(`/api/sources/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to delete source');
-    }
-  } catch (error) {
-    console.error('Error deleting source:', error);
-    throw error;
-  }
+  console.log('API: deleteSource called (placeholder)', id);
+  // Placeholder for deleting a source from the backend
+  return { success: true };
 }
 
-export async function updateSource(source) {
-  try {
-    const response = await fetch(`/api/sources/${source.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(source),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to update source');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error updating source:', error);
-    throw error;
-  }
+export async function updateSource(id, source) {
+  console.log('API: updateSource called (placeholder)', id, source);
+  // Placeholder for updating a source in the backend
+  return { ...source, id: id };
 }

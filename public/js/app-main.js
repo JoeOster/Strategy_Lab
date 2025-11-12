@@ -1,12 +1,12 @@
 import { initializeNavigation } from './modules/navigation/index.js';
 import {
   initializeSettingsModule,
-  loadUserPreferences,
+  loadAppearanceSettings,
 } from './modules/settings/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Strategy Lab App Main script loaded.');
-  loadUserPreferences();
+  loadAppearanceSettings();
   initializeNavigation();
   initializeSettingsModule();
 });
