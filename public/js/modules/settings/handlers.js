@@ -1,8 +1,8 @@
 // public/js/modules/settings/handlers.js
 import {
+  addExchange,
   addHolder,
   addSource,
-  addExchange,
   deleteHolder,
   deleteSource,
   getAccountHolders,
@@ -23,6 +23,10 @@ export function handleMainTabClick(event) {
   }
   for (const panel of document.querySelectorAll('.settings-panel')) {
     panel.classList.remove('active');
+  }
+  // Deactivate all sub-panels globally
+  for (const subPanel of document.querySelectorAll('.sub-panel')) {
+    subPanel.classList.remove('active');
   }
 
   // Activate the clicked tab and its corresponding panel
@@ -145,7 +149,9 @@ export function handleCloseModal() {
  * Handles saving all settings.
  */
 export function handleSaveAllSettings() {
-  console.log('Save All Settings button clicked. Settings saved (visual feedback is immediate for theme/font).');
+  console.log(
+    'Save All Settings button clicked. Settings saved (visual feedback is immediate for theme/font).'
+  );
   // General settings form values are typically read directly when needed or saved on change.
   // Appearance settings (theme/font) are saved to localStorage immediately on change.
   // No explicit API call here for these settings as they are client-side preferences.
@@ -250,8 +256,6 @@ export function handleFontChange(event) {
   localStorage.setItem('font', selectedFont); // Save to Local Storage
 }
 
-
-
 /**
  * Clears the General and Appearance settings forms.
  */
@@ -280,6 +284,49 @@ export function handleClearEditSourceForm() {
     if (fieldsContainer) {
       fieldsContainer.style.display = 'none';
     }
+  }
+}
+
+/**
+ * Clears the "Add New Source" form.
+ */
+export function handleClearNewSourceForm() {
+  console.log('handleClearNewSourceForm called');
+  const form = document.getElementById('add-new-source-form');
+  if (form) {
+    form.reset();
+    // Hide the dynamic fields again
+    const fieldsContainer = form.querySelector('#new-source-fields-container');
+    if (fieldsContainer) {
+      fieldsContainer.style.display = 'none';
+    }
+    // Reset the source type dropdown to its default
+    const newSourceType = form.querySelector('#new-source-type');
+    if (newSourceType) {
+      newSourceType.value = ''; // Assuming empty string is the default/placeholder value
+    }
+  }
+}
+
+/**
+ * Clears the "Add New Exchange" form.
+ */
+export function handleClearExchangeForm() {
+  console.log('handleClearExchangeForm called');
+  const form = document.getElementById('add-exchange-form');
+  if (form) {
+    form.reset();
+  }
+}
+
+/**
+ * Clears the "Add New Holder" form.
+ */
+export function handleClearHolderForm() {
+  console.log('handleClearHolderForm called');
+  const form = document.getElementById('add-holder-form');
+  if (form) {
+    form.reset();
   }
 }
 

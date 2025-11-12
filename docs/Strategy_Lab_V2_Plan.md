@@ -40,29 +40,28 @@ development will adhere to a Git-based feature branch workflow.
 
 ### Branching & Commits
 
-1.  **Main as Truth:** The `main` branch is the single source of truth and must
-    always be in a stable, deployable state. Direct commits to `main` are
-    forbidden post-setup.
-2.  **Temporary Feature Branches:** All new work (features, bug fixes) **must**
-    be done on a temporary feature branch, created from `main` (e.g.,
-    `feature/add-settings-modal`).
-3.  **Atomic Commits:** Each logical step of a task will be committed
-    individually. This creates a granular history and allows for easy rollbacks.
-4.  **Pre-Merge Verification:** Before a branch can be merged, it must pass all
-    automated quality checks (e.g., `npm run check`).
-5.  **Merge and Delete:** Once a feature is complete and verified, the branch
-    will be merged into `main`. The feature branch will then be deleted.
+1. **Main as Truth:** The `main` branch is the single source of truth and must
+   always be in a stable, deployable state. Direct commits to `main` are
+   forbidden post-setup.
+2. **Temporary Feature Branches:** All new work (features, bug fixes) **must**
+   be done on a temporary feature branch, created from `main` (e.g.,
+   `feature/add-settings-modal`).
+3. **Atomic Commits:** Each logical step of a task will be committed
+   individually. This creates a granular history and allows for easy rollbacks.
+4. **Pre-Merge Verification:** Before a branch can be merged, it must pass all
+   automated quality checks (e.g., `npm run check`).
+5. **Merge and Delete:** Once a feature is complete and verified, the branch
+   will be merged into `main`. The feature branch will then be deleted.
 
 ### Task Management (The "Issue Tracker")
 
-1.  **The Plan:** For each task, a detailed, step-by-step technical plan will be
-    generated.
-2.  **Local Task Log:** Due to the agent's limitations in accessing the GitHub
-    web UI, we will use the `docs/CURRENT_TASK_LOG.md` file as a local
-    substitute for a GitHub Issue. This file will contain the checklist for the
-    active task.
-3.  **Execution:** The agent will execute the steps from the task log and make a
-    corresponding Git commit for each completed step.
+1. **The Plan:** For each task, a detailed, step-by-step technical plan will be
+   generated.
+2. **Local Task Log:** Due to the agent's limitations in accessing the GitHub
+   web UI, we will use the `docs/CURRENT_TASK_LOG.md` file as a local substitute
+   for a GitHub Issue. This file will contain the checklist for the active task.
+3. **Execution:** The agent will execute the steps from the task log and make a
+   corresponding Git commit for each completed step.
 
 ## 2. Core Data Definitions
 
@@ -154,4 +153,37 @@ _(Note: The main HTML template files (e.g., `_modal_settings.html`) will remain
 in the `public/templates/` directory. This pattern is only for the JavaScript
 that powers them.)_
 
-### Proposed `public/js/` Directory Structure
+---
+
+## **NEW SECTION STARTS HERE**
+
+### Special Case: "Conductor Module" Pattern
+
+A "Conductor Module" (like `settings`) acts as a container for other, smaller
+modules (like `settings-appearance`, `settings-sources`, etc.).
+
+To prevent the Conductor's `handlers.js` and `api.js` files from becoming
+monoliths, a Conductor must follow these rules:
+
+1. **Conductor Files:** The root `index.js` and `handlers.js` of a Conductor
+   (e.g., `settings/index.js`) are responsible _only_ for the main "shell" logic
+   (e.g., loading the modal, switching the main L1 tabs).
+2. **Sub-Module Files:** All logic for a sub-module (e.g., "Advice Sources")
+   **must** be contained in its _own_ set of files, prefixed within the _same_
+   folder.
+3. **Example Structure:** The `public/js/modules/settings/` folder should look
+   like this:
+   - `index.js` (The Conductor: initializes the modal and all sub-modules)
+   - `handlers.js` (Conductor Handlers: `handleMainTabClick`,
+     `handleCloseModal`)
+   - **`appearance.handlers.js`** (Appearance-specific handlers)
+   - **`sources.api.js`** (Sources-specific API calls)
+   - **`sources.handlers.js`** (Sources-specific handlers)
+   - **`sources.render.js`** (Sources-specific render functions)
+   - **`users.api.js`**
+   - **`users.handlers.js`**
+   - ...etc.
+
+The Conductor's `index.js` will import from all its sibling files (e.g.,
+`import * as sourcesHandlers from './sources.handlers.js'`) to attach listeners.
+This keeps each piece of logic small, isolated, and highly maintainable.

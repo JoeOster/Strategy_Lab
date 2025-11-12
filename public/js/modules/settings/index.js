@@ -37,9 +37,14 @@ export function initializeSettingsModule() {
     .addEventListener('click', handlers.handleSaveAllSettings);
 
   // Clear general settings button
-  const clearGeneralSettingsBtn = document.getElementById('clear-general-settings-button');
+  const clearGeneralSettingsBtn = document.getElementById(
+    'clear-general-settings-button'
+  );
   if (clearGeneralSettingsBtn) {
-    clearGeneralSettingsBtn.addEventListener('click', handlers.handleClearGeneralAndAppearanceForms);
+    clearGeneralSettingsBtn.addEventListener(
+      'click',
+      handlers.handleClearGeneralAndAppearanceForms
+    );
   }
 
   // Source type dropdowns
@@ -71,13 +76,19 @@ export function initializeSettingsModule() {
   // Clear new source form button
   const clearNewSourceBtn = document.getElementById('clear-new-source-btn');
   if (clearNewSourceBtn) {
-    clearNewSourceBtn.addEventListener('click', handlers.handleClearNewSourceForm);
+    clearNewSourceBtn.addEventListener(
+      'click',
+      handlers.handleClearNewSourceForm
+    );
   }
 
   // Clear exchange form button
   const clearExchangeBtn = document.getElementById('clear-exchange-btn');
   if (clearExchangeBtn) {
-    clearExchangeBtn.addEventListener('click', handlers.handleClearExchangeForm);
+    clearExchangeBtn.addEventListener(
+      'click',
+      handlers.handleClearExchangeForm
+    );
   }
 
   // Clear holder form button
@@ -87,9 +98,14 @@ export function initializeSettingsModule() {
   }
 
   // Clear edit source form button
-  const clearEditSourceBtn = document.getElementById('clear-edit-source-button');
+  const clearEditSourceBtn = document.getElementById(
+    'clear-edit-source-button'
+  );
   if (clearEditSourceBtn) {
-    clearEditSourceBtn.addEventListener('click', handlers.handleClearEditSourceForm);
+    clearEditSourceBtn.addEventListener(
+      'click',
+      handlers.handleClearEditSourceForm
+    );
   }
 
   // Edit source form submission
@@ -103,7 +119,7 @@ export function initializeSettingsModule() {
   // export function handleEditSourceSubmit(event) {
   //   console.log('handleEditSourceSubmit called (placeholder)');
   //   event.preventDefault();
-  }
+  // }
 
   // Event delegation for deleting sources
   const sourcesContainer = document.getElementById('advice-source-list');
