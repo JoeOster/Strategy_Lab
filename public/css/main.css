@@ -7,7 +7,7 @@
 
 .settings-tabs button,
 .settings-sub-tabs button {
-  background-color: var(--info-panel-bg);
+  background-color: var(--container-bg);
   color: var(--text-color);
   border: none;
   padding: 10px 15px;
@@ -21,15 +21,14 @@
 
 .settings-tabs button:hover,
 .settings-sub-tabs button:hover {
-  background-color: var(--container-bg);
+  background-color: var(--info-panel-bg);
 }
 
 .settings-tabs button.active,
 .settings-sub-tabs button.active {
-  background-color: var(--container-bg);
+  background-color: var(--info-panel-bg);
   color: var(--heading-color);
-  border-bottom: 1px solid var(--container-bg);
-}
+  border-bottom: 1px solid var(--info-panel-bg);
 
 /* Settings Panels */
 .settings-panel,
