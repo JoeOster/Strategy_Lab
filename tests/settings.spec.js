@@ -79,6 +79,70 @@ test.describe('Settings Module - Advice Sources', () => {
     ).not.toBeAttached();
   });
 
+  test('should not add a person advice source with empty name', async ({
+    page,
+  }) => {
+    const sourceEmail = 'invalid_name@example.com';
+    await page.selectOption('#new-source-type', 'person');
+    await page.fill('#new-source-name', ''); // Empty name
+    await page.fill('#new-source-contact-email', sourceEmail);
+    await page.click('#add-new-source-form button[type="submit"]');
+
+    await expect(page.locator('#new-source-name')).toHaveClass(/is-invalid/); // Assuming Bootstrap validation class
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      '(person)'
+    );
+  });
+
+  test('should not add a person advice source with invalid email', async ({
+    page,
+  }) => {
+    const sourceName = 'Invalid Email Person';
+    await page.selectOption('#new-source-type', 'person');
+    await page.fill('#new-source-name', sourceName);
+    await page.fill('#new-source-contact-email', 'invalid-email'); // Invalid email
+    await page.click('#add-new-source-form button[type="submit"]');
+
+    await expect(page.locator('#new-source-contact-email')).toHaveClass(
+      /is-invalid/
+    ); // Assuming Bootstrap validation class
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      sourceName
+    );
+  });
+
+  test('should not add a book advice source with empty title', async ({
+    page,
+  }) => {
+    const sourceAuthor = 'Invalid Title Author';
+    await page.selectOption('#new-source-type', 'book');
+    await page.fill('#new-source-name', ''); // Empty title
+    await page.fill('#new-source-book-author', sourceAuthor);
+    await page.click('#add-new-source-form button[type="submit"]');
+
+    await expect(page.locator('#new-source-name')).toHaveClass(/is-invalid/); // Assuming Bootstrap validation class
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      '(book)'
+    );
+  });
+
+  test('should not add a book advice source with empty author', async ({
+    page,
+  }) => {
+    const sourceTitle = 'Invalid Author Book';
+    await page.selectOption('#new-source-type', 'book');
+    await page.fill('#new-source-name', sourceTitle);
+    await page.fill('#new-source-book-author', ''); // Empty author
+    await page.click('#add-new-source-form button[type="submit"]');
+
+    await expect(page.locator('#new-source-book-author')).toHaveClass(
+      /is-invalid/
+    ); // Assuming Bootstrap validation class
+    await expect(page.locator('#advice-source-list')).not.toContainText(
+      sourceTitle
+    );
+  });
+
   test('should clear "Add New Exchange" form fields after successful submission', async ({
     page,
   }) => {
