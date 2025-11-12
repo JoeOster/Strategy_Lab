@@ -178,6 +178,70 @@ app.delete('/api/sources/:id', async (req, res) => {
   }
 });
 
+// API route to get all account holders
+app.get('/api/holders', async (req, res) => {
+  try {
+    const db = await getDb();
+    const holders = await db.all(
+      'SELECT * FROM account_holders ORDER BY username'
+    );
+    res.json(holders);
+  } catch (err) {
+    console.error('Failed to get account holders:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to get account holders', details: err.message });
+  }
+});
+
+// API route to add a new account holder
+app.post('/api/holders', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+
+    const result = await db.run(
+      'INSERT INTO account_holders (username) VALUES (?)',
+      username
+    );
+
+    const newHolder = await db.get(
+      'SELECT * FROM account_holders WHERE id = ?',
+      result.lastID
+    );
+
+    res.status(201).json(newHolder);
+  } catch (err) {
+    console.error('Failed to add account holder:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to add account holder', details: err.message });
+  }
+});
+
+// API route to delete an account holder
+app.delete('/api/holders/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+
+    const result = await db.run('DELETE FROM account_holders WHERE id = ?', id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Account holder not found' });
+    }
+
+    res.status(204).send();
+  } catch (err) {
+    console.error('Failed to delete account holder:', err);
+    res.status(500).json({ error: 'Failed to delete account holder' });
+  }
+});
+
 // API route to clear the database (for testing purposes)
 if (process.env.TEST_ENV) {
   app.post('/api/clear-db', async (req, res) => {

@@ -41,7 +41,9 @@ following actions:
 2.  Break the Leader's high-level task into a detailed, step-by-step checklist.
     This must account for all required file creations, modifications, and
     deletions.
-3.  Write this checklist into a new file named `docs/CURRENT_TASK_LOG.md`.
+3.  Write this checklist into a new file named `docs/CURRENT_TASK_LOG.md`. This
+    log is a living document and should be updated as the task progresses to
+    maintain context.
 4.  Report back to the Leader: "Log created. Ready to execute."
 
 ### Phase 3: Execution (Leader)
@@ -61,7 +63,8 @@ This is the Servant's **Primary Directive** during execution.
 3.  **Execute:** Perform the action for _only_ that single step.
 4.  **Update:** _After_ the step is successfully completed, **immediately update
     the `docs/CURRENT_TASK_LOG.md` file** to mark the step as complete (e.g.,
-    `[x] Step 4`).
+    `[x] Step 4`). This update should also include any new insights or changes
+    to the plan that emerged during the execution of the step.
 5.  **Loop or Stop:**
     - If in "Continuous Mode," loop back to Step 1.
     - If in "Single-Step Mode," stop and await the Leader's next command.

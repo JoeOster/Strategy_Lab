@@ -1,8 +1,15 @@
 // public/js/modules/settings/handlers.js
-import { addSource, deleteSource, getSources } from './api.js';
+import {
+  addHolder,
+  addSource,
+  deleteHolder,
+  deleteSource,
+  getAccountHolders,
+  getSources,
+} from './api.js';
 
 export function handleMainTabClick(event) {
-  console.log('Main tab clicked:', event.target.dataset.tab);
+  console.log('handleMainTabClick called for:', event.target.dataset.tab);
   // Deactivate all main tabs and panels
   for (const tab of document.querySelectorAll('.settings-tab')) {
     tab.classList.remove('active');
@@ -17,44 +24,92 @@ export function handleMainTabClick(event) {
   const panel = document.getElementById(targetPanelId);
   if (panel) {
     panel.classList.add('active');
+    // Always load data for the clicked main tab
+    if (targetPanelId === 'appearance-settings-panel') {
+      loadAppearanceSettings();
+    } else if (targetPanelId === 'data-management-settings-panel') {
+      initializeSubTabs(panel, 'sources-panel', loadSourcesList);
+    } else if (targetPanelId === 'user-management-settings-panel') {
+      initializeSubTabs(panel, 'users-panel', loadAccountHoldersList);
+    }
   } else {
     console.error(`Settings panel not found: ${targetPanelId}`);
   }
 }
 
-export function handleDataSubTabClick(event) {
-  console.log('Data sub-tab clicked:', event.target.dataset.subTab);
-  // Deactivate all data sub-tabs and panels
-  for (const tab of document.querySelectorAll('.data-sub-tab')) {
+function initializeSubTabs(panelElement, defaultPanelId, defaultLoadFunction) {
+  // Deactivate all sub-tabs and panels within the section
+  for (const tab of panelElement.querySelectorAll('.settings-sub-tab')) {
     tab.classList.remove('active');
   }
-  // Activate the clicked sub-tab and its corresponding panel
-  event.target.classList.add('active');
-  const targetPanelId = event.target.dataset.subTab;
-  document.getElementById(targetPanelId).classList.add('active');
-
-  // If the Advice Sources panel is activated, load the sources list
-  if (targetPanelId === 'advice-sources-panel') {
-    loadSourcesList();
-  }
-}
-
-export function handleUserSubTabClick(event) {
-  console.log('User sub-tab clicked:', event.target.dataset.subTab);
-  // Deactivate all user sub-tabs and panels
-  for (const tab of document.querySelectorAll('.user-sub-tab')) {
-    tab.classList.remove('active');
-  }
-  for (const panel of document.querySelectorAll(
-    '#user-management-settings-panel .sub-panel'
-  )) {
+  for (const panel of panelElement.querySelectorAll('.sub-panel')) {
     panel.classList.remove('active');
   }
 
-  // Activate the clicked sub-tab and its corresponding panel
-  event.target.classList.add('active');
-  const targetPanelId = event.target.dataset.subTab;
-  document.getElementById(targetPanelId).classList.add('active');
+  // Activate the default sub-tab and its panel
+  const defaultTab = panelElement.querySelector(`[data-sub-tab="${defaultPanelId}"]`);
+  if (defaultTab) {
+    defaultTab.classList.add('active');
+    const defaultPanel = document.getElementById(defaultPanelId);
+    if (defaultPanel) {
+      defaultPanel.classList.add('active');
+      if (defaultLoadFunction) {
+        defaultLoadFunction();
+      }
+    }
+  }
+}
+
+
+export function handleSubTabClick(event) {
+  const clickedTab = event.target.closest('.settings-sub-tab');
+  if (!clickedTab) {
+    return;
+  }
+  event.stopPropagation();
+
+  const targetPanelId = clickedTab.dataset.subTab;
+  const settingsPanel = clickedTab.closest('.settings-panel');
+
+  if (!settingsPanel) {
+    console.error('Could not find parent settings panel.');
+    return;
+  }
+
+  // Deactivate all sub-tabs and sub-panels within this section
+  for (const tab of settingsPanel.querySelectorAll('.settings-sub-tab')) {
+    tab.classList.remove('active');
+  }
+  for (const panel of settingsPanel.querySelectorAll('.sub-panel')) {
+    panel.classList.remove('active');
+  }
+
+  // Activate the clicked tab and its corresponding panel
+  clickedTab.classList.add('active');
+  const targetPanel = settingsPanel.querySelector(`#${targetPanelId}`);
+  if (targetPanel) {
+    targetPanel.classList.add('active');
+    // Load data for the activated panel
+    switch (targetPanelId) {
+      case 'sources-panel':
+        loadSourcesList();
+        break;
+      case 'exchanges-panel':
+        loadExchangesList();
+        break;
+      case 'users-panel':
+        loadAccountHoldersList();
+        break;
+      case 'subscriptions-panel':
+        // Assuming you have a function to get the currently selected user
+        // and pass it to loadSubscriptionsForUser.
+        // This might need more complex logic.
+        loadSubscriptionsForUser();
+        break;
+    }
+  } else {
+    console.error(`Sub-panel with ID '${targetPanelId}' not found.`);
+  }
 }
 
 export function handleCloseModal() {
@@ -77,14 +132,79 @@ export function initializeSettingsModal() {
 export function loadGeneralSettings() {
   console.log('loadGeneralSettings called (placeholder)');
 }
+
 export function loadAppearanceSettings() {
-  console.log('loadAppearanceSettings called (placeholder)');
+  console.log('loadAppearanceSettings called');
+
+  const themeSelector = document.getElementById('theme-selector');
+  const fontSelector = document.getElementById('font-selector');
+
+  if (!themeSelector || !fontSelector) {
+    console.error('Theme or font selector not found!');
+    return;
+  }
+
+  // Populate Themes
+  const themes = [
+    { value: 'light', text: 'Light' },
+    { value: 'dark', text: 'Dark' },
+    { value: 'sepia', text: 'Sepia' },
+    { value: 'contrast', text: 'High Contrast' },
+  ];
+
+  themeSelector.innerHTML = ''; // Clear existing options
+  for (const theme of themes) {
+    const option = document.createElement('option');
+    option.value = theme.value;
+    option.textContent = theme.text;
+    themeSelector.appendChild(option);
+  }
+
+  // Populate Fonts
+  const fonts = [
+    { value: 'var(--font-system)', text: 'System Default' },
+    { value: 'var(--font-inter)', text: 'Inter' },
+    { value: 'var(--font-roboto)', text: 'Roboto' },
+    { value: 'var(--font-lato)', text: 'Lato' },
+    { value: 'var(--font-open-sans)', text: 'Open Sans' },
+    { value: 'var(--font-dancing-script)', text: 'Dancing Script' },
+  ];
+
+  fontSelector.innerHTML = ''; // Clear existing options
+  for (const font of fonts) {
+    const option = document.createElement('option');
+    option.value = font.value;
+    option.textContent = font.text;
+    fontSelector.appendChild(option);
+  }
+
+  // Add event listeners
+  themeSelector.addEventListener('change', handleThemeChange);
+  fontSelector.addEventListener('change', handleFontChange);
+
+  // Set initial values from Local Storage
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  themeSelector.value = savedTheme;
+  document.body.dataset.theme = savedTheme;
+
+
+  const savedFont = localStorage.getItem('font') || 'var(--font-system)';
+  fontSelector.value = savedFont;
+  document.body.style.fontFamily = savedFont;
 }
+
 export function handleThemeChange(event) {
-  console.log('handleThemeChange called (placeholder)', event.target.value);
+  const selectedTheme = event.target.value;
+  console.log('handleThemeChange called:', selectedTheme);
+  document.body.dataset.theme = selectedTheme;
+  localStorage.setItem('theme', selectedTheme); // Save to Local Storage
 }
+
 export function handleFontChange(event) {
-  console.log('handleFontChange called (placeholder)', event.target.value);
+  const selectedFont = event.target.value;
+  console.log('handleFontChange called:', selectedFont);
+  document.body.style.fontFamily = selectedFont;
+  localStorage.setItem('font', selectedFont); // Save to Local Storage
 }
 
 export async function handleAddNewSourceSubmit(event) {
@@ -95,16 +215,44 @@ export async function handleAddNewSourceSubmit(event) {
   const formData = new FormData(form);
   const sourceData = Object.fromEntries(formData.entries());
 
-  // The form gives us 'new-source-type' but the API expects 'type'
-  // and 'new-source-name' but API expects 'name' etc.
-  // We need to rename the keys.
-  const renamedSourceData = {};
-  for (const key in sourceData) {
-    renamedSourceData[key.replace('new-source-', '')] = sourceData[key];
-  }
+  const apiPayload = {
+    name: sourceData['new-source-name'],
+    type: sourceData['new-source-type'],
+    description: sourceData['new-source-description'],
+    image_path: sourceData['new-source-image-path'],
+    url: sourceData['new-source-url'],
+
+    // Person
+    person_email: sourceData['new-source-contact-email'],
+    person_phone: sourceData['new-source-contact-phone'],
+    person_app_type: sourceData['new-source-contact-app-type'],
+    person_app_handle: sourceData['new-source-contact-app-handle'],
+
+    // Group
+    group_primary_contact: sourceData['new-source-group-person'],
+    group_email: sourceData['new-source-group-email'],
+    group_phone: sourceData['new-source-group-phone'],
+    group_app_type: sourceData['new-source-group-app-type'],
+    group_app_handle: sourceData['new-source-group-app-handle'],
+
+    // Book
+    book_author: sourceData['new-source-book-author'],
+    book_isbn: sourceData['new-source-book-isbn'],
+    book_websites: sourceData['new-source-book-websites'],
+    book_pdfs: sourceData['new-source-book-pdfs'],
+
+    // Website
+    website_websites: sourceData['new-source-website-websites'],
+    website_pdfs: sourceData['new-source-website-pdfs'],
+  };
+
+  // Remove undefined properties
+  Object.keys(apiPayload).forEach(
+    (key) => apiPayload[key] === undefined && delete apiPayload[key]
+  );
 
   try {
-    const newSource = await addSource(renamedSourceData);
+    const newSource = await addSource(apiPayload);
     console.log('Source added successfully:', newSource);
     form.reset();
     // Hide the dynamic fields again
@@ -277,7 +425,11 @@ export function handleAddExchangeSubmit(event) {
   event.preventDefault();
 }
 export function loadExchangesList() {
-  console.log('loadExchangesList called (placeholder)');
+  console.log('loadExchangesList called');
+  const listContainer = document.getElementById('exchange-list');
+  if (listContainer) {
+    listContainer.innerHTML = '<p>No exchanges found.</p>';
+  }
 }
 export function handleDeleteExchangeClick(exchangeId) {
   console.log(
@@ -285,12 +437,68 @@ export function handleDeleteExchangeClick(exchangeId) {
     exchangeId
   );
 }
-export function handleAddHolderSubmit(event) {
-  console.log('handleAddHolderSubmit called (placeholder)');
+export async function handleAddHolderSubmit(event) {
   event.preventDefault();
+  console.log('handleAddHolderSubmit called');
+
+  const form = event.target;
+  // Get the value directly from the input field
+  const holderNameInput = form.querySelector('#new-holder-name');
+  const holderName = holderNameInput ? holderNameInput.value : '';
+
+  // Create an object with the 'username' property as expected by the API
+  const holderData = { username: holderName };
+
+  try {
+    const newHolder = await addHolder(holderData);
+    console.log('Holder added successfully:', newHolder);
+    form.reset();
+    await loadAccountHoldersList(); // Refresh the list
+  } catch (error) {
+    console.error('Failed to add holder:', error);
+    alert('Failed to add holder. Please check the console for details.');
+  }
 }
-export function loadAccountHoldersList() {
-  console.log('loadAccountHoldersList called (placeholder)');
+export async function loadAccountHoldersList() {
+  console.log('loadAccountHoldersList called');
+  try {
+    const holders = await getAccountHolders();
+    const listContainer = document.getElementById('account-holder-list');
+    if (!listContainer) {
+      console.error('Account holder list container not found!');
+      return;
+    }
+    listContainer.innerHTML = ''; // Clear existing list
+
+    if (holders.length === 0) {
+      listContainer.innerHTML = '<p>No account holders found.</p>';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'account-holders-list';
+
+    for (const holder of holders) {
+      const li = document.createElement('li');
+      li.className = 'account-holders-list-item';
+      li.innerHTML = `
+        <span>${holder.username}</span>
+        <button class="set-default-holder-btn" data-id="${holder.id}">Set Default</button>
+        <button class="manage-subscriptions-btn" data-id="${holder.id}">Manage Subscriptions</button>
+        <button class="delete-holder-btn" data-id="${holder.id}">Delete</button>
+      `;
+      ul.appendChild(li);
+    }
+
+    listContainer.appendChild(ul);
+  } catch (error) {
+    console.error('Failed to load account holders list:', error);
+    const listContainer = document.getElementById('account-holder-list');
+    if (listContainer) {
+      listContainer.innerHTML =
+        '<p class="error">Error loading account holders. Please try again.</p>';
+    }
+  }
 }
 export function handleSetDefaultHolderClick(holderId) {
   console.log(
@@ -304,11 +512,20 @@ export function handleManageSubscriptionsClick(holderId) {
     holderId
   );
 }
-export function handleDeleteHolderClick(holderId) {
-  console.log(
-    'handleDeleteHolderClick called (placeholder) for holderId:',
-    holderId
-  );
+export async function handleDeleteHolderClick(holderId) {
+  console.log('handleDeleteHolderClick called for holderId:', holderId);
+  if (!confirm('Are you sure you want to delete this account holder?')) {
+    return;
+  }
+
+  try {
+    await deleteHolder(holderId);
+    // Refresh the list to show the holder has been removed
+    await loadAccountHoldersList();
+  } catch (error) {
+    console.error(`Failed to delete holder with ID ${holderId}:`, error);
+    alert('Failed to delete holder. Please check the console for details.');
+  }
 }
 export function loadSubscriptionsForUser(holderId) {
   console.log(
@@ -330,4 +547,12 @@ export function openEditSourceModal(sourceId) {
 export function handleEditSourceSubmit(event) {
   console.log('handleEditSourceSubmit called (placeholder)');
   event.preventDefault();
+}
+
+export function loadUserPreferences() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.body.dataset.theme = savedTheme;
+
+  const savedFont = localStorage.getItem('font') || 'var(--font-system)';
+  document.body.style.fontFamily = savedFont;
 }

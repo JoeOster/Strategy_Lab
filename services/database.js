@@ -49,6 +49,11 @@ export async function getDb() {
           website_pdfs TEXT
         );
         -- INSERT OR IGNORE INTO advice_sources (id, name, type, description) VALUES (1, 'Dummy Source', 'person', 'This is a dummy source for testing purposes.');
+
+        CREATE TABLE IF NOT EXISTS account_holders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT NOT NULL UNIQUE
+        );
       `);
     } catch (err) {
       console.error('Error connecting to the database:', err);

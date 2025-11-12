@@ -2,6 +2,8 @@
 
 import * as handlers from './handlers.js';
 
+export { loadUserPreferences } from './handlers.js';
+
 export function initializeSettingsModule() {
   console.log('Settings module initialized.');
 
@@ -10,14 +12,10 @@ export function initializeSettingsModule() {
     button.addEventListener('click', handlers.handleMainTabClick);
   }
 
-  // Data Management sub-tab navigation
-  for (const button of document.querySelectorAll('.data-sub-tab')) {
-    button.addEventListener('click', handlers.handleDataSubTabClick);
-  }
-
-  // User Management sub-tab navigation
-  for (const button of document.querySelectorAll('.user-sub-tab')) {
-    button.addEventListener('click', handlers.handleUserSubTabClick);
+  // Sub-tab navigation (using event delegation)
+  const subtabsContainers = document.querySelectorAll('.settings-sub-tabs');
+  for (const container of subtabsContainers) {
+    container.addEventListener('click', handlers.handleDataSubTabClick);
   }
 
   // Close button
@@ -75,6 +73,23 @@ export function initializeSettingsModule() {
     });
   }
 
-  // Initial load of the sources list
-  handlers.loadSourcesList();
+  // Add new holder form submission
+  const addHolderForm = document.getElementById('add-holder-form');
+  if (addHolderForm) {
+    addHolderForm.addEventListener('submit', handlers.handleAddHolderSubmit);
+  }
+
+  // Event delegation for deleting holders
+  const accountHolderList = document.getElementById('account-holder-list');
+  if (accountHolderList) {
+    accountHolderList.addEventListener('click', (event) => {
+      if (event.target.classList.contains('delete-holder-btn')) {
+        const holderId = event.target.dataset.id;
+        handlers.handleDeleteHolderClick(holderId);
+      }
+    });
+  }
+
+  // Initial load of the account holders list
+  handlers.loadAccountHoldersList();
 }
