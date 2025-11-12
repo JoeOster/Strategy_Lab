@@ -162,7 +162,9 @@ if (-not $serverReady) {
 
 # --- IMPROVEMENT: Launch in default browser ---
 Write-Log "Launching default browser. The script will wait for you to close the browser."
-Invoke-Item "http://localhost:$port" -Wait
+Start-Process "http://localhost:$port"
+Write-Host "Press any key to close the browser and continue..."
+$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
 # --- END IMPROVEMENT ---
 
 
