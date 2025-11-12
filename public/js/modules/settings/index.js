@@ -15,8 +15,7 @@ export function initializeSettingsModule() {
   // Sub-tab navigation (using event delegation)
   const subtabsContainers = document.querySelectorAll('.settings-sub-tabs');
   for (const container of subtabsContainers) {
-    container.addEventListener('click', handlers.handleDataSubTabClick);
-  }
+  container.addEventListener('click', handlers.handleSubTabClick);  }
 
   // Close button
   const settingsModal = document.getElementById('settings-modal');

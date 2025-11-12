@@ -66,32 +66,27 @@ test.describe('Settings Module - Advice Sources', () => {
       page.locator(`li:has-text("${sourceTitle} (book)")`)
     ).not.toBeAttached();
   });
+test('should delete an advice source', async ({ page }) => {
+  const sourceName = 'Source to Delete';
+  const sourceEmail = 'delete@example.com';
 
-  // This test is temporarily disabled because it consistently fails in Firefox.
-  // The user has requested to "nix" this test for now, as it's not critical
-  // for their primary browsers (Chrome/Edge). It is kept here for future reference.
-  /*
-  test('should delete an advice source', async ({ page }) => {
-    const sourceName = 'Source to Delete';
-    const sourceEmail = 'delete@example.com';
+  // 1. Create the source
+  await page.selectOption('#new-source-type', 'person');
+  await page.fill('#new-source-name', sourceName);
+  await page.fill('#new-source-contact-email', sourceEmail);
+  await page.click('#add-new-source-form button[type="submit"]');
 
-    await page.selectOption('#new-source-type', 'person');
-    await page.fill('#new-source-name', sourceName);
-    await page.fill('#new-source-contact-email', sourceEmail);
-    await page.click('#add-new-source-form button[type="submit"]');
-    await expect(page.locator('#advice-source-list')).toContainText(
-      `${sourceName} (person)`
-    );
+  // 2. Locate the specific list item
+  const sourceItemLocator = page.locator(`li:has-text("${sourceName} (person)")`);
+  await expect(sourceItemLocator).toBeVisible();
 
-    page.on('dialog', (dialog) => dialog.accept());
-    await page.locator('.delete-source-btn[data-id]').first().click();
+  // 3. Set up the dialog handler and click delete
+  page.on('dialog', (dialog) => dialog.accept());
+  await sourceItemLocator.getByRole('button', { name: 'Delete' }).click();
 
-    await expect(
-      page.locator(`li:has-text("${sourceName} (person)")`)
-    ).not.toBeAttached();
-  });
-  */
-
+  // 4. THE FIX: Wait for the element to be removed from the DOM
+  await expect(sourceItemLocator).not.toBeAttached();
+});
 
 });
 
