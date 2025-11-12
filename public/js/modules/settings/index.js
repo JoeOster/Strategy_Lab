@@ -1,6 +1,13 @@
 // public/js/modules/settings/index.js
 
 import * as handlers from './handlers.js';
+import {
+  handleAddNewSourceSubmit,
+  handleSourceTypeChange,
+  loadSourcesList,
+  handleEditSourceClick,
+  handleDeleteSourceClick,
+} from './sources.handlers.js';
 
 export { loadUserPreferences } from './handlers.js';
 
@@ -51,16 +58,16 @@ export function initializeSettingsModule() {
   const newSourceType = document.getElementById('new-source-type');
   if (newSourceType) {
     newSourceType.addEventListener('change', (event) =>
-      handlers.handleSourceTypeChange(event, 'new')
+      handleSourceTypeChange(event, 'new')
     );
     // Trigger once to set initial state
-    handlers.handleSourceTypeChange({ target: newSourceType }, 'new');
+    handleSourceTypeChange({ target: newSourceType }, 'new');
   }
 
   const editSourceType = document.getElementById('edit-source-type');
   if (editSourceType) {
     editSourceType.addEventListener('change', (event) =>
-      handlers.handleSourceTypeChange(event, 'edit')
+      handleSourceTypeChange(event, 'edit')
     );
   }
 
@@ -69,7 +76,7 @@ export function initializeSettingsModule() {
   if (addNewSourceForm) {
     addNewSourceForm.addEventListener(
       'submit',
-      handlers.handleAddNewSourceSubmit
+      handleAddNewSourceSubmit
     );
   }
 
@@ -127,7 +134,7 @@ export function initializeSettingsModule() {
     sourcesContainer.addEventListener('click', (event) => {
       if (event.target.classList.contains('delete-source-btn')) {
         const sourceId = event.target.dataset.id;
-        handlers.handleDeleteSourceClick(sourceId);
+        handleDeleteSourceClick(sourceId);
       }
     });
   }
