@@ -1,6 +1,6 @@
 // public/js/modules/settings/exchanges.handlers.js
 
-import { addExchange, getExchanges, deleteExchange } from './exchanges.api.js';
+import { addExchange, deleteExchange, getExchanges } from './exchanges.api.js';
 
 /**
  * Loads the list of exchanges and renders them in the UI.
@@ -23,7 +23,7 @@ export async function loadExchangesList() {
     }
 
     const ul = document.createElement('ul');
-    exchanges.forEach(exchange => {
+    for (const exchange of exchanges) {
       const li = document.createElement('li');
       li.textContent = exchange.name;
       // Add delete button
@@ -31,7 +31,7 @@ export async function loadExchangesList() {
         <button class="delete-exchange-btn" data-id="${exchange.id}">Delete</button>
       `;
       ul.appendChild(li);
-    });
+    }
     exchangeListDiv.appendChild(ul);
   } catch (error) {
     console.error('Failed to load exchanges:', error);

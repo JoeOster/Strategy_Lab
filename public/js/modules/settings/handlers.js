@@ -1,7 +1,7 @@
-// public/js/modules/settings/handlers.js
-import { getSettings, updateSettings } from './general.api.js';
 import * as appearanceHandlers from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
+// public/js/modules/settings/handlers.js
+import { getSettings, updateSettings } from './general.api.js';
 import * as sourcesHandlers from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
 import { initializeWebAppsPanel } from './webapps.handlers.js';
@@ -192,12 +192,12 @@ export async function loadGeneralSettings() {
 
       const themeSelector = document.getElementById('theme-selector');
       if (themeSelector) {
-        themeSelector.value = settings['theme'] || 'light';
+        themeSelector.value = settings.theme || 'light';
       }
 
       const fontSelector = document.getElementById('font-selector');
       if (fontSelector) {
-        fontSelector.value = settings['font'] || 'system';
+        fontSelector.value = settings.font || 'system';
       }
 
       // Apply the loaded appearance settings

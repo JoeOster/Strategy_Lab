@@ -37,7 +37,7 @@ export async function loadAccountHoldersList() {
     // Prepend default users to the list
     const defaultHolders = [
       { id: -1, username: 'All Users' },
-      { id: -2, username: 'Primary' }
+      { id: -2, username: 'Primary' },
     ];
     const allHolders = [...defaultHolders, ...holders];
 
@@ -49,12 +49,13 @@ export async function loadAccountHoldersList() {
     }
 
     const ul = document.createElement('ul');
-    allHolders.forEach(holder => {
+    for (const holder of allHolders) {
       const li = document.createElement('li');
       li.textContent = holder.username;
       // Add buttons for delete, set default, manage subscriptions
       // Only show action buttons for actual users, not for default "All Users" or "Primary"
-      if (holder.id >= 0) { // Assuming actual user IDs are non-negative
+      if (holder.id >= 0) {
+        // Assuming actual user IDs are non-negative
         li.innerHTML += `
           <button class="set-default-holder-btn" data-id="${holder.id}">Set Default</button>
           <button class="manage-subscriptions-btn" data-id="${holder.id}">Manage Subscriptions</button>
@@ -62,7 +63,7 @@ export async function loadAccountHoldersList() {
         `;
       }
       ul.appendChild(li);
-    });
+    }
     accountHolderListDiv.appendChild(ul);
   } catch (error) {
     console.error('Failed to load account holders:', error);

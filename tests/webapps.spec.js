@@ -51,7 +51,7 @@ test.describe('Settings Module - Web Apps', () => {
 
     // Delete the web app
     page.on('dialog', (dialog) => dialog.accept());
-    await page.locator(`.delete-webapp-btn[data-id]`).first().click();
+    await page.locator('.delete-webapp-btn[data-id]').first().click();
 
     await expect(page.locator('#webapp-list')).not.toContainText(webAppName);
     await expect(page.locator('#webapp-list')).toContainText(

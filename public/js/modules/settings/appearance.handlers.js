@@ -77,14 +77,14 @@ export function loadAppearanceSettings() {
   const fontSelector = document.getElementById('font-selector');
 
   let currentTheme = 'light'; // Default theme
-  if (themeSelector && themeSelector.value) {
+  if (themeSelector?.value) {
     currentTheme = themeSelector.value;
   }
   applyTheme(currentTheme);
   populateThemeSelector(currentTheme); // Call here
 
   let currentFont = 'system'; // Default font
-  if (fontSelector && fontSelector.value) {
+  if (fontSelector?.value) {
     currentFont = fontSelector.value;
   }
   applyFont(currentFont);

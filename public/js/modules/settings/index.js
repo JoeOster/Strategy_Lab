@@ -5,6 +5,7 @@ import {
   handleThemeChange,
   loadAppearanceSettings,
 } from './appearance.handlers.js';
+import * as exchangesHandlers from './exchanges.handlers.js';
 import * as handlers from './handlers.js';
 import {
   handleAddNewSourceSubmit,
@@ -12,7 +13,6 @@ import {
   handleSourceTypeChange,
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
-import * as exchangesHandlers from './exchanges.handlers.js';
 
 import { loadAccountHoldersList } from './users.handlers.js';
 
@@ -97,7 +97,10 @@ export function initializeSettingsModule() {
   // Add new exchange form submission
   const addExchangeForm = document.getElementById('add-exchange-form');
   if (addExchangeForm) {
-    addExchangeForm.addEventListener('submit', exchangesHandlers.handleAddExchangeSubmit);
+    addExchangeForm.addEventListener(
+      'submit',
+      exchangesHandlers.handleAddExchangeSubmit
+    );
   }
 
   // Clear new source form button

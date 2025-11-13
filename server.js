@@ -301,8 +301,14 @@ app.post('/api/exchanges', async (req, res) => {
       console.log('Validation error: Exchange name is required');
       return res.status(400).send('Exchange name is required');
     }
-    const result = await db.run('INSERT INTO exchanges (name) VALUES (?)', name);
-    const newExchange = await db.get('SELECT * FROM exchanges WHERE id = ?', result.lastID);
+    const result = await db.run(
+      'INSERT INTO exchanges (name) VALUES (?)',
+      name
+    );
+    const newExchange = await db.get(
+      'SELECT * FROM exchanges WHERE id = ?',
+      result.lastID
+    );
     console.log('New exchange added:', newExchange);
     res.status(201).json(newExchange);
   } catch (err) {
@@ -350,7 +356,10 @@ app.post('/api/webapps', async (req, res) => {
       return res.status(400).json({ error: 'Web app name is required' });
     }
     const result = await db.run('INSERT INTO web_apps (name) VALUES (?)', name);
-    const newWebApp = await db.get('SELECT * FROM web_apps WHERE id = ?', result.lastID);
+    const newWebApp = await db.get(
+      'SELECT * FROM web_apps WHERE id = ?',
+      result.lastID
+    );
     res.status(201).json(newWebApp);
   } catch (err) {
     console.error('Failed to add web app:', err);
