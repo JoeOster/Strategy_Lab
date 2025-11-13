@@ -1,4 +1,4 @@
-The Biome parsing errors in `public\js\modules\settings\index.js` have been resolved.
-- Removed a duplicated block of code.
-- Added a missing closing brace for the `if (clearGeneralSettingsBtn)` block.
-- Added the final missing closing brace for the `initializeSettingsModule` function.
+- Fixed Biome linting error `lint/complexity/noForEach` in `public/js/modules/settings/appearance.handlers.js`.
+- Replaced the `forEach` loop with a `for...of` loop.
+- Verified the fix by running `npm run fix` and `npm run check`.
+- Committed the changes to the `feature/beautification` branch.
