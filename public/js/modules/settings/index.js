@@ -55,7 +55,7 @@ export function initializeSettingsModule() {
   }
 
   // Theme selection
-  const themeSelect = document.getElementById('theme-select');
+  const themeSelect = document.getElementById('theme-selector');
   if (themeSelect) {
     themeSelect.addEventListener('change', handleThemeChange);
   }
