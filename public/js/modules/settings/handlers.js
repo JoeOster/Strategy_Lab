@@ -1,8 +1,10 @@
 // public/js/modules/settings/handlers.js
+import { getSettings, updateSettings } from './api.js';
 import * as appearanceHandlers from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as sourcesHandlers from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
+import { initializeWebAppsPanel } from './webapps.handlers.js';
 
 /**
  * Handles clicks on the main settings tabs (e.g., General, Appearance).
@@ -33,7 +35,11 @@ export function handleMainTabClick(event) {
     if (targetPanelId === 'appearance-settings-panel') {
       appearanceHandlers.loadAppearanceSettings();
     } else if (targetPanelId === 'data-management-settings-panel') {
-      sourcesHandlers.loadSourcesList();
+      initializeSubTabs(
+        panel,
+        'sources-panel', // Default to sources-panel
+        sourcesHandlers.loadSourcesList
+      );
     } else if (targetPanelId === 'user-management-settings-panel') {
       initializeSubTabs(
         panel,
@@ -119,6 +125,9 @@ export function handleSubTabClick(event) {
       case 'exchanges-panel':
         exchangesHandlers.loadExchangesList();
         break;
+      case 'webapps-panel':
+        initializeWebAppsPanel();
+        break;
       case 'users-panel':
         usersHandlers.loadAccountHoldersList();
         break;
@@ -143,14 +152,60 @@ export function handleCloseModal() {
 /**
  * Handles saving all settings.
  */
-export function handleSaveAllSettings() {
-  console.log(
-    'Save All Settings button clicked. Settings saved (visual feedback is immediate for theme/font).'
-  );
-  // General settings form values are typically read directly when needed or saved on change.
-  // Appearance settings (theme/font) are saved to localStorage immediately on change.
-  // No explicit API call here for these settings as they are client-side preferences.
-  // The modal should not close automatically after saving.
+export async function handleSaveAllSettings() {
+  console.log('Save All Settings button clicked.');
+  const settings = {
+    'family-name': document.getElementById('family-name').value,
+    'take-profit-percent': document.getElementById('take-profit-percent').value,
+    'stop-loss-percent': document.getElementById('stop-loss-percent').value,
+    'notification-cooldown': document.getElementById('notification-cooldown')
+      .value,
+    theme: document.getElementById('theme-selector').value,
+    font: document.getElementById('font-selector').value,
+  };
+
+  try {
+    await updateSettings(settings);
+    console.log('Settings saved to database.');
+    // Optionally, show a success message to the user
+  } catch (error) {
+    console.error('Failed to save settings:', error);
+    // Optionally, show an error message to the user
+  }
+}
+
+/**
+ * Loads general settings from the database and populates the form.
+ */
+export async function loadGeneralSettings() {
+  try {
+    const settings = await getSettings();
+    if (settings) {
+      document.getElementById('family-name').value =
+        settings['family-name'] || '';
+      document.getElementById('take-profit-percent').value =
+        settings['take-profit-percent'] || '';
+      document.getElementById('stop-loss-percent').value =
+        settings['stop-loss-percent'] || '';
+      document.getElementById('notification-cooldown').value =
+        settings['notification-cooldown'] || '';
+
+      const themeSelector = document.getElementById('theme-selector');
+      if (themeSelector) {
+        themeSelector.value = settings['theme'] || 'light';
+      }
+
+      const fontSelector = document.getElementById('font-selector');
+      if (fontSelector) {
+        fontSelector.value = settings['font'] || 'system';
+      }
+
+      // Apply the loaded appearance settings
+      appearanceHandlers.loadAppearanceSettings();
+    }
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
 }
 
 /**
@@ -158,19 +213,39 @@ export function handleSaveAllSettings() {
  */
 export function handleClearExchangeForm() {
   console.log('handleClearExchangeForm called (placeholder)');
-  // TODO: Implement actual logic to clear the exchange form
+  const addExchangeForm = document.getElementById('add-exchange-form');
+  if (addExchangeForm) {
+    addExchangeForm.reset();
+  }
 }
 
 /**
- * Handles clearing the general and appearance settings forms.
+ * Handles clearing the web app form.
  */
-export function handleClearGeneralAndAppearanceForms() {
-  console.log('handleClearGeneralAndAppearanceForms called');
+export function handleClearWebAppForm() {
+  console.log('handleClearWebAppForm called');
+  const addWebAppForm = document.getElementById('add-webapp-form');
+  if (addWebAppForm) {
+    addWebAppForm.reset();
+  }
+}
+
+/**
+ * Handles clearing the general settings form.
+ */
+export function handleClearGeneralSettingsForm() {
+  console.log('handleClearGeneralSettingsForm called');
   const generalSettingsForm = document.getElementById('general-settings-form');
   if (generalSettingsForm) {
     generalSettingsForm.reset();
   }
+}
 
+/**
+ * Handles clearing the appearance settings forms.
+ */
+export function handleClearAppearanceForms() {
+  console.log('handleClearAppearanceForms called');
   const themeSelector = document.getElementById('theme-selector');
   if (themeSelector) {
     themeSelector.value = 'light';
@@ -181,7 +256,16 @@ export function handleClearGeneralAndAppearanceForms() {
   const fontSelector = document.getElementById('font-selector');
   if (fontSelector) {
     fontSelector.value = 'system';
-        const event = new Event('change');
+    const event = new Event('change');
     fontSelector.dispatchEvent(event);
   }
+}
+
+/**
+ * Handles clearing both the general settings and appearance forms.
+ */
+export function handleClearGeneralAndAppearanceForms() {
+  console.log('handleClearGeneralAndAppearanceForms called');
+  handleClearGeneralSettingsForm();
+  handleClearAppearanceForms();
 }

@@ -1,32 +1,20 @@
-export async function addHolder(holder) {
+// public/js/modules/settings/users.api.js
+
+export async function addAccountHolder(name) {
   try {
     const response = await fetch('/api/holders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username: holder.username }),
+      body: JSON.stringify({ username: name }),
     });
     if (!response.ok) {
-      throw new Error('Failed to add holder');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {
-    console.error('Error adding holder:', error);
-    throw error;
-  }
-}
-
-export async function deleteHolder(id) {
-  try {
-    const response = await fetch(`/api/holders/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to delete holder');
-    }
-  } catch (error) {
-    console.error('Error deleting holder:', error);
+    console.error('Error adding account holder:', error);
     throw error;
   }
 }
@@ -35,7 +23,7 @@ export async function getAccountHolders() {
   try {
     const response = await fetch('/api/holders');
     if (!response.ok) {
-      throw new Error('Failed to fetch account holders');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {

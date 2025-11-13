@@ -1,8 +1,5 @@
 // public/js/modules/settings/appearance.handlers.js
 
-const THEME_STORAGE_KEY = 'strategyLabTheme';
-const FONT_STORAGE_KEY = 'strategyLabFont';
-
 /**
  * Applies the given theme to the document body.
  * @param {string} themeName - The name of the theme to apply.
@@ -52,7 +49,13 @@ function populateFontSelector(currentFont) {
   // Clear existing options
   fontSelector.innerHTML = '';
 
-  const fonts = ['system', 'sans-serif', 'serif', 'monospace', 'dancing-script']; // These should ideally come from a more centralized config
+  const fonts = [
+    'system',
+    'sans-serif',
+    'serif',
+    'monospace',
+    'dancing-script',
+  ]; // These should ideally come from a more centralized config
 
   for (const font of fonts) {
     const option = document.createElement('option');
@@ -66,23 +69,23 @@ function populateFontSelector(currentFont) {
 }
 
 /**
- * Loads user preferences (theme and font) from local storage and applies them.
+ * Loads user preferences (theme and font) and applies them.
  */
 export function loadAppearanceSettings() {
   console.log('loadAppearanceSettings called');
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  const savedFont = localStorage.getItem(FONT_STORAGE_KEY);
+  const themeSelector = document.getElementById('theme-selector');
+  const fontSelector = document.getElementById('font-selector');
 
   let currentTheme = 'light'; // Default theme
-  if (savedTheme) {
-    currentTheme = savedTheme;
+  if (themeSelector && themeSelector.value) {
+    currentTheme = themeSelector.value;
   }
   applyTheme(currentTheme);
   populateThemeSelector(currentTheme); // Call here
 
   let currentFont = 'system'; // Default font
-  if (savedFont) {
-    currentFont = savedFont;
+  if (fontSelector && fontSelector.value) {
+    currentFont = fontSelector.value;
   }
   applyFont(currentFont);
   populateFontSelector(currentFont);
@@ -95,7 +98,6 @@ export function loadAppearanceSettings() {
 export function handleThemeChange(event) {
   const newTheme = event.target.value;
   applyTheme(newTheme);
-  localStorage.setItem(THEME_STORAGE_KEY, newTheme);
   console.log('Theme changed to:', newTheme);
 }
 
@@ -106,6 +108,5 @@ export function handleThemeChange(event) {
 export function handleFontChange(event) {
   const newFont = event.target.value;
   applyFont(newFont);
-  localStorage.setItem(FONT_STORAGE_KEY, newFont);
   console.log('Font changed to:', newFont);
 }

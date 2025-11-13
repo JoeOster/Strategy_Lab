@@ -34,6 +34,13 @@ guides and `docs/service-guides/`. This is the primary "source of truth" GCA
 - `id` (INTEGER, PRIMARY KEY)
 - `name` (TEXT, NOT NULL, UNIQUE)
 
+### `web_apps`
+
+(Manages web applications)
+
+- `id` (INTEGER, PRIMARY KEY)
+- `name` (TEXT, NOT NULL, UNIQUE)
+
 ---
 
 ## 2. Strategy Lab Tables

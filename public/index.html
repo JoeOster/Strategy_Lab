@@ -10,7 +10,7 @@
 <body>
     <div class="app-container">
         <header class="header">
-            <h1>Strategy Lab</h1>
+            <img src="images/strategy-lab-logo.svg" alt="Strategy Lab Logo" class="header-logo">
         </header>
         <nav class="main-nav">
             <button type="button" class="nav-btn" data-tab="dashboard">Dashboard</button>
@@ -75,13 +75,14 @@
             <div class="settings-sub-tabs">
                 <button class="settings-sub-tab active" data-sub-tab="sources-panel">Advice Sources</button>
                 <button class="settings-sub-tab" data-sub-tab="exchanges-panel">Exchanges</button>
+                <button class="settings-sub-tab" data-sub-tab="webapps-panel">Web Apps</button>
             </div>
 
             <!-- Advice Sources Sub-Panel -->
             <div id="sources-panel" class="sub-panel active">
                 <h4>Add New Advice Source</h4>
                 <form id="add-new-source-form">
-                    <select id="new-source-type" name="new-source-type">
+                    <select id="new-source-type" name="type">
                         <option value="" selected disabled>Select a type...</option>
                         <option value="person">Person</option>
                         <option value="group">Group</option>
@@ -91,42 +92,62 @@
                     <div id="new-source-fields-container" style="display:none;">
                         <div id="new-source-name-wrapper">
                             <label for="new-source-name">Name:</label>
-                            <input type="text" id="new-source-name" name="new-source-name" required>
+                            <input type="text" id="new-source-name" name="name" required>
                         </div>
-                        <div id="new-source-url-wrapper">
+                        <div id="new-source-url-wrapper" style="display: none;">
                             <label for="new-source-url">URL:</label>
-                            <input type="url" id="new-source-url" name="new-source-url">
+                            <input type="url" id="new-source-url" name="url">
                         </div>
                         <div id="new-source-description-wrapper">
                             <label for="new-source-description">Description:</label>
-                            <textarea id="new-source-description" name="new-source-description"></textarea>
+                            <textarea id="new-source-description" name="description"></textarea>
                         </div>
                         <div id="new-source-image-path-wrapper">
                             <label for="new-source-image-path">Image Path:</label>
-                            <input type="text" id="new-source-image-path" name="new-source-image-path">
+                            <input type="text" id="new-source-image-path" name="image_path">
                         </div>
                         <!-- Dynamic Panels for Source Type -->
                         <div id="new-source-panel-person" class="source-type-panel" style="display:none;">
+                            <h5>Person Details</h5>
                             <label for="new-source-contact-email">Email:</label>
-                            <input type="email" id="new-source-contact-email" name="new-source-contact-email">
+                            <input type="email" id="new-source-contact-email" name="person_email">
                             <label for="new-source-contact-phone">Phone:</label>
-                            <input type="tel" id="new-source-contact-phone" name="new-source-contact-phone">
+                            <input type="tel" id="new-source-contact-phone" name="person_phone">
                             <label for="new-source-contact-app-type">Contact App:</label>
-                            <input type="text" id="new-source-contact-app-type" name="new-source-contact-app-type">
+                            <input type="text" id="new-source-contact-app-type" name="person_app_type">
                             <label for="new-source-contact-app-handle">App Handle:</label>
-                            <input type="text" id="new-source-contact-app-handle" name="new-source-contact-app-handle">
+                            <input type="text" id="new-source-contact-app-handle" name="person_app_handle">
                         </div>
                         <div id="new-source-panel-group" class="source-type-panel" style="display:none;">
+                            <h5>Group Details</h5>
                             <label for="new-source-group-person">Primary Contact:</label>
-                            <input type="text" id="new-source-group-person" name="new-source-group-person">
+                            <input type="text" id="new-source-group-person" name="group_primary_contact">
+                            <label for="new-source-group-email">Contact Email:</label>
+                            <input type="email" id="new-source-group-email" name="group_email">
+                            <label for="new-source-group-phone">Group Phone:</label>
+                            <input type="tel" id="new-source-group-phone" name="group_phone">
+                            <label for="new-source-group-app-type">Group App:</label>
+                            <input type="text" id="new-source-group-app-type" name="group_app_type">
+                            <label for="new-source-group-app-handle">Group App Handle:</label>
+                            <input type="text" id="new-source-group-app-handle" name="group_app_handle">
                         </div>
                         <div id="new-source-panel-book" class="source-type-panel" style="display:none;">
+                            <h5>Book Details</h5>
                             <label for="new-source-book-author">Author:</label>
-                            <input type="text" id="new-source-book-author" name="new-source-book-author">
+                            <input type="text" id="new-source-book-author" name="book_author">
                             <label for="new-source-book-isbn">ISBN:</label>
-                            <input type="text" id="new-source-book-isbn" name="new-source-book-isbn">
+                            <input type="text" id="new-source-book-isbn" name="book_isbn">
+                            <label for="new-source-book-websites">Book URL:</label>
+                            <input type="text" id="new-source-book-websites" name="book_websites">
+                            <label for="new-source-book-pdfs">PDFs (comma-separated):</label>
+                            <input type="text" id="new-source-book-pdfs" name="book_pdfs">
                         </div>
                         <div id="new-source-panel-website" class="source-type-panel" style="display:none;">
+                            <h5>Website Details</h5>
+                            <label for="new-source-website-websites">Relevant Links (comma-separated):</label>
+                            <input type="text" id="new-source-website-websites" name="website_websites">
+                            <label for="new-source-website-pdfs">Saved Docs (comma-separated):</label>
+                            <input type="text" id="new-source-website-pdfs" name="website_pdfs">
                         </div>
                         <div class="form-actions">
                             <button type="submit">Add Source</button>
@@ -156,6 +177,24 @@
                 <h4>Exchanges</h4>
                 <div id="exchange-list">
                     <!-- Exchange list will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Web Apps Sub-Panel -->
+            <div id="webapps-panel" class="sub-panel">
+                <h4>Add New Web App</h4>
+                <form id="add-webapp-form">
+                    <label for="new-webapp-name">Name:</label>
+                    <input type="text" id="new-webapp-name" name="new-webapp-name" required>
+                    <div class="form-actions">
+                        <button type="submit" id="add-webapp-btn">Add Web App</button>
+                        <button type="button" id="clear-webapp-btn" class="clear-btn">Clear</button>
+                    </div>
+                </form>
+                <hr>
+                <h4>Web Apps</h4>
+                <div id="webapp-list">
+                    <!-- Web App list will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -196,8 +235,7 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" id="save-settings-button">Save Settings</button>
-            <button type="button" id="clear-general-settings-button" class="clear-btn">Clear Settings</button>
+            <button type="button" id="save-settings-button">Save All Settings</button>
         </div>
     </div>
 </div>
@@ -210,7 +248,7 @@
         <form id="edit-source-form">
             <input type="hidden" id="edit-source-id">
             <label for="edit-source-type">Type:</label>
-            <select id="edit-source-type">
+            <select id="edit-source-type" name="type">
                 <option value="" selected disabled>Select a type...</option>
                 <option value="person">Person</option>
                 <option value="group">Group</option>
@@ -221,63 +259,63 @@
             <div id="edit-source-fields-container" style="display:none;">
                 <div id="edit-source-name-wrapper">
                     <label for="edit-source-name">Name:</label>
-                    <input type="text" id="edit-source-name" required>
+                    <input type="text" id="edit-source-name" name="name" required>
                 </div>
-                <div id="edit-source-url-wrapper">
+                <div id="edit-source-url-wrapper" style="display: none;">
                     <label for="edit-source-url">URL:</label>
-                    <input type="url" id="edit-source-url">
+                    <input type="url" id="edit-source-url" name="url">
                 </div>
                 <div id="edit-source-description-wrapper">
                     <label for="edit-source-description">Description:</label>
-                    <textarea id="edit-source-description"></textarea>
+                    <textarea id="edit-source-description" name="description"></textarea>
                 </div>
                 <div id="edit-source-image-path-wrapper">
                     <label for="edit-source-image-path">Image Path:</label>
-                    <input type="text" id="edit-source-image-path">
+                    <input type="text" id="edit-source-image-path" name="image_path">
                 </div>
 
                 <!-- Dynamic Panels for Source Type -->
                 <div id="edit-source-panel-person" class="source-type-panel" style="display:none;">
                     <h5>Person Details</h5>
                     <label for="edit-source-contact-email">Email:</label>
-                    <input type="email" id="edit-source-contact-email">
+                    <input type="email" id="edit-source-contact-email" name="person_email">
                     <label for="edit-source-contact-phone">Phone:</label>
-                    <input type="tel" id="edit-source-contact-phone">
+                    <input type="tel" id="edit-source-contact-phone" name="person_phone">
                     <label for="edit-source-contact-app-type">Contact App:</label>
-                    <input type="text" id="edit-source-contact-app-type">
+                    <input type="text" id="edit-source-contact-app-type" name="person_app_type">
                     <label for="edit-source-contact-app-handle">App Handle:</label>
-                    <input type="text" id="edit-source-contact-app-handle">
+                    <input type="text" id="edit-source-contact-app-handle" name="person_app_handle">
                 </div>
                 <div id="edit-source-panel-group" class="source-type-panel" style="display:none;">
                     <h5>Group Details</h5>
                     <label for="edit-source-group-person">Primary Contact:</label>
-                    <input type="text" id="edit-source-group-person">
-                    <label for="edit-source-group-email">Group Email:</label>
-                    <input type="email" id="edit-source-group-email">
+                    <input type="text" id="edit-source-group-person" name="group_primary_contact">
+                    <label for="edit-source-group-email">Contact Email:</label>
+                    <input type="email" id="edit-source-group-email" name="group_email">
                     <label for="edit-source-group-phone">Group Phone:</label>
-                    <input type="tel" id="edit-source-group-phone">
+                    <input type="tel" id="edit-source-group-phone" name="group_phone">
                     <label for="edit-source-group-app-type">Group App:</label>
-                    <input type="text" id="edit-source-group-app-type">
+                    <input type="text" id="edit-source-group-app-type" name="group_app_type">
                     <label for="edit-source-group-app-handle">Group App Handle:</label>
-                    <input type="text" id="edit-source-group-app-handle">
+                    <input type="text" id="edit-source-group-app-handle" name="group_app_handle">
                 </div>
                 <div id="edit-source-panel-book" class="source-type-panel" style="display:none;">
                     <h5>Book Details</h5>
                     <label for="edit-source-book-author">Author:</label>
-                    <input type="text" id="edit-source-book-author">
+                    <input type="text" id="edit-source-book-author" name="book_author">
                     <label for="edit-source-book-isbn">ISBN:</label>
-                    <input type="text" id="edit-source-book-isbn">
-                    <label for="edit-source-book-websites">Websites (comma-separated):</label>
-                    <input type="text" id="edit-source-book-websites">
+                    <input type="text" id="edit-source-book-isbn" name="book_isbn">
+                    <label for="edit-source-book-websites">Book URL:</label>
+                    <input type="text" id="edit-source-book-websites" name="book_websites">
                     <label for="edit-source-book-pdfs">PDFs (comma-separated):</label>
-                    <input type="text" id="edit-source-book-pdfs">
+                    <input type="text" id="edit-source-book-pdfs" name="book_pdfs">
                 </div>
                 <div id="edit-source-panel-website" class="source-type-panel" style="display:none;">
                     <h5>Website Details</h5>
                     <label for="edit-source-website-websites">Relevant Links (comma-separated):</label>
-                    <input type="text" id="edit-source-website-websites">
+                    <input type="text" id="edit-source-website-websites" name="website_websites">
                     <label for="edit-source-website-pdfs">Saved Docs (comma-separated):</label>
-                    <input type="text" id="edit-source-website-pdfs">
+                    <input type="text" id="edit-source-website-pdfs" name="website_pdfs">
                 </div>
                 <div class="modal-footer">
                     <button type="submit">Save Changes</button>

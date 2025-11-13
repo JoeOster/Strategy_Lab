@@ -12,8 +12,8 @@
   --font-lato: "Lato", var(--font-system);
   --font-open-sans: "Open Sans", var(--font-system);
   --font-dancing-script: "Dancing Script", cursive;
-  --font-serif: Georgia, 'Times New Roman', Times, serif;
-  --font-monospace: 'Courier New', Courier, monospace;
+  --font-serif: Georgia, "Times New Roman", Times, serif;
+  --font-monospace: "Courier New", Courier, monospace;
 
   /* Light Theme (Default) */
   --bg-color: #f4f7f9;

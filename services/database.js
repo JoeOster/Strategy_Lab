@@ -54,6 +54,29 @@ export async function getDb() {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           username TEXT NOT NULL UNIQUE
         );
+
+        CREATE TABLE IF NOT EXISTS web_apps (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS exchanges (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS app_settings (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          key TEXT UNIQUE,
+          value TEXT
+        );
+
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('family-name', '');
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('take-profit-percent', '10');
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('stop-loss-percent', '5');
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification-cooldown', '60');
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('theme', 'light');
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('font', 'system');
       `);
     } catch (err) {
       console.error('Error connecting to the database:', err);
@@ -101,4 +124,20 @@ export async function clearDb() {
       `Failed to unlink database after ${maxRetries} retries: ${dbPath}`
     );
   }
+}
+
+export async function addWebApp(name) {
+  const db = await getDb();
+  const result = await db.run('INSERT INTO web_apps (name) VALUES (?)', name);
+  return result.lastID;
+}
+
+export async function getWebApps() {
+  const db = await getDb();
+  return db.all('SELECT * FROM web_apps');
+}
+
+export async function deleteWebApp(id) {
+  const db = await getDb();
+  await db.run('DELETE FROM web_apps WHERE id = ?', id);
 }

@@ -1,0 +1,12 @@
+<svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 30C10 24.4772 14.4772 20 20 20C25.5228 20 30 15.5228 30 10" 
+        stroke="blue" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 30H24" 
+        stroke="blue" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <text x="40" y="28" font-family="var(--font-lato), var(--font-system), sans-serif" font-size="20" font-weight="600" fill="black">
+    Strategy Lab
+  </text>
+  
+  <rect x="0" y="0" width="160" height="40" fill="transparent"/>
+</svg>

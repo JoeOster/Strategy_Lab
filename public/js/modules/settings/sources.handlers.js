@@ -3,47 +3,73 @@ import { addSource, deleteSource, getSources } from './sources.api.js';
 
 export function handleAddNewSourceSubmit(event) {
   event.preventDefault();
-  console.log('Handler: handleAddNewSourceSubmit called (placeholder)');
+  console.log('Handler: handleAddNewSourceSubmit called');
 
   const form = event.target;
-  const newSource = {
-    name: form['new-source-name'].value,
-    type: form['new-source-type'].value,
-    author: form['new-source-author'] ? form['new-source-author'].value : '',
-    contact: form['new-source-contact'] ? form['new-source-contact'].value : '',
-    notes: form['new-source-notes'].value,
-  };
+  const formData = new FormData(form);
+  const newSource = Object.fromEntries(formData.entries());
 
   addSource(newSource)
     .then((addedSource) => {
       console.log('Source added:', addedSource);
       form.reset();
+      handleSourceTypeChange({ target: { value: '' } }, 'new'); // Hide dynamic fields
       loadSourcesList(); // Refresh the list
     })
     .catch((error) => console.error('Error adding source:', error));
 }
 
 export function handleSourceTypeChange(event, formType) {
-  console.log(
-    'Handler: handleSourceTypeChange called (placeholder)',
-    event.target.value,
-    formType
-  );
   const selectedType = event.target.value;
   const formPrefix = formType === 'new' ? 'new-source' : 'edit-source';
+  console.log('handleSourceTypeChange called with:', {
+    selectedType,
+    formPrefix,
+  });
 
-  const authorGroup = document.getElementById(`${formPrefix}-author-group`);
-  const contactGroup = document.getElementById(`${formPrefix}-contact-group`);
+  // Hide all dynamic panels first
+  const panels = document.querySelectorAll(
+    `#${formPrefix}-fields-container .source-type-panel`
+  );
+  console.log('Found panels:', panels);
+  for (const panel of panels) {
+    panel.style.display = 'none';
+  }
 
-  if (selectedType === 'Book') {
-    if (authorGroup) authorGroup.style.display = 'block';
-    if (contactGroup) contactGroup.style.display = 'none';
-  } else if (selectedType === 'Person') {
-    if (authorGroup) authorGroup.style.display = 'none';
-    if (contactGroup) contactGroup.style.display = 'block';
+  // Show the selected panel
+  const selectedPanel = document.getElementById(
+    `${formPrefix}-panel-${selectedType}`
+  );
+  console.log('Selected panel:', selectedPanel);
+  if (selectedPanel) {
+    selectedPanel.style.display = 'block';
+  }
+
+  // Show/hide the fields container
+  const fieldsContainer = document.getElementById(
+    `${formPrefix}-fields-container`
+  );
+  if (fieldsContainer) {
+    fieldsContainer.style.display = selectedType ? 'block' : 'none';
+  }
+
+  // Handle label changes and URL field visibility
+  const nameLabel = document.querySelector(`label[for="${formPrefix}-name"]`);
+  const urlWrapper = document.getElementById(`${formPrefix}-url-wrapper`);
+  const urlLabel = document.querySelector(`label[for="${formPrefix}-url"]`);
+
+  if (selectedType === 'book') {
+    if (nameLabel) nameLabel.textContent = 'Title:';
+    if (urlWrapper) urlWrapper.style.display = 'block';
+    if (urlLabel) urlLabel.textContent = 'Book URL:';
   } else {
-    if (authorGroup) authorGroup.style.display = 'none';
-    if (contactGroup) contactGroup.style.display = 'none';
+    if (nameLabel) nameLabel.textContent = 'Name:';
+    if (selectedType === 'person' || selectedType === 'group') {
+      if (urlWrapper) urlWrapper.style.display = 'none';
+    } else {
+      if (urlWrapper) urlWrapper.style.display = 'block';
+      if (urlLabel) urlLabel.textContent = 'URL:';
+    }
   }
 }
 

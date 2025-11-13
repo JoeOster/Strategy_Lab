@@ -242,6 +242,139 @@ app.delete('/api/holders/:id', async (req, res) => {
   }
 });
 
+// API route to get all settings
+app.get('/api/settings', async (req, res) => {
+  try {
+    const db = await getDb();
+    const settings = await db.all('SELECT * FROM app_settings');
+    const settingsObj = settings.reduce((acc, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    }, {});
+    res.json(settingsObj);
+  } catch (err) {
+    console.error('Failed to get settings:', err);
+    res.status(500).json({ error: 'Failed to get settings' });
+  }
+});
+
+// API route to update settings
+app.put('/api/settings', async (req, res) => {
+  try {
+    const db = await getDb();
+    const settings = req.body;
+    const promises = Object.entries(settings).map(([key, value]) => {
+      return db.run(
+        'INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)',
+        [key, value]
+      );
+    });
+    await Promise.all(promises);
+    res.json({ message: 'Settings updated successfully' });
+  } catch (err) {
+    console.error('Failed to update settings:', err);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// API routes for Exchanges
+app.get('/api/exchanges', async (req, res) => {
+  try {
+    const db = await getDb();
+    const exchanges = await db.all('SELECT * FROM exchanges ORDER BY name');
+    res.json(exchanges);
+  } catch (err) {
+    console.error('Failed to get exchanges:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to get exchanges', details: err.message });
+  }
+});
+
+app.post('/api/exchanges', async (req, res) => {
+  console.log('POST /api/exchanges hit');
+  console.log('Request body:', req.body);
+  try {
+    const db = await getDb();
+    const { name } = req.body;
+    if (!name) {
+      console.log('Validation error: Exchange name is required');
+      return res.status(400).send('Exchange name is required');
+    }
+    const result = await db.run('INSERT INTO exchanges (name) VALUES (?)', name);
+    const newExchange = await db.get('SELECT * FROM exchanges WHERE id = ?', result.lastID);
+    console.log('New exchange added:', newExchange);
+    res.status(201).json(newExchange);
+  } catch (err) {
+    console.error('Failed to add exchange:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to add exchange', details: err.message });
+  }
+});
+
+app.delete('/api/exchanges/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const result = await db.run('DELETE FROM exchanges WHERE id = ?', id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Exchange not found' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    console.error('Failed to delete exchange:', err);
+    res.status(500).json({ error: 'Failed to delete exchange' });
+  }
+});
+
+// API routes for Web Apps
+app.get('/api/webapps', async (req, res) => {
+  try {
+    const db = await getDb();
+    const webApps = await db.all('SELECT * FROM web_apps ORDER BY name');
+    res.json(webApps);
+  } catch (err) {
+    console.error('Failed to get web apps:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to get web apps', details: err.message });
+  }
+});
+
+app.post('/api/webapps', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'Web app name is required' });
+    }
+    const result = await db.run('INSERT INTO web_apps (name) VALUES (?)', name);
+    const newWebApp = await db.get('SELECT * FROM web_apps WHERE id = ?', result.lastID);
+    res.status(201).json(newWebApp);
+  } catch (err) {
+    console.error('Failed to add web app:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to add web app', details: err.message });
+  }
+});
+
+app.delete('/api/webapps/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const result = await db.run('DELETE FROM web_apps WHERE id = ?', id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Web app not found' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    console.error('Failed to delete web app:', err);
+    res.status(500).json({ error: 'Failed to delete web app' });
+  }
+});
+
 // API route to clear the database (for testing purposes)
 if (process.env.TEST_ENV) {
   app.post('/api/clear-db', async (req, res) => {

@@ -1,6 +1,10 @@
 // public/js/modules/settings/index.js
 
-import { handleFontChange, handleThemeChange } from './appearance.handlers.js';
+import {
+  handleFontChange,
+  handleThemeChange,
+  loadAppearanceSettings,
+} from './appearance.handlers.js';
 import * as handlers from './handlers.js';
 import {
   handleAddNewSourceSubmit,
@@ -8,11 +12,16 @@ import {
   handleSourceTypeChange,
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
+import * as exchangesHandlers from './exchanges.handlers.js';
+import { initializeWebAppsPanel } from './webapps.handlers.js';
+import { loadAccountHoldersList } from './users.handlers.js';
 
-export { loadAppearanceSettings } from './appearance.handlers.js';
+export { loadAppearanceSettings };
 
 export function initializeSettingsModule() {
   console.log('Settings module initialized.');
+  handlers.loadGeneralSettings();
+  loadAccountHoldersList();
 
   // Main tab navigation
   for (const button of document.querySelectorAll('.settings-tab')) {
@@ -34,6 +43,31 @@ export function initializeSettingsModule() {
     } else {
       console.error('Close button not found within settings modal.');
     }
+
+    // Delegated event listener for all change events within the modal
+    settingsModal.addEventListener('change', (event) => {
+      const targetId = event.target.id;
+      switch (targetId) {
+        case 'theme-selector':
+          handleThemeChange(event);
+          break;
+        case 'font-selector':
+          handleFontChange(event);
+          break;
+        case 'new-source-type':
+          handleSourceTypeChange(event, 'new');
+          break;
+        case 'edit-source-type':
+          handleSourceTypeChange(event, 'edit');
+          break;
+      }
+    });
+
+    // Trigger once to set initial state for the new source form
+    const newSourceType = document.getElementById('new-source-type');
+    if (newSourceType) {
+      handleSourceTypeChange({ target: newSourceType }, 'new');
+    }
   } else {
     console.error('Settings modal not found.');
   }
@@ -54,39 +88,16 @@ export function initializeSettingsModule() {
     );
   }
 
-  // Theme selection
-  const themeSelect = document.getElementById('theme-selector');
-  if (themeSelect) {
-    themeSelect.addEventListener('change', handleThemeChange);
-  }
-
-  // Font selection
-  const fontSelect = document.getElementById('font-selector');
-  if (fontSelect) {
-    fontSelect.addEventListener('change', handleFontChange);
-  }
-
-  // Source type dropdowns
-  const newSourceType = document.getElementById('new-source-type');
-  if (newSourceType) {
-    newSourceType.addEventListener('change', (event) =>
-      handleSourceTypeChange(event, 'new')
-    );
-    // Trigger once to set initial state
-    handleSourceTypeChange({ target: newSourceType }, 'new');
-  }
-
-  const editSourceType = document.getElementById('edit-source-type');
-  if (editSourceType) {
-    editSourceType.addEventListener('change', (event) =>
-      handleSourceTypeChange(event, 'edit')
-    );
-  }
-
   // Add new source form submission
   const addNewSourceForm = document.getElementById('add-new-source-form');
   if (addNewSourceForm) {
     addNewSourceForm.addEventListener('submit', handleAddNewSourceSubmit);
+  }
+
+  // Add new exchange form submission
+  const addExchangeForm = document.getElementById('add-exchange-form');
+  if (addExchangeForm) {
+    addExchangeForm.addEventListener('submit', exchangesHandlers.handleAddExchangeSubmit);
   }
 
   // Clear new source form button
@@ -111,6 +122,12 @@ export function initializeSettingsModule() {
   const clearHolderBtn = document.getElementById('clear-holder-btn');
   if (clearHolderBtn) {
     clearHolderBtn.addEventListener('click', handlers.handleClearHolderForm);
+  }
+
+  // Clear web app form button
+  const clearWebAppBtn = document.getElementById('clear-webapp-btn');
+  if (clearWebAppBtn) {
+    clearWebAppBtn.addEventListener('click', handlers.handleClearWebAppForm);
   }
 
   // Clear edit source form button
