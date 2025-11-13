@@ -52,7 +52,7 @@ function populateFontSelector(currentFont) {
   // Clear existing options
   fontSelector.innerHTML = '';
 
-  const fonts = ['system', 'sans-serif', 'serif', 'monospace']; // These should ideally come from a more centralized config
+  const fonts = ['system', 'sans-serif', 'serif', 'monospace', 'dancing-script']; // These should ideally come from a more centralized config
 
   for (const font of fonts) {
     const option = document.createElement('option');
