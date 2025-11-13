@@ -19,6 +19,17 @@ app.use(express.json());
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Explicitly set MIME type for JavaScript modules to prevent "text/html" errors
+app.get('/js/modules/:moduleName/:fileName', (req, res) => {
+  const modulePath = path.join(__dirname, 'public', 'js', 'modules', req.params.moduleName, req.params.fileName);
+  res.type('application/javascript').sendFile(modulePath);
+});
+
+app.get('/js/modules/:fileName', (req, res) => {
+  const modulePath = path.join(__dirname, 'public', 'js', 'modules', req.params.fileName);
+  res.type('application/javascript').sendFile(modulePath);
+});
+
 // API route to get all sources
 app.get('/api/sources', async (req, res) => {
   try {
