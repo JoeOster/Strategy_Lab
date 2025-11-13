@@ -61,7 +61,7 @@ export function initializeSettingsModule() {
   }
 
   // Font selection
-  const fontSelect = document.getElementById('font-select');
+  const fontSelect = document.getElementById('font-selector');
   if (fontSelect) {
     fontSelect.addEventListener('change', handleFontChange);
   }

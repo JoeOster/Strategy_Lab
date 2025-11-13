@@ -42,6 +42,29 @@ function populateThemeSelector(currentTheme) {
   }
 }
 
+function populateFontSelector(currentFont) {
+  const fontSelector = document.getElementById('font-selector');
+  if (!fontSelector) {
+    console.error('Font selector element not found.');
+    return;
+  }
+
+  // Clear existing options
+  fontSelector.innerHTML = '';
+
+  const fonts = ['system', 'sans-serif', 'serif', 'monospace']; // These should ideally come from a more centralized config
+
+  for (const font of fonts) {
+    const option = document.createElement('option');
+    option.value = font;
+    option.textContent = font.charAt(0).toUpperCase() + font.slice(1); // Capitalize first letter
+    if (font === currentFont) {
+      option.selected = true;
+    }
+    fontSelector.appendChild(option);
+  }
+}
+
 /**
  * Loads user preferences (theme and font) from local storage and applies them.
  */
@@ -57,11 +80,12 @@ export function loadAppearanceSettings() {
   applyTheme(currentTheme);
   populateThemeSelector(currentTheme); // Call here
 
+  let currentFont = 'system'; // Default font
   if (savedFont) {
-    applyFont(savedFont);
-  } else {
-    applyFont('system'); // Default font
+    currentFont = savedFont;
   }
+  applyFont(currentFont);
+  populateFontSelector(currentFont);
 }
 
 /**
