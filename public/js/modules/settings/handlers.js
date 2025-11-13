@@ -160,3 +160,28 @@ export function handleClearExchangeForm() {
   console.log('handleClearExchangeForm called (placeholder)');
   // TODO: Implement actual logic to clear the exchange form
 }
+
+/**
+ * Handles clearing the general and appearance settings forms.
+ */
+export function handleClearGeneralAndAppearanceForms() {
+  console.log('handleClearGeneralAndAppearanceForms called');
+  const generalSettingsForm = document.getElementById('general-settings-form');
+  if (generalSettingsForm) {
+    generalSettingsForm.reset();
+  }
+
+  const themeSelector = document.getElementById('theme-selector');
+  if (themeSelector) {
+    themeSelector.value = 'light';
+    const event = new Event('change');
+    themeSelector.dispatchEvent(event);
+  }
+
+  const fontSelector = document.getElementById('font-selector');
+  if (fontSelector) {
+    fontSelector.value = 'system';
+        const event = new Event('change');
+    fontSelector.dispatchEvent(event);
+  }
+}
