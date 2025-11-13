@@ -1,12 +1,6 @@
-feat: Improve server management and fix Strategy Lab sub-tab display
+refactor: Remove background server management scripts
 
-This commit introduces scripts for background server management and resolves
-the issue of Strategy Lab sub-tabs not populating.
-
-Changes include:
-- Added `start-server-bg.ps1` to run the Node.js server in the background.
-- Added `stop-server.ps1` to gracefully stop the background server process.
-- Updated `package.json` with a `start-bg` script for convenient background server launch.
-- Modified `public/css/main.css` to include display rules for `.sub-tab-content`,
-  ensuring Strategy Lab sub-panels are correctly shown/hidden.
-- Updated `docs/CURRENT_TASK_LOG.md` to reflect task progress.
+This commit removes the `start-server-bg.ps1`, `stop-server.ps1` scripts,
+and the `server.pid` file, along with the `start-bg` script from `package.json`.
+These scripts were introduced for background server management but proved
+unreliable in the current execution environment.
