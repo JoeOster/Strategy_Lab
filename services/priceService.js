@@ -1,8 +1,8 @@
-// services/priceService.js
-const fetch = require('node-fetch');
 // --- FIX: Refined JSDoc import for Bottleneck CommonJS constructor ---
 /** @type {typeof import('bottleneck')} */
-const Bottleneck = require('bottleneck');
+import Bottleneck from 'bottleneck';
+// services/priceService.js
+import fetch from 'node-fetch';
 
 // --- Read both API keys ---
 const API_KEYS = [
@@ -152,4 +152,4 @@ async function getPrices(tickers, priority = 5) {
   return results;
 }
 
-module.exports = { getPrices, disconnect };
+export { getPrices, disconnect };

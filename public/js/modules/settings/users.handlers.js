@@ -51,16 +51,25 @@ export async function loadAccountHoldersList() {
     const ul = document.createElement('ul');
     for (const holder of allHolders) {
       const li = document.createElement('li');
-      li.textContent = holder.username;
+      li.classList.add('account-holder-item'); // Add a class for consistent styling of list items
+
+      const nameSpan = document.createElement('span');
+      nameSpan.classList.add('holder-name');
+      nameSpan.textContent = holder.username;
+      li.appendChild(nameSpan);
+
       // Add buttons for delete, set default, manage subscriptions
       // Only show action buttons for actual users, not for default "All Users" or "Primary"
       if (holder.id >= 0) {
-        // Assuming actual user IDs are non-negative
-        li.innerHTML += `
-          <button class="set-default-holder-btn" data-id="${holder.id}">Set Default</button>
-          <button class="manage-subscriptions-btn" data-id="${holder.id}">Manage Subscriptions</button>
-          <button class="delete-holder-btn" data-id="${holder.id}">Delete</button>
+        const actionsDiv = document.createElement('div');
+        actionsDiv.classList.add('holder-actions');
+
+        actionsDiv.innerHTML = `
+          <button class="set-default-holder-btn table-action-btn small-btn" data-id="${holder.id}">Set Default</button>
+          <button class="manage-subscriptions-btn table-action-btn small-btn" data-id="${holder.id}">Manage Subscriptions</button>
+          <button class="delete-holder-btn table-action-btn small-btn" data-id="${holder.id}">Delete</button>
         `;
+        li.appendChild(actionsDiv);
       }
       ul.appendChild(li);
     }

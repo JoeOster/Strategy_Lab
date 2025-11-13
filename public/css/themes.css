@@ -30,6 +30,11 @@
   --primary-hover: #2563eb;
   --positive-color: #10b981;
   --negative-color: #ef4444;
+
+  /* Secondary Button Variables */
+  --button-secondary-bg: #6b7280;
+  --button-secondary-color: #ffffff;
+  --button-secondary-hover: #4b5563;
 }
 
 body[data-theme="dark"] {

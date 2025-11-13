@@ -81,12 +81,20 @@ export async function loadSourcesList() {
     sourcesContainer.innerHTML = ''; // Clear existing list
     for (const source of sources) {
       const sourceElement = document.createElement('div');
-      sourceElement.className = 'advice-source-item';
-      sourceElement.innerHTML = `
-        <span>${source.name} (${source.type})</span>
-        <button class="edit-source-btn" data-id="${source.id}">Edit</button>
-        <button class="delete-source-btn" data-id="${source.id}">Delete</button>
+      sourceElement.className = 'advice-source-item'; // Add a class for consistent styling of list items
+
+      const infoSpan = document.createElement('span');
+      infoSpan.classList.add('source-info');
+      infoSpan.textContent = `${source.name} (${source.type})`;
+      sourceElement.appendChild(infoSpan);
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.classList.add('source-actions');
+      actionsDiv.innerHTML = `
+        <button class="edit-source-btn table-action-btn" data-id="${source.id}">Edit</button>
+        <button class="delete-source-btn table-action-btn" data-id="${source.id}">Delete</button>
       `;
+      sourceElement.appendChild(actionsDiv);
       sourcesContainer.appendChild(sourceElement);
     }
   }

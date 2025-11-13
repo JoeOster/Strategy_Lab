@@ -25,11 +25,19 @@ export async function loadExchangesList() {
     const ul = document.createElement('ul');
     for (const exchange of exchanges) {
       const li = document.createElement('li');
-      li.textContent = exchange.name;
-      // Add delete button
-      li.innerHTML += `
-        <button class="delete-exchange-btn" data-id="${exchange.id}">Delete</button>
+      li.classList.add('exchange-item'); // Add a class for consistent styling of list items
+
+      const nameSpan = document.createElement('span');
+      nameSpan.classList.add('exchange-name');
+      nameSpan.textContent = exchange.name;
+      li.appendChild(nameSpan);
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.classList.add('exchange-actions');
+      actionsDiv.innerHTML = `
+        <button class="delete-exchange-btn table-action-btn" data-id="${exchange.id}">Delete</button>
       `;
+      li.appendChild(actionsDiv);
       ul.appendChild(li);
     }
     exchangeListDiv.appendChild(ul);

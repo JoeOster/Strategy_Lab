@@ -20,10 +20,19 @@ export async function renderWebApps() {
     for (const app of webApps) {
       const li = document.createElement('li');
       li.dataset.id = app.id;
-      li.innerHTML = `
-                <span>${app.name}</span>
-                <button type="button" class="delete-webapp-btn">Delete</button>
-            `;
+      li.classList.add('webapp-item'); // Add a class for consistent styling of list items
+
+      const nameSpan = document.createElement('span');
+      nameSpan.classList.add('webapp-name');
+      nameSpan.textContent = app.name;
+      li.appendChild(nameSpan);
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.classList.add('webapp-actions');
+      actionsDiv.innerHTML = `
+        <button type="button" class="delete-webapp-btn table-action-btn small-btn">Delete</button>
+      `;
+      li.appendChild(actionsDiv);
       ul.appendChild(li);
     }
     webAppList.appendChild(ul);

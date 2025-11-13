@@ -158,7 +158,8 @@ p {
 #appearance-settings-form,
 #add-new-source-form,
 #add-exchange-form,
-#add-holder-form {
+#add-holder-form,
+#add-webapp-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -196,7 +197,8 @@ p {
 
 #add-new-source-form button,
 #add-exchange-form button,
-#add-holder-form button {
+#add-holder-form button,
+#add-webapp-form button {
   padding: 10px 15px;
   border: none;
   background-color: var(--primary-color);
@@ -208,8 +210,18 @@ p {
 
 #add-new-source-form button:hover,
 #add-exchange-form button:hover,
-#add-holder-form button:hover {
+#add-holder-form button:hover,
+#add-webapp-form button:hover {
   background-color: var(--primary-hover);
+}
+
+.clear-btn {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+}
+
+.clear-btn:hover {
+  background-color: var(--button-secondary-hover);
 }
 
 /* Modal Styles */
@@ -258,4 +270,176 @@ p {
 .header-logo {
   width: 480px;
   height: 120px;
+}
+
+/* User Selector Dropdown */
+.user-select-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 20px; /* Adjust as needed for positioning */
+}
+
+.user-select-dropdown {
+  padding: 5px 10px;
+  border: 1px solid var(--container-border);
+  border-radius: 5px;
+  background-color: var(--info-panel-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+/* Account Holder List (mimicking table) */
+#account-holder-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--container-border);
+  border-radius: 5px;
+  overflow: hidden; /* Ensures border-radius applies to children */
+}
+
+.account-holder-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.account-holder-item:last-child {
+  border-bottom: none;
+}
+
+.holder-name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: var(--heading-color);
+}
+
+.holder-actions {
+  display: flex;
+  gap: 5px; /* Space between buttons */
+}
+
+/* Table Action Buttons */
+.table-action-btn {
+  padding: 5px 8px; /* Smaller padding */
+  font-size: 0.8rem; /* Smaller font size */
+  border-radius: 3px; /* Slightly smaller border-radius */
+  /* Inherit other button styles from main.css or themes.css */
+  background-color: var(--primary-color); /* Example: using primary color */
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.table-action-btn:hover {
+  background-color: var(--primary-hover); /* Example: using primary hover color */
+}
+
+.small-btn {
+  padding: 5px 8px; /* Smaller padding */
+  font-size: 0.8rem; /* Smaller font size */
+  border-radius: 3px; /* Slightly smaller border-radius */
+}
+
+/* Advice Source List (mimicking table) */
+#advice-source-list {
+  list-style: none; /* Ensure no bullets if it's a ul */
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--container-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.advice-source-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.advice-source-item:last-child {
+  border-bottom: none;
+}
+
+.source-info {
+  flex-grow: 1;
+  font-weight: bold;
+  color: var(--heading-color);
+}
+
+.source-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Exchange List (mimicking table) */
+#exchange-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--container-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.exchange-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.exchange-item:last-child {
+  border-bottom: none;
+}
+
+.exchange-name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: var(--heading-color);
+}
+
+.exchange-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Web App List (mimicking table) */
+#webapp-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--container-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.webapp-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.webapp-item:last-child {
+  border-bottom: none;
+}
+
+.webapp-name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: var(--heading-color);
+}
+
+.webapp-actions {
+  display: flex;
+  gap: 5px;
 }

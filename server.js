@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { clearDb, getDb } from './services/database.js'; // Import clearDb
+import { getPriceV2 } from './services/priceServiceV2.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -381,6 +384,22 @@ app.delete('/api/webapps/:id', async (req, res) => {
   } catch (err) {
     console.error('Failed to delete web app:', err);
     res.status(500).json({ error: 'Failed to delete web app' });
+  }
+});
+
+// API route to get price for a ticker using V2 service
+app.get('/api/priceV2/:ticker', async (req, res) => {
+  const { ticker } = req.params;
+  try {
+    const price = await getPriceV2(ticker);
+    if (price !== null) {
+      res.json({ ticker, price, timestamp: Date.now() });
+    } else {
+      res.status(404).json({ error: `Price for ${ticker} not found or invalid.` });
+    }
+  } catch (err) {
+    console.error(`Failed to get price for ${ticker} using V2 service:`, err);
+    res.status(500).json({ error: `Failed to get price for ${ticker} using V2 service`, details: err.message });
   }
 });
 
