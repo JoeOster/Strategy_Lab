@@ -1,6 +1,6 @@
 /* General Body and App Layout */
 body {
-  font-family: var(--font-system);
+  font-family: var(--body-font);
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
