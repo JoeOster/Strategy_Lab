@@ -19,6 +19,29 @@ function applyFont(fontName) {
   document.body.style.setProperty('--body-font', `var(--font-${fontName})`);
 }
 
+function populateThemeSelector(currentTheme) {
+  const themeSelector = document.getElementById('theme-selector');
+  if (!themeSelector) {
+    console.error('Theme selector element not found.');
+    return;
+  }
+
+  // Clear existing options
+  themeSelector.innerHTML = '';
+
+  const themes = ['light', 'dark', 'sepia', 'contrast']; // These should ideally come from a more centralized config
+
+  for (const theme of themes) {
+    const option = document.createElement('option');
+    option.value = theme;
+    option.textContent = theme.charAt(0).toUpperCase() + theme.slice(1); // Capitalize first letter
+    if (theme === currentTheme) {
+      option.selected = true;
+    }
+    themeSelector.appendChild(option);
+  }
+}
+
 /**
  * Loads user preferences (theme and font) from local storage and applies them.
  */
@@ -27,11 +50,12 @@ export function loadAppearanceSettings() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
   const savedFont = localStorage.getItem(FONT_STORAGE_KEY);
 
+  let currentTheme = 'light'; // Default theme
   if (savedTheme) {
-    applyTheme(savedTheme);
-  } else {
-    applyTheme('light'); // Default theme
+    currentTheme = savedTheme;
   }
+  applyTheme(currentTheme);
+  populateThemeSelector(currentTheme); // Call here
 
   if (savedFont) {
     applyFont(savedFont);
