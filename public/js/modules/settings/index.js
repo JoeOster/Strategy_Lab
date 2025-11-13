@@ -13,7 +13,7 @@ import {
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
-import { initializeWebAppsPanel } from './webapps.handlers.js';
+
 import { loadAccountHoldersList } from './users.handlers.js';
 
 export { loadAppearanceSettings };
