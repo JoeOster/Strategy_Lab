@@ -3,12 +3,14 @@ import {
   initializeSettingsModule,
   loadAppearanceSettings,
 } from './modules/settings/index.js';
-import { initializeUserSelector } from './modules/user-selector.js'; // Import the new module
+import { initializeUserSelector } from './modules/user-selector.js';
+import * as strategyLab from './modules/strategy-lab/index.js'; // Import the strategy-lab module
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Strategy Lab App Main script loaded.');
   loadAppearanceSettings();
   initializeNavigation();
   initializeSettingsModule();
-  initializeUserSelector(); // Initialize the user selector
+  initializeUserSelector();
+  strategyLab.initializeModule(); // Initialize the strategy-lab module
 });
