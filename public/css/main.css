@@ -121,14 +121,16 @@ p {
 
 /* Settings Panels */
 .settings-panel,
-.sub-panel {
+.sub-panel,
+.sub-tab-content { /* Added .sub-tab-content */
   display: none; /* Hidden by default */
   padding: 15px 0;
   border-top: 1px solid var(--container-border);
 }
 
 .settings-panel.active,
-.sub-panel.active {
+.sub-panel.active,
+.sub-tab-content.active { /* Added .sub-tab-content.active */
   display: block; /* Show active panel */
 }
 

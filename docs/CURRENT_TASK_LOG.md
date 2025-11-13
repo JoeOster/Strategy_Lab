@@ -120,35 +120,46 @@ This task is now considered complete.
 
 ## Task: Implement Initial Structure for Module E: Strategy Lab
 
-**Objective:** Establish the foundational file structure and basic conductor logic for the "Strategy Lab" module (Module E) according to the "Standard Module Pattern" and "Conductor Module Pattern" defined in `Strategy_Lab_V2_Plan.md`.
+**Objective:** Establish the foundational file structure and basic conductor
+logic for the "Strategy Lab" module (Module E) according to the "Standard Module
+Pattern" and "Conductor Module Pattern" defined in `Strategy_Lab_V2_Plan.md`.
 
 **Detailed Steps:**
 
-1.  [x] **Create Module Directory:** Create the directory `public/js/modules/strategy-lab/`.
+1.  [x] **Create Module Directory:** Create the directory
+        `public/js/modules/strategy-lab/`.
 2.  [x] **Create `index.js` (Conductor):**
-    *   Create `public/js/modules/strategy-lab/index.js`.
-    *   Add a basic `initializeModule()` function.
-    *   Add placeholder imports for `handlers.js` and sub-module handlers (e.g., `sources.handlers.js`, `watched-list.handlers.js`, `paper-trades.handlers.js`).
-    *   Add basic event listener attachment for the main sub-tab clicks (Sources, Watched List, Paper Trades) as defined in `docs/wiring/strategy-lab.md` (E1).
+    - Create `public/js/modules/strategy-lab/index.js`.
+    - Add a basic `initializeModule()` function.
+    - Add placeholder imports for `handlers.js` and sub-module handlers (e.g.,
+      `sources.handlers.js`, `watched-list.handlers.js`,
+      `paper-trades.handlers.js`).
+    - Add basic event listener attachment for the main sub-tab clicks (Sources,
+      Watched List, Paper Trades) as defined in `docs/wiring/strategy-lab.md`
+      (E1).
 3.  [x] **Create `handlers.js` (Conductor Handlers):**
-    *   Create `public/js/modules/strategy-lab/handlers.js`.
-    *   Add a placeholder `handleSubTabClick(event)` function that manages the display of sub-tab content.
+    - Create `public/js/modules/strategy-lab/handlers.js`.
+    - Add a placeholder `handleSubTabClick(event)` function that manages the
+      display of sub-tab content.
 4.  [x] **Create Sub-Module Directories (Placeholders):**
-    *   Create `public/js/modules/strategy-lab/sources/`.
-    *   Create `public/js/modules/strategy-lab/watched-list/`.
-    *   Create `public/js/modules/strategy-lab/paper-trades/`.
+    - Create `public/js/modules/strategy-lab/sources/`.
+    - Create `public/js/modules/strategy-lab/watched-list/`.
+    - Create `public/js/modules/strategy-lab/paper-trades/`.
 5.  [x] **Create Placeholder Sub-Module Files:**
-    *   `public/js/modules/strategy-lab/sources/api.js` (empty for now)
-    *   `public/js/modules/strategy-lab/sources/handlers.js` (empty for now)
-    *   `public/js/modules/strategy-lab/sources/render.js` (empty for now)
-    *   `public/js/modules/strategy-lab/watched-list/api.js` (empty for now)
-    *   `public/js/modules/strategy-lab/watched-list/handlers.js` (empty for now)
-    *   `public/js/modules/strategy-lab/watched-list/render.js` (empty for now)
-    *   `public/js/modules/strategy-lab/paper-trades/api.js` (empty for now)
-    *   `public/js/modules/strategy-lab/paper-trades/handlers.js` (empty for now)
-    *   `public/js/modules/strategy-lab/paper-trades/render.js` (empty for now)
+    - `public/js/modules/strategy-lab/sources/api.js` (empty for now)
+    - `public/js/modules/strategy-lab/sources/handlers.js` (empty for now)
+    - `public/js/modules/strategy-lab/sources/render.js` (empty for now)
+    - `public/js/modules/strategy-lab/watched-list/api.js` (empty for now)
+    - `public/js/modules/strategy-lab/watched-list/handlers.js` (empty for now)
+    - `public/js/modules/strategy-lab/watched-list/render.js` (empty for now)
+    - `public/js/modules/strategy-lab/paper-trades/api.js` (empty for now)
+    - `public/js/modules/strategy-lab/paper-trades/handlers.js` (empty for now)
+    - `public/js/modules/strategy-lab/paper-trades/render.js` (empty for now)
 6.  [x] **Update `public/js/app-main.js`:**
-    *   Import the `strategy-lab` module.
-    *   Call `strategyLab.initializeModule()` when the Strategy Lab tab is activated.
+    - Import the `strategy-lab` module.
+    - Call `strategyLab.initializeModule()` when the Strategy Lab tab is
+      activated.
 7.  [x] **Update `public/index.html`:**
-    *   Ensure the main "Strategy Lab" tab and its sub-tab containers (`#sources-panel`, `#watched-list-panel`, `#paper-trades-panel`) are present as defined in `docs/wiring/strategy-lab.md`.
+    - Ensure the main "Strategy Lab" tab and its sub-tab containers
+      (`#sources-panel`, `#watched-list-panel`, `#paper-trades-panel`) are
+      present as defined in `docs/wiring/strategy-lab.md`.

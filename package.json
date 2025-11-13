@@ -6,6 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start-bg": "powershell -File ./start-server-bg.ps1",
     "dev": "node --watch server.js",
     "test": "npm run test:e2e >log/npm_e2e.log",
     "test:e2e": "playwright test",
