@@ -1,13 +1,12 @@
-feat: Implement initial structure for Module E: Strategy Lab
+feat: Improve server management and fix Strategy Lab sub-tab display
 
-This commit establishes the foundational file structure and basic conductor logic
-for the "Strategy Lab" module (Module E) according to the "Standard Module
-Pattern" and "Conductor Module Pattern" defined in `Strategy_Lab_V2_Plan.md`.
+This commit introduces scripts for background server management and resolves
+the issue of Strategy Lab sub-tabs not populating.
 
 Changes include:
-- Created `public/js/modules/strategy-lab/` directory and its sub-modules
-  (`sources`, `watched-list`, `paper-trades`) with placeholder files.
-- Modified `public/js/app-main.js` to import and initialize the `strategy-lab` module.
-- Modified `public/index.html` to include the Strategy Lab UI structure and sub-tab containers.
-- Updated `docs/Strategy_Lab_V2_Plan.md` with a "Workflow Clarification for LLM Interaction" section.
-- Updated `docs/CURRENT_TASK_LOG.md` to reflect the completion of the "Implement Initial Structure for Module E: Strategy Lab" task.
+- Added `start-server-bg.ps1` to run the Node.js server in the background.
+- Added `stop-server.ps1` to gracefully stop the background server process.
+- Updated `package.json` with a `start-bg` script for convenient background server launch.
+- Modified `public/css/main.css` to include display rules for `.sub-tab-content`,
+  ensuring Strategy Lab sub-panels are correctly shown/hidden.
+- Updated `docs/CURRENT_TASK_LOG.md` to reflect task progress.
