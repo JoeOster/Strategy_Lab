@@ -92,3 +92,35 @@ List.
 | `#paper-trades-panel`            | Container: The "Paper Trades" sub-tab content.                                                                                    | `loadPaperTradesSubTab()`             |
 | `#paper-trades-table`            | The main table of all paper trades.                                                                                               | `renderPaperTradesTable()`            |
 | `(Table Content)`                | (Dynamic) This table is a "non-cash" version of the Dashboard's `open-positions-table` and will re-use the global table renderer. | (Managed by `renderPaperTradesTable`) |
+
+---
+
+## E5: Styling Considerations
+
+This section details the key CSS classes used within the Strategy Lab module to control the appearance and behavior of its sub-navigation and sub-tab content. These styles are defined in `public/css/main.css` and leverage CSS variables from `public/css/themes.css` for theming.
+
+### Sub-Navigation Buttons
+
+*   **`.sub-nav`**:
+    *   **Purpose:** Container for the Level 1 sub-navigation buttons (Sources, Watched List, Paper Trades).
+    *   **Styling:** Uses `display: flex` for horizontal layout, `margin-bottom` for spacing, `border-bottom` for a separator, and `padding-bottom`.
+*   **`.sub-nav-btn`**:
+    *   **Purpose:** Individual button for each sub-tab.
+    *   **Styling:** Inherits general button styles, but specifically sets `background-color`, `color`, `padding`, `font-size`, `border-radius` (top corners rounded), `margin-right`, and `border-bottom`. Includes a `transition` for smooth hover effects.
+*   **`.sub-nav-btn:hover`**:
+    *   **Purpose:** Defines the hover state for sub-tab buttons.
+    *   **Styling:** Changes `background-color` to `var(--info-panel-bg)`.
+*   **`.sub-nav-btn.active`**:
+    *   **Purpose:** Defines the appearance of the currently active sub-tab button.
+    *   **Styling:** Sets a distinct `background-color` (`var(--primary-color)`), `color` (white), `font-weight` (bold), and `border-bottom` to visually indicate the active state.
+
+### Sub-Tab Content Panels
+
+*   **`.sub-tab-content`**:
+    *   **Purpose:** Container for the content of each individual sub-tab (e.g., Sources panel, Watched List panel).
+    *   **Styling:** By default, `display: none;` to hide the content. Also includes `padding` and `border-top`.
+*   **`.sub-tab-content.active`**:
+    *   **Purpose:** Defines the appearance of the currently active sub-tab content panel.
+    *   **Styling:** Sets `display: block;` to make the content visible.
+
+This structure ensures that only the active sub-tab's content is displayed, and the corresponding navigation button is visually highlighted according to the application's theme.
