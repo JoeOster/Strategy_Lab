@@ -19,18 +19,15 @@ export const loadPageContent = async (tab) => {
     mainContent.innerHTML = await response.text();
 
     // Defer script loading until after HTML is parsed
-    setTimeout(() => {
-      const oldScript = document.getElementById('module-script');
-      if (oldScript) {
-        oldScript.remove();
+    // Use dynamic import to load the module and call its initializeModule function
+    try {
+      const module = await import(`../${tab}/index.js`);
+      if (module && module.initializeModule) {
+        module.initializeModule();
       }
-
-      const script = document.createElement('script');
-      script.id = 'module-script';
-      script.src = `js/modules/${tab}.js`;
-      script.defer = true;
-      document.body.appendChild(script);
-    }, 0);
+    } catch (scriptError) {
+      console.error(`Error loading or initializing module for tab ${tab}:`, scriptError);
+    }
   } catch (error) {
     console.error('Error loading tab:', error);
     mainContent.innerHTML = `<p>Error loading content for ${tab}.</p>`;

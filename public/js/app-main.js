@@ -12,5 +12,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeNavigation();
   initializeSettingsModule();
   initializeUserSelector();
-  strategyLab.initializeModule(); // Initialize the strategy-lab module
+
 });
