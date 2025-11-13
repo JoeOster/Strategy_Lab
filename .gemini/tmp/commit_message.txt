@@ -1,6 +1,12 @@
-refactor: Remove background server management scripts
+fix: Re-apply dynamic module initialization for main tabs
 
-This commit removes the `start-server-bg.ps1`, `stop-server.ps1` scripts,
-and the `server.pid` file, along with the `start-bg` script from `package.json`.
-These scripts were introduced for background server management but proved
-unreliable in the current execution environment.
+This commit re-applies the previously reverted JavaScript logic to correctly
+initialize tab-specific modules after their HTML content is loaded into the DOM.
+
+Changes include:
+- Restoring modifications to `public/js/modules/navigation/index.js` to use
+  dynamic `import()` and call `initializeModule()` after HTML injection.
+- Restoring the removal of the premature `strategyLab.initializeModule()` call
+  from `public/js/app-main.js`.
+This resolves the "Strategy Lab container not found" error and ensures
+correct sub-tab population.

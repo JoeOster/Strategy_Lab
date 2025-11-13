@@ -118,48 +118,50 @@ This task is now considered complete.
 
 ---
 
-## Task: Implement Initial Structure for Module E: Strategy Lab
+## Task: Refactor Core Modules to Standard Module Pattern
 
-**Objective:** Establish the foundational file structure and basic conductor
-logic for the "Strategy Lab" module (Module E) according to the "Standard Module
-Pattern" and "Conductor Module Pattern" defined in `Strategy_Lab_V2_Plan.md`.
+**Objective:** Refactor existing core JavaScript modules (e.g., `dashboard.js`,
+`daily-report.js`, `imports.js`, `ledger.js`, `orders.js`, `user-selector.js`)
+to conform to the "Standard Module Pattern" as defined in
+`Strategy_Lab_V2_Plan.md`. This involves creating a dedicated folder for each
+module and moving its main JavaScript file into an `index.js` within that
+folder.
 
 **Detailed Steps:**
 
-1.  [x] **Create Module Directory:** Create the directory
-        `public/js/modules/strategy-lab/`.
-2.  [x] **Create `index.js` (Conductor):**
-    - Create `public/js/modules/strategy-lab/index.js`.
-    - Add a basic `initializeModule()` function.
-    - Add placeholder imports for `handlers.js` and sub-module handlers (e.g.,
-      `sources.handlers.js`, `watched-list.handlers.js`,
-      `paper-trades.handlers.js`).
-    - Add basic event listener attachment for the main sub-tab clicks (Sources,
-      Watched List, Paper Trades) as defined in `docs/wiring/strategy-lab.md`
-      (E1).
-3.  [x] **Create `handlers.js` (Conductor Handlers):**
-    - Create `public/js/modules/strategy-lab/handlers.js`.
-    - Add a placeholder `handleSubTabClick(event)` function that manages the
-      display of sub-tab content.
-4.  [x] **Create Sub-Module Directories (Placeholders):**
-    - Create `public/js/modules/strategy-lab/sources/`.
-    - Create `public/js/modules/strategy-lab/watched-list/`.
-    - Create `public/js/modules/strategy-lab/paper-trades/`.
-5.  [x] **Create Placeholder Sub-Module Files:**
-    - `public/js/modules/strategy-lab/sources/api.js` (empty for now)
-    - `public/js/modules/strategy-lab/sources/handlers.js` (empty for now)
-    - `public/js/modules/strategy-lab/sources/render.js` (empty for now)
-    - `public/js/modules/strategy-lab/watched-list/api.js` (empty for now)
-    - `public/js/modules/strategy-lab/watched-list/handlers.js` (empty for now)
-    - `public/js/modules/strategy-lab/watched-list/render.js` (empty for now)
-    - `public/js/modules/strategy-lab/paper-trades/api.js` (empty for now)
-    - `public/js/modules/strategy-lab/paper-trades/handlers.js` (empty for now)
-    - `public/js/modules/strategy-lab/paper-trades/render.js` (empty for now)
-6.  [x] **Update `public/js/app-main.js`:**
-    - Import the `strategy-lab` module.
-    - Call `strategyLab.initializeModule()` when the Strategy Lab tab is
-      activated.
-7.  [x] **Update `public/index.html`:**
-    - Ensure the main "Strategy Lab" tab and its sub-tab containers
-      (`#sources-panel`, `#watched-list-panel`, `#paper-trades-panel`) are
-      present as defined in `docs/wiring/strategy-lab.md`.
+1.  [x] **Create `public/js/modules/dashboard/` directory.**
+2.  [x] **Move `public/js/modules/dashboard.js` to
+        `public/js/modules/dashboard/index.js`.**
+3.  [x] **Update `public/js/modules/navigation/index.js` to import `dashboard`
+        from `public/js/modules/dashboard/index.js`.**
+4.  [x] **Create `public/js/modules/daily-report/` directory.**
+5.  [x] **Move `public/js/modules/daily-report.js` to
+        `public/js/modules/daily-report/index.js`.**
+6.  [x] **Update `public/js/modules/navigation/index.js` to import
+        `daily-report` from `public/js/modules/daily-report/index.js`.**
+7.  [x] **Create `public/js/modules/imports/` directory.**
+8.  [x] **Move `public/js/modules/imports.js` to
+        `public/js/modules/imports/index.js`.**
+9.  [x] **Update `public/js/modules/navigation/index.js` to import `imports`
+        from `public/js/modules/imports/index.js`.**
+10. [x] **Create `public/js/modules/ledger/` directory.**
+11. [x] **Move `public/js/modules/ledger.js` to
+        `public/js/modules/ledger/index.js`.**
+12. [x] **Update `public/js/modules/navigation/index.js` to import `ledger` from
+        `public/js/modules/ledger/index.js`.**
+13. [x] **Create `public/js/modules/orders/` directory.**
+14. [x] **Move `public/js/modules/orders.js` to
+        `public/js/modules/orders/index.js`.**
+15. [x] **Update `public/js/modules/navigation/index.js` to import `orders` from
+        `public/js/modules/orders/index.js`.**
+16. [x] **Create `public/js/modules/user-selector/` directory.**
+17. [x] **Move `public/js/modules/user-selector.js` to
+        `public/js/modules/user-selector/index.js`.**
+18. [x] **Update `public/js/app-main.js` to import `user-selector` from
+        `public/js/modules/user-selector/index.js`.**
+19. [x] **Re-apply the dynamic import logic in
+        `public/js/modules/navigation/index.js` (from the reverted commit).**
+20. [x] **Re-apply the removal of `strategyLab.initializeModule()` from
+        `public/js/app-main.js` (from the reverted commit).**
+21. [ ] **Verify application functionality:** Ensure all main tabs and Strategy
+        Lab sub-tabs load and function correctly.
