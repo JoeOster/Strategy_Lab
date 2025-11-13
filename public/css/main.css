@@ -445,3 +445,35 @@ p {
   display: flex;
   gap: 5px;
 }
+
+/* Sub-navigation for Strategy Lab */
+.sub-nav {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--container-border);
+  padding-bottom: 5px;
+}
+
+.sub-nav .sub-nav-btn {
+  background-color: var(--container-bg);
+  color: var(--text-color);
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 5px 5px 0 0;
+  margin-right: 5px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.sub-nav .sub-nav-btn:hover {
+  background-color: var(--info-panel-bg);
+}
+
+.sub-nav .sub-nav-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  border-bottom: 1px solid var(--primary-color); /* Match active background */
+}
