@@ -62,7 +62,10 @@ export async function getDb() {
 
         CREATE TABLE IF NOT EXISTS exchanges (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL UNIQUE
+          name TEXT NOT NULL UNIQUE,
+          url TEXT,
+          description TEXT,
+          cs_contact TEXT
         );
 
         CREATE TABLE IF NOT EXISTS app_settings (

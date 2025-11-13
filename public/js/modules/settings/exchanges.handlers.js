@@ -1,6 +1,6 @@
 // public/js/modules/settings/exchanges.handlers.js
 
-import { addExchange, getExchanges } from './exchanges.api.js';
+import { addExchange, getExchanges, deleteExchange } from './exchanges.api.js';
 
 /**
  * Loads the list of exchanges and renders them in the UI.
@@ -45,7 +45,6 @@ export async function loadExchangesList() {
  */
 export async function handleAddExchangeSubmit(event) {
   event.preventDefault();
-  console.log('handleAddExchangeSubmit called');
 
   const newExchangeNameInput = document.getElementById('new-exchange-name');
   const name = newExchangeNameInput.value.trim();
@@ -56,12 +55,29 @@ export async function handleAddExchangeSubmit(event) {
   }
 
   try {
-    await addExchange(name);
+    await addExchange({ name });
     newExchangeNameInput.value = ''; // Clear the form
     await loadExchangesList(); // Refresh the list
   } catch (error) {
     console.error('Failed to add exchange:', error);
     alert('Failed to add exchange. Please try again.');
+  }
+}
+
+/**
+ * Handles the deletion of an exchange.
+ * @param {string} id - The ID of the exchange to delete.
+ */
+export async function handleDeleteExchangeClick(id) {
+  if (!confirm('Are you sure you want to delete this exchange?')) {
+    return;
+  }
+  try {
+    await deleteExchange(id);
+    await loadExchangesList(); // Refresh the list
+  } catch (error) {
+    console.error('Failed to delete exchange:', error);
+    alert('Failed to delete exchange. Please try again.');
   }
 }
 

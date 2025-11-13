@@ -34,23 +34,33 @@ export async function loadAccountHoldersList() {
 
   try {
     const holders = await getAccountHolders();
+    // Prepend default users to the list
+    const defaultHolders = [
+      { id: -1, username: 'All Users' },
+      { id: -2, username: 'Primary' }
+    ];
+    const allHolders = [...defaultHolders, ...holders];
+
     accountHolderListDiv.innerHTML = ''; // Clear existing list
 
-    if (holders.length === 0) {
+    if (allHolders.length === 0) {
       accountHolderListDiv.innerHTML = '<p>No account holders added yet.</p>';
       return;
     }
 
     const ul = document.createElement('ul');
-    holders.forEach(holder => {
+    allHolders.forEach(holder => {
       const li = document.createElement('li');
       li.textContent = holder.username;
       // Add buttons for delete, set default, manage subscriptions
-      li.innerHTML += `
-        <button class="set-default-holder-btn" data-id="${holder.id}">Set Default</button>
-        <button class="manage-subscriptions-btn" data-id="${holder.id}">Manage Subscriptions</button>
-        <button class="delete-holder-btn" data-id="${holder.id}">Delete</button>
-      `;
+      // Only show action buttons for actual users, not for default "All Users" or "Primary"
+      if (holder.id >= 0) { // Assuming actual user IDs are non-negative
+        li.innerHTML += `
+          <button class="set-default-holder-btn" data-id="${holder.id}">Set Default</button>
+          <button class="manage-subscriptions-btn" data-id="${holder.id}">Manage Subscriptions</button>
+          <button class="delete-holder-btn" data-id="${holder.id}">Delete</button>
+        `;
+      }
       ul.appendChild(li);
     });
     accountHolderListDiv.appendChild(ul);

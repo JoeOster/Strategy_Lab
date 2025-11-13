@@ -190,4 +190,15 @@ export function initializeSettingsModule() {
       }
     });
   }
+
+  // Event delegation for deleting exchanges
+  const exchangesContainer = document.getElementById('exchange-list');
+  if (exchangesContainer) {
+    exchangesContainer.addEventListener('click', (event) => {
+      if (event.target.classList.contains('delete-exchange-btn')) {
+        const exchangeId = event.target.dataset.id;
+        exchangesHandlers.handleDeleteExchangeClick(exchangeId);
+      }
+    });
+  }
 }

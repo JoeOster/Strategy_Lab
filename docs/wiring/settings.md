@@ -15,7 +15,7 @@ Handles opening, closing, and navigating the main modal tabs.
 
 | Element ID / Selector   | Purpose (Human-Readable)                    | Handler Function (for GCA)  |
 | :---------------------- | :------------------------------------------ | :-------------------------- |
-| `#settings-modal`       | The main settings modal container.          | `initializeSettingsModal()` |
+| #settings-modal       | The main settings modal container.          | `initializeSettingsModule()` |
 | `.settings-tab`         | A main tab button (e.g., Appearance, Data). | `handleMainTabClick(event)` |
 | `#save-settings-button` | The "Save & Close" button for all settings. | `handleSaveAllSettings()`   |
 | `.close-button`         | The 'x' in the modal corner.                | `handleCloseModal()`        |
@@ -50,8 +50,8 @@ Handles the sub-tabs for Data Management.
 
 | Element ID / Selector              | Purpose (Human-Readable)             | Handler Function (for GCA)     |
 | :--------------------------------- | :----------------------------------- | :----------------------------- |
-| `[data-sub-tab="sources-panel"]`   | Sub-tab button for "Advice Sources". | `handleDataSubTabClick(event)` |
-| `[data-sub-tab="exchanges-panel"]` | Sub-tab button for "Exchanges".      | `handleDataSubTabClick(event)` |
+| [data-sub-tab="sources-panel"]   | Sub-tab button for "Advice Sources". | `handleSubTabClick(event)` |
+| [data-sub-tab="exchanges-panel"] | Sub-tab button for "Exchanges".      | `handleSubTabClick(event)` |
 
 #### A4.1: Sources Sub-Module (Add New)
 
@@ -133,27 +133,30 @@ Handles the sub-tabs for User Management.
 
 | Element ID / Selector                  | Purpose (Human-Readable)            | Handler Function (for GCA)     |
 | :------------------------------------- | :---------------------------------- | :----------------------------- |
-| `[data-sub-tab="users-panel"]`         | Sub-tab button for "Users".         | `handleUserSubTabClick(event)` |
-| `[data-sub-tab="subscriptions-panel"]` | Sub-tab button for "Subscriptions". | `handleUserSubTabClick(event)` |
+| [data-sub-tab="users-panel"]         | Sub-tab button for "Users".         | `handleSubTabClick(event)` |
+| [data-sub-tab="subscriptions-panel"] | Sub-tab button for "Subscriptions". | `handleSubTabClick(event)` |
 
 #### A5.1: Users Sub-Module (Account Holders)
 
 | Element ID / Selector     | Purpose (Human-Readable)                  | Handler Function (for GCA)                 |
 | :------------------------ | :---------------------------------------- | :----------------------------------------- |
 | `#add-holder-form`        | Form to add a new account holder.         | `handleAddHolderSubmit(event)`             |
-| `#add-account-holder-btn` | Button: Submits the new holder.           | (Wired to form submit)                     |
+| `#add-account-holder-btn` | Button: Submits the new holder.           | (Wired to `#add-holder-form` submit event) |
 | `#account-holder-list`    | Container: List of all account holders.   | `loadAccountHoldersList()`                 |
 | `(list item button)`      | (Dynamic) Button to set user as default.  | `handleSetDefaultHolderClick(holderId)`    |
 | `(list item button)`      | (Dynamic) Button to manage subscriptions. | `handleManageSubscriptionsClick(holderId)` |
 | `(list item button)`      | (Dynamic) Button to delete a holder.      | `handleDeleteHolderClick(holderId)`        |
+| :------------------------ | :---------------------------------------- | :----------------------------------------- |
+| **Note:** "All Users" and "Primary" are prepended as default account holders by `loadAccountHoldersList()`. |
 
 #### A5.2: Subscriptions Sub-Module
 
 | Element ID / Selector                 | Purpose (Human-Readable)                        | Handler Function (for GCA)                     |
 | :------------------------------------ | :---------------------------------------------- | :--------------------------------------------- |
-| `#subscriptions-panel-title`          | Content: "Manage Subscribed Sources for [User]" | `loadSubscriptionsForUser(holderId)`           |
+| `#subscriptions-panel-title`          | Content: "Manage Subscribed Sources for [User]" | `loadSubscriptionsForUser()`                   |
 | `#subscriptions-panel-list-container` | Container: List of all sources with checkboxes. | (Managed by `loadSubscriptionsForUser`)        |
 | `(dynamic checkbox)`                  | (Dynamic) Checkbox to subscribe/unsubscribe.    | `handleSubscriptionToggle(holderId, sourceId)` |
+| **Note:** The `holderId` for `loadSubscriptionsForUser` is determined dynamically based on the currently selected account holder. |
 
 ---
 
@@ -165,7 +168,6 @@ This is a separate modal, triggered by `handleEditSourceClick()`.
 | :------------------------------------------------------------------------------------------------- | :----------------------------------------------- | :--------------------------------------- |
 | `#edit-source-modal`                                                                               | The "Edit Source" modal container.               | `openEditSourceModal(sourceId)`          |
 | `#edit-source-form`                                                                                | Form to edit an existing source.                 | `handleEditSourceSubmit(event)`          |
-| **Backend API:** `PUT /api/sources/:id` (expects JSON body matching `advice_sources` table schema) |
 | **Backend API:** `PUT /api/sources/:id` (expects JSON body matching `advice_sources` table schema) |
 | `#edit-source-id`                                                                                  | Hidden Input: The ID of the source being edited. | (Populated by `openEditSourceModal`)     |
 | `#edit-source-name`                                                                                | Input: Source Name (label changes dynamically)   | (Loaded by `openEditSourceModal`)        |

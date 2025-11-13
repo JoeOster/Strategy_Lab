@@ -1,5 +1,5 @@
 // public/js/modules/settings/handlers.js
-import { getSettings, updateSettings } from './api.js';
+import { getSettings, updateSettings } from './general.api.js';
 import * as appearanceHandlers from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as sourcesHandlers from './sources.handlers.js';
