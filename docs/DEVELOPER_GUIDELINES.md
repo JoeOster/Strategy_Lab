@@ -131,8 +131,10 @@ Here's the step-by-step flow:
     *   **When a main navigation button is clicked (e.g., "Strategy Lab"):**
         *   It updates the `active` class on the navigation buttons (making the
             clicked one active, others inactive).
-        *   If the clicked tab is "settings", it explicitly shows the settings
-            modal.
+        *   **Special Case: "Settings" Tab:** If the clicked tab is "settings",
+            it explicitly shows the settings modal (whose HTML is statically
+            present in `public/index.html`) and clears the main content area.
+            This deviates from the dynamic page loading pattern.
         *   **For all other main tabs (e.g., "Dashboard", "Orders", "Strategy
             Lab"), it calls `loadPageContent(tab)` (e.g.,
             `loadPageContent('strategy-lab')`).**
