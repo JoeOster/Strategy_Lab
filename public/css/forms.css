@@ -20,7 +20,8 @@
 #add-exchange-form,
 #add-holder-form,
 #add-webapp-form,
-#log-strategy-form {
+#log-strategy-form,
+#edit-source-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -31,7 +32,8 @@
 #add-new-source-form label,
 #add-exchange-form label,
 #add-holder-form label,
-#log-strategy-form label {
+#log-strategy-form label,
+#edit-source-form label {
   font-weight: bold;
   margin-bottom: -10px;
   color: var(--heading-color);
@@ -46,7 +48,10 @@
 #add-holder-form input,
 #log-strategy-form input,
 #log-strategy-form select,
-#log-strategy-form textarea {
+#log-strategy-form textarea,
+#edit-source-form input,
+#edit-source-form select,
+#edit-source-form textarea {
   padding: 10px;
   border: 1px solid var(--container-border);
   background-color: var(--info-panel-bg);
