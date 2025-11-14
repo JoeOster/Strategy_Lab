@@ -23,84 +23,19 @@ export async function getDb() {
       });
 
       // Run migrations or initial setup
-      await db.exec(`
+      // Run migrations
+      const migrationsPath = path.join(__dirname, 'migrations');
+      const migrationFiles = await fs.readdir(migrationsPath);
+      const sortedMigrations = migrationFiles
+        .filter((file) => file.endsWith('.sql'))
+        .sort();
 
-        CREATE TABLE IF NOT EXISTS advice_sources (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          type TEXT NOT NULL,
-          url TEXT,
-          description TEXT,
-          image_path TEXT,
-          person_email TEXT,
-          person_phone TEXT,
-          person_app_type TEXT,
-          person_app_handle TEXT,
-          group_primary_contact TEXT,
-          group_email TEXT,
-          group_phone TEXT,
-          group_app_type TEXT,
-          group_app_handle TEXT,
-          book_author TEXT,
-          book_isbn TEXT,
-          book_websites TEXT,
-          book_pdfs TEXT,
-          website_websites TEXT,
-          website_pdfs TEXT
-        );
-        -- INSERT OR IGNORE INTO advice_sources (id, name, type, description) VALUES (1, 'Dummy Source', 'person', 'This is a dummy source for testing purposes.');
-
-        CREATE TABLE IF NOT EXISTS account_holders (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          username TEXT NOT NULL UNIQUE
-        );
-
-        CREATE TABLE IF NOT EXISTS web_apps (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL UNIQUE
-        );
-
-        CREATE TABLE IF NOT EXISTS exchanges (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL UNIQUE,
-          url TEXT,
-          description TEXT,
-          cs_contact TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS app_settings (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          key TEXT UNIQUE,
-          value TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS watched_items (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          is_paper_trade INTEGER NOT NULL,
-          user_id INTEGER,
-          source_id INTEGER,
-          strategy_id INTEGER,
-          ticker TEXT NOT NULL,
-          order_type TEXT,
-          buy_price_high REAL,
-          buy_price_low REAL,
-          take_profit_high REAL,
-          take_profit_low REAL,
-          escape_price REAL,
-          status TEXT NOT NULL,
-          notes TEXT,
-          created_date TEXT NOT NULL,
-          FOREIGN KEY (source_id) REFERENCES advice_sources(id),
-          FOREIGN KEY (strategy_id) REFERENCES strategies(id)
-        );
-
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('family-name', '');
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('take-profit-percent', '10');
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('stop-loss-percent', '5');
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification-cooldown', '60');
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('theme', 'light');
-        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('font', 'system');
-      `);
+      for (const file of sortedMigrations) {
+        const filePath = path.join(migrationsPath, file);
+        const sql = await fs.readFile(filePath, 'utf8');
+        await db.exec(sql);
+        console.log(`Applied migration: ${file}`);
+      }
     } catch (err) {
       console.error('Error connecting to the database:', err);
       throw err;

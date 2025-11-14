@@ -1,179 +1,174 @@
-# Strategy Lab V2: Database Schema
+# Database Schema
 
-This document is the "contract" for the database, based on our `docs/wiring/`
-guides and `docs/service-guides/`. This is the primary "source of truth" GCA
-(the Servant) will use to write all `api.js` files.
-
----
-
-## 1. User & Settings Tables
-
-(Based on `docs/wiring/settings.md`)
-
-### `users`
-
-(Manages Account Holders)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `name` (TEXT, NOT NULL)
-- `is_default` (BOOLEAN, DEFAULT 0)
-
-### `app_settings`
-
-(Manages app settings)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `key` (TEXT, UNIQUE)
-- `value` (TEXT)
-- _(Examples: `family-name`, `default-take-profit-percent`, etc.)_
-
-### `exchanges`
-
-(Manages exchanges)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `name` (TEXT, NOT NULL, UNIQUE)
-
-### `web_apps`
-
-(Manages web applications)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `name` (TEXT, NOT NULL, UNIQUE)
+This document outlines the database schema for the Strategy Lab application. The
+database is SQLite, and tables are created and managed via migration scripts in
+`services/migrations/`.
 
 ---
 
-## 2. Strategy Lab Tables
+## Table: `app_settings`
 
-(Based on `docs/wiring/strategy-lab.md`)
+Stores application-wide settings as key-value pairs.
 
-### `advice_sources`
-
-(Manages all "Sources")
-
-- `id` (INTEGER, PRIMARY KEY)
-- `name` (TEXT, NOT NULL)
-- `type` (TEXT, NOT NULL) -- 'Person', 'Group', 'Book', 'Website'
-- `url` (TEXT)
-- `description` (TEXT)
-- `image_path` (TEXT)
-- `person_email` (TEXT)
-- `person_phone` (TEXT)
-- `person_app_type` (TEXT)
-- `person_app_handle` (TEXT)
-- `group_primary_contact` (TEXT)
-- `book_author` (TEXT)
-- `book_isbn` (TEXT)
-- _...etc. for all dynamic fields_
-
-### `user_subscriptions`
-
-(Join table for Users and Sources)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `user_id` (INTEGER, FOREIGN KEY to `users.id`)
-- `source_id` (INTEGER, FOREIGN KEY to `advice_sources.id`)
-
-### `strategies`
-
-(Manages "Strategies" from Books/Websites)
-
-- `id` (INTEGER, PRIMARY KEY)
-- `source_id` (INTEGER, FOREIGN KEY to `advice_sources.id`)
-- `title` (TEXT, NOT NULL)
-- `chapter` (TEXT)
-- `page_number` (INTEGER)
+```sql
+CREATE TABLE app_settings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  key TEXT UNIQUE,
+  value TEXT
+);
+```
 
 ---
 
-## 3. UNIFIED "Watched Items" Table
+## Table: `advice_sources`
 
-(Based on `docs/wiring/orders.md` and `docs/wiring/strategy-lab.md`)
+Stores information about various sources of trading advice (e.g., books, people,
+websites).
 
-This table **replaces** the "tangled" `pending_orders` and `journal_entries`
-tables. It holds _all_ hypothetical trades.
-
-### `watched_items`
-
-- `id` (INTEGER, PRIMARY KEY)
-- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no
-  toggle"._
-  - `0` = "Real Watched Order" (from Module B: Orders)
-  - `1` = "Trade Idea" (from Module E: Strategy Lab)
-- `user_id` (INTEGER, FOREIGN KEY to `users.id`)
-- `source_id` (INTEGER, FOREIGN KEY to `advice_sources.id`, NULLABLE)
-- `strategy_id` (INTEGER, FOREIGN KEY to `strategies.id`, NULLABLE)
-- `ticker` (TEXT, NOT NULL)
-- `order_type` (TEXT, NOT NULL) -- 'Buy Limit', 'Sell Limit'
-- **`quantity` (REAL, NULLABLE)** -- _(Added) For "Real Watched Orders"_
-- `buy_price_high` (REAL)
-- `buy_price_low` (REAL)
-- `take_profit_high` (REAL)
-- `take_profit_low` (REAL)
-- `escape_price` (REAL) -- "Escape Point"
-- **`take_profit_2_high` (REAL, NULLABLE)** -- _(Added) For "Real Watched
-  Orders"_
-- **`take_profit_2_low` (REAL, NULLABLE)** -- _(Added) For "Real Watched
-  Orders"_
-- `status` (TEXT, NOT NULL, DEFAULT 'WATCHING') -- 'WATCHING', 'ALERT',
-  'EXECUTED', 'CANCELLED'
-- `created_date` (TEXT)
-- `expiration_date` (TEXT, NULLABLE)
-- `notes` (TEXT)
+```sql
+CREATE TABLE advice_sources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  url TEXT,
+  description TEXT,
+  image_path TEXT,
+  person_email TEXT,
+  person_phone TEXT,
+  person_app_type TEXT,
+  person_app_handle TEXT,
+  group_primary_contact TEXT,
+  group_email TEXT,
+  group_phone TEXT,
+  group_app_type TEXT,
+  group_app_handle TEXT,
+  book_author TEXT,
+  book_isbn TEXT,
+  book_websites TEXT,
+  book_pdfs TEXT,
+  website_websites TEXT,
+  website_pdfs TEXT
+);
+```
 
 ---
 
-## 4. UNIFIED "Transactions" Table
+## Table: `account_holders`
 
-(Based on `docs/wiring/ledger.md`, `docs/wiring/dashboard.md`,
-`docs/wiring/strategy-lab.md`)
+Stores information about the users or account holders within the application.
 
-This table holds _all_ executed trades (real and paper) in one "untangled"
-location.
-
-### `transactions`
-
-- `id` (INTEGER, PRIMARY KEY)
-- **`is_paper_trade` (BOOLEAN, NOT NULL, DEFAULT 0)** -- _This is our "yes/no
-  toggle"._
-  - `0` = "Real Money Transaction" (for Ledger & Dashboard)
-  - `1` = "Paper Trade" (for Strategy Lab)
-- `user_id` (INTEGER, FOREIGN KEY to `users.id`)
-- `source_id` (INTEGER, FOREIGN KEY to `advice_sources.id`, NULLABLE)
-- `watched_item_id` (INTEGER, FOREIGN KEY to `watched_items.id`, NULLABLE) --
-  Links to the "Idea" that started it
-- `transaction_date` (TEXT, NOT NULL)
-- `ticker` (TEXT, NOT NULL)
-- `exchange_id` (INTEGER, FOREIGN KEY to `exchanges.id`)
-- `transaction_type` (TEXT, NOT NULL) -- 'BUY', 'SELL', 'DIVIDEND'
-- `quantity` (REAL, NOT NULL)
-- `price` (REAL, NOT NULL)
-- `cost_basis` (REAL) -- Calculated at time of "BUY"
-- `quantity_remaining` (REAL) -- For tracking open lots
-- `linked_buy_id` (INTEGER) -- For "SELL" transactions, linking to the "BUY" lot
+```sql
+CREATE TABLE account_holders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT NOT NULL UNIQUE
+);
+```
 
 ---
 
-## 5. Market Data Tables
+## Table: `web_apps`
 
-(Based on `docs/service-guides/module-h-api.md`)
+Stores information about integrated web applications.
 
-### `company_profiles`
+```sql
+CREATE TABLE web_apps (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
+);
+```
 
-(Stores static "pull everything" data)
+---
 
-- `id` (INTEGER, PRIMARY KEY)
-- `ticker` (TEXT, NOT NULL, UNIQUE)
-- `company_name` (TEXT)
-- `logo_url` (TEXT)
-- `industry` (TEXT)
-- _...etc._
+## Table: `exchanges`
 
-### `historical_prices`
+Stores information about financial exchanges.
 
-(Stores EOD prices)
+```sql
+CREATE TABLE exchanges (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  url TEXT,
+  description TEXT,
+  cs_contact TEXT
+);
+```
 
-- `id` (INTEGER, PRIMARY KEY)
-- `ticker` (TEXT, NOT NULL)
-- `date` (TEXT, NOT NULL)
-- `close_price` (REAL, NOT NULL)
+---
+
+## Table: `strategies`
+
+Stores detailed information about trading strategies derived from
+`advice_sources`.
+
+```sql
+CREATE TABLE strategies (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  source_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  chapter TEXT,
+  page_number TEXT,
+  description TEXT,
+  pdf_path TEXT,
+  created_date TEXT NOT NULL,
+  updated_date TEXT NOT NULL,
+  FOREIGN KEY (source_id) REFERENCES advice_sources(id)
+);
+```
+
+---
+
+## Table: `watched_items`
+
+Stores "trade ideas" or items being watched, potentially for paper trading or
+real trades.
+
+```sql
+CREATE TABLE watched_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  is_paper_trade INTEGER NOT NULL DEFAULT 0,
+  user_id INTEGER,
+  source_id INTEGER,
+  strategy_id INTEGER,
+  ticker TEXT NOT NULL,
+  order_type TEXT,
+  buy_price_high REAL,
+  buy_price_low REAL,
+  take_profit_high REAL,
+  take_profit_low REAL,
+  escape_price REAL,
+  status TEXT NOT NULL DEFAULT 'WATCHING',
+  notes TEXT,
+  created_date TEXT NOT NULL,
+  updated_date TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES account_holders(id),
+  FOREIGN KEY (source_id) REFERENCES advice_sources(id),
+  FOREIGN KEY (strategy_id) REFERENCES strategies(id)
+);
+```
+
+---
+
+## Table: `transactions`
+
+Stores records of executed trades, including paper trades.
+
+```sql
+CREATE TABLE transactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  is_paper_trade INTEGER NOT NULL DEFAULT 0,
+  user_id INTEGER,
+  source_id INTEGER,
+  watched_item_id INTEGER,
+  transaction_date TEXT NOT NULL,
+  ticker TEXT NOT NULL,
+  transaction_type TEXT NOT NULL,
+  quantity INTEGER NOT NULL,
+  price REAL NOT NULL,
+  quantity_remaining INTEGER,
+  created_date TEXT NOT NULL,
+  updated_date TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES account_holders(id),
+  FOREIGN KEY (source_id) REFERENCES advice_sources(id),
+  FOREIGN KEY (watched_item_id) REFERENCES watched_items(id)
+);
+```
