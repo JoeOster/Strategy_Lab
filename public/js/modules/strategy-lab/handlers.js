@@ -8,11 +8,7 @@ import {
   getSources,
   getStrategiesForSource,
 } from './sources/api.js';
-import {
-  renderSourceCards,
-  renderSourceDetail,
-  renderStrategiesTable,
-} from './sources/render.js';
+import { renderSourceCards, renderStrategiesTable } from './sources/render.js';
 import { getWatchedList } from './watched-list/api.js';
 import { renderWatchedList } from './watched-list/render.js';
 
@@ -119,7 +115,9 @@ export function handleSubTabClick(event) {
         loadPaperTradesContent();
         break;
       default:
-        console.warn(`No content loading function for sub-panel: ${targetPanelId}`);
+        console.warn(
+          `No content loading function for sub-panel: ${targetPanelId}`
+        );
     }
   } else {
     console.error(`Sub-panel with ID '${targetPanelId}' not found.`);
@@ -133,38 +131,202 @@ export function handleSubTabClick(event) {
  * @param {Event} event - The click event.
  */
 export function handleSourceCardClick(event) {
-  // --- FIX: Cast event.target to Element ---
   if (!(event.target instanceof Element)) {
     return;
   }
   const card = event.target.closest('.source-card');
-  // --- END FIX ---
   if (!card) return;
 
-  // @ts-ignore
   const sourceId = card.dataset.sourceId;
   if (!sourceId) {
     console.error('Source card is missing a data-source-id attribute.');
     return;
   }
 
-  // Use optional chaining for null safety
-  gridView()?.style.setProperty('display', 'none');
-  detailView()?.style.setProperty('display', 'block');
-
-  loadSourceDetail(sourceId);
+  openSourceDetailModal(sourceId);
 }
 
 /**
- * Handles a click on the "Back to List" button in the detail view.
+ * Opens the source detail modal and populates it with data.
+ * @param {string} sourceId - The ID of the source to display.
  */
-export function handleCloseSourceDetail() {
-  // Use optional chaining for null safety
-  detailView()?.style.setProperty('display', 'none');
-  gridView()?.style.setProperty('display', 'block');
+export async function openSourceDetailModal(sourceId) {
+  const modal = document.getElementById('source-detail-modal');
+  const profileContainer = document.getElementById('source-profile-container');
+  const featureBtnContainer = document.getElementById(
+    'source-feature-btn-container'
+  );
+  const rightPanel = document.querySelector('.source-detail-right-panel');
+  const closeButton = modal?.querySelector('.close-button');
 
-  // Optionally, re-load the sources list
-  loadSourcesContent();
+  console.log('Modal:', modal);
+  console.log('Profile Container:', profileContainer);
+  console.log('Feature Button Container:', featureBtnContainer);
+  console.log('Right Panel:', rightPanel);
+  console.log('Close Button:', closeButton);
+
+  if (
+    !modal ||
+    !profileContainer ||
+    !featureBtnContainer ||
+    !rightPanel ||
+    !closeButton
+  ) {
+    console.error(
+      'Source detail modal elements not found. One or more elements are null.'
+    );
+    return;
+  }
+
+  try {
+    const source = await getSource(sourceId);
+
+    // Populate profile container
+    profileContainer.innerHTML = `
+      <h4>${source.name}</h4>
+      <p>Type: ${source.type}</p>
+      ${source.description ? `<p>${source.description}</p>` : ''}
+      ${source.url ? `<p>URL: <a href="${source.url}" target="_blank">${source.url}</a></p>` : ''}
+      ${source.book_author ? `<p>Author: ${source.book_author}</p>` : ''}
+      ${source.book_isbn ? `<p>ISBN: ${source.book_isbn}</p>` : ''}
+      ${source.person_email ? `<p>Email: ${source.person_email}</p>` : ''}
+      ${source.person_phone ? `<p>Phone: ${source.person_phone}</p>` : ''}
+      ${source.group_primary_contact ? `<p>Primary Contact: ${source.group_primary_contact}</p>` : ''}
+    `;
+
+    // Render feature button
+    let featureButtonHtml = '';
+    if (source.type === 'book' || source.type === 'website') {
+      featureButtonHtml = `
+        <button class="btn" id="add-strategy-btn" data-source-id="${source.id}">Add Strategy</button>
+        <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
+      `;
+    } else if (source.type === 'person' || source.type === 'group') {
+      featureButtonHtml = `
+        <button class="btn" id="add-idea-btn" data-source-id="${source.id}">Add Idea</button>
+        <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
+      `;
+    }
+    featureBtnContainer.innerHTML = featureButtonHtml;
+
+    // Load content for the right panel (strategies/trade ideas)
+    await loadSourceDetailContent(sourceId, source.type, rightPanel);
+
+    // Display the modal
+    modal.style.display = 'block';
+
+    // Attach event listeners
+    closeButton.onclick = closeSourceDetailModal;
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        closeSourceDetailModal();
+      }
+    };
+
+    // Attach listener for the feature button
+    const addStrategyButton = featureBtnContainer.querySelector('#add-strategy-btn');
+    const addIdeaButton = featureBtnContainer.querySelector('#add-idea-btn');
+    const editButton = featureBtnContainer.querySelector('#edit-source-btn');
+
+    if (addStrategyButton) {
+      addStrategyButton.addEventListener('click', handleShowStrategyForm);
+    } else if (addIdeaButton) {
+      // TODO: Implement handleShowAddIdeaForm
+      addIdeaButton.addEventListener('click', () =>
+        alert('Add Idea functionality not yet implemented.')
+      );
+    }
+
+    if (editButton) {
+      editButton.addEventListener('click', handleEditSource);
+    }
+  } catch (error) {
+    console.error(
+      `Failed to load source details for modal ${sourceId}:`,
+      error
+    );
+    profileContainer.innerHTML =
+      '<p class="error">Failed to load source details.</p>';
+  }
+}
+
+/**
+ * Placeholder function for handling the edit source action.
+ * @param {Event} event - The click event.
+ */
+function handleEditSource(event) {
+  const sourceId = event.target.dataset.sourceId;
+  alert(`Edit functionality for source ID: ${sourceId} not yet implemented.`);
+}
+
+/**
+ * Closes the source detail modal.
+ */
+export function closeSourceDetailModal() {
+  const modal = document.getElementById('source-detail-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    // Clear content to ensure fresh load next time
+    document.getElementById('source-profile-container').innerHTML = '';
+    document.getElementById('source-feature-btn-container').innerHTML = '';
+    const dynamicContentDiv = document.getElementById(
+      'source-detail-dynamic-content'
+    );
+    if (dynamicContentDiv) {
+      dynamicContentDiv.remove(); // Remove the dynamic content div
+    }
+    // Clear the content of the new bottom panel placeholders
+    document.getElementById('open-trades-table-placeholder').innerHTML =
+      '<h4>Open Trades</h4><p>Table for open trades will go here.</p>';
+    document.getElementById('paper-trades-table-placeholder').innerHTML =
+      '<h4>Paper Trades</h4><p>Table for paper trades will go here.</p>';
+  }
+}
+
+/**
+ * Fetches and renders the detailed view for a single source.
+ * This function now renders content into the modal's right panel.
+ * @param {string} sourceId - The ID of the source to load.
+ * @param {string} sourceType - The type of the source (e.g., 'book', 'person').
+ * @param {HTMLElement} targetElement - The element to render the content into.
+ */
+async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
+  console.log(
+    `Loading content for source detail right panel for source ${sourceId}...`
+  );
+  const contentDiv = document.createElement('div');
+  contentDiv.id = 'source-detail-dynamic-content';
+  targetElement.prepend(contentDiv); // Prepend to keep placeholders at the bottom
+
+  try {
+    if (sourceType === 'book' || sourceType === 'website') {
+      contentDiv.innerHTML = `
+        <div id="strategy-table-container">
+          <h4>Logged Strategies</h4>
+          <div id="strategy-table"></div> 
+        </div>
+      `;
+      await loadStrategiesForSource(sourceId);
+      // Attach form submit listener - no longer needed here as form is in its own modal
+      // document.getElementById('log-strategy-form')?.addEventListener('submit', handleLogStrategySubmit);
+    } else if (sourceType === 'person' || sourceType === 'group') {
+      contentDiv.innerHTML = `
+        <div id="trade-ideas-table-container">
+          <h4>Logged Trade Ideas</h4>
+          <div id="trade-ideas-table">
+            <p>No trade ideas logged for this source yet.</p>
+          </div>
+        </div>
+      `;
+      // TODO: Implement loadTradeIdeasForSource
+    }
+  } catch (error) {
+    console.error(
+      `Failed to load source detail content for ${sourceId}:`,
+      error
+    );
+    contentDiv.innerHTML = '<p class="error">Failed to load content.</p>';
+  }
 }
 
 /**
@@ -176,8 +338,9 @@ async function loadSourcesContent() {
     const sources = await getSources();
     renderSourceCards(sources);
     // Ensure the correct view is visible
-    detailView()?.style.setProperty('display', 'none');
-    gridView()?.style.setProperty('display', 'block');
+    // No longer needed as modal handles detail view
+    detailView()?.classList.remove('active'); // Keep this commented if it refers to the old detail view
+    gridView()?.classList.add('active'); // Restore this to make source cards visible
   } catch (err) {
     console.error('Failed to load sources:', err);
     // Cast unknown 'err' to 'Error'
@@ -187,63 +350,52 @@ async function loadSourcesContent() {
 }
 
 /**
- * Fetches and renders the detailed view for a single source.
- * @param {string} sourceId - The ID of the source to load.
+ * Shows the "Log New Strategy" form modal.
  */
-async function loadSourceDetail(sourceId) {
-  console.log(`Loading details for source ${sourceId}...`);
-  try {
-    const source = await getSource(sourceId);
-    renderSourceDetail(source);
+function handleShowStrategyForm(event) {
+  const addStrategyModal = document.getElementById('add-strategy-modal');
+  const strategySourceIdInput = document.getElementById('strategy-source-id');
 
-    // Attach listeners for the dynamically rendered buttons
-    document
-      .getElementById('close-source-detail-btn')
-      ?.addEventListener('click', handleCloseSourceDetail);
-
-    document
-      .getElementById('source-strategy-btn')
-      ?.addEventListener('click', handleShowStrategyForm);
-
-    document
-      .getElementById('log-strategy-form')
-      ?.addEventListener('submit', handleLogStrategySubmit);
-
-    // Load the strategies table for this source
-    // @ts-ignore (This will be fixed when the function is defined)
-    await loadStrategiesForSource(sourceId);
-  } catch (error) {
-    console.error(`Failed to load source detail for ${sourceId}:`, error);
-    // Fix: Remove optional chaining from left-hand side
-    const dv = detailView();
-    if (dv) {
-      dv.innerHTML =
-        '<p class="error">Failed to load source details. Please try again.</p>';
+  if (addStrategyModal && strategySourceIdInput) {
+    // Get sourceId from the button that was clicked
+    const sourceId = event.target.dataset.sourceId;
+    if (sourceId) {
+      strategySourceIdInput.value = sourceId;
     }
-  }
-}
 
-/**
- * Shows the "Log New Strategy" form.
- */
-function handleShowStrategyForm() {
-  const formContainer = document.getElementById('log-strategy-form-container');
-  if (formContainer) {
-    formContainer.style.display = 'block';
+    addStrategyModal.style.display = 'block';
+
     // Attach listener for the new "Cancel" button
     document
       .getElementById('cancel-strategy-form-btn')
       ?.addEventListener('click', handleCancelStrategyForm);
+
+    // Attach listener for the modal's close button
+    addStrategyModal
+      .querySelector('.close-button')
+      ?.addEventListener('click', handleCancelStrategyForm);
+
+    // Attach listener for the form submission
+    document
+      .getElementById('log-strategy-form')
+      ?.addEventListener('submit', handleLogStrategySubmit);
+
+    // Attach listener for closing the modal by clicking outside
+    window.onclick = (event) => {
+      if (event.target === addStrategyModal) {
+        handleCancelStrategyForm();
+      }
+    };
   }
 }
 
 /**
- * Hides the "Log New Strategy" form.
+ * Hides the "Log New Strategy" form modal.
  */
 function handleCancelStrategyForm() {
-  const formContainer = document.getElementById('log-strategy-form-container');
-  if (formContainer) {
-    formContainer.style.display = 'none';
+  const addStrategyModal = document.getElementById('add-strategy-modal');
+  if (addStrategyModal) {
+    addStrategyModal.style.display = 'none';
     // Cast form to HTMLFormElement to access reset()
     const form = /** @type {HTMLFormElement | null} */ (
       document.getElementById('log-strategy-form')
