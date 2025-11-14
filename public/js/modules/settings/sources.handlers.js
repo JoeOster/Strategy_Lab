@@ -79,6 +79,23 @@ export function handleSourceTypeChange(event, formType) {
         newSourceStrategiesContainer.innerHTML = '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
       }
     }
+  } else if (selectedType === 'website') {
+    if (nameLabel) nameLabel.textContent = 'Website Name:';
+    if (urlWrapper) urlWrapper.style.display = 'block';
+    if (urlLabel) urlLabel.textContent = 'Website URL:';
+
+    // Load strategies for website type
+    if (formType === 'edit') {
+      const sourceId = document.getElementById('edit-source-id').value;
+      if (sourceId) {
+        loadStrategiesForSource(sourceId, 'edit-source-website-strategies-table');
+      }
+    } else if (formType === 'new') {
+      const newSourceStrategiesContainer = document.getElementById('new-source-website-strategies-table');
+      if (newSourceStrategiesContainer) {
+        newSourceStrategiesContainer.innerHTML = '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
+      }
+    }
   } else {
     if (nameLabel) nameLabel.textContent = 'Name:';
     if (selectedType === 'person' || selectedType === 'group') {
