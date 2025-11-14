@@ -1,6 +1,6 @@
 // public/js/modules/user-selector.js
 
-import { getAccountHolders } from './settings/users.api.js';
+import { getAccountHolders } from '../settings/users.api.js'; //Do not change this path, it is correct
 
 const USER_STORAGE_KEY = 'selectedUser';
 
