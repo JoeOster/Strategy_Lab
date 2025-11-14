@@ -20,7 +20,7 @@ export function handleAddNewSourceSubmit(event) {
     .catch((error) => console.error('Error adding source:', error));
 }
 
-export function handleSourceTypeChange(event, formType) {
+export function handleSourceTypeChange(event, formType, sourceData = {}) {
   const selectedType = event.target.value;
   const formPrefix = formType === 'new' ? 'new-source' : 'edit-source';
   console.log('handleSourceTypeChange called with:', {
@@ -64,6 +64,14 @@ export function handleSourceTypeChange(event, formType) {
     if (urlWrapper) urlWrapper.style.display = 'block';
     if (urlLabel) urlLabel.textContent = 'Book URL:';
 
+    const bookFields = ['book_author', 'book_isbn', 'book_websites', 'book_pdfs'];
+    bookFields.forEach(field => {
+      const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
+      if (wrapper) {
+        wrapper.style.display = (sourceData[field] && sourceData[field].length > 0) ? 'block' : 'none';
+      }
+    });
+
     // Load strategies for book type
     if (formType === 'edit') {
       const sourceId = document.getElementById('edit-source-id').value;
@@ -71,9 +79,6 @@ export function handleSourceTypeChange(event, formType) {
         loadStrategiesForSource(sourceId, 'edit-source-book-strategies-table');
       }
     } else if (formType === 'new') {
-      // For new sources, strategies will be loaded after the source is added
-      // or if there's a temporary way to associate them before saving.
-      // For now, we'll just clear the placeholder.
       const newSourceStrategiesContainer = document.getElementById('new-source-book-strategies-table');
       if (newSourceStrategiesContainer) {
         newSourceStrategiesContainer.innerHTML = '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
@@ -83,6 +88,14 @@ export function handleSourceTypeChange(event, formType) {
     if (nameLabel) nameLabel.textContent = 'Website Name:';
     if (urlWrapper) urlWrapper.style.display = 'block';
     if (urlLabel) urlLabel.textContent = 'Website URL:';
+
+    const websiteFields = ['website_websites', 'website_pdfs'];
+    websiteFields.forEach(field => {
+      const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
+      if (wrapper) {
+        wrapper.style.display = (sourceData[field] && sourceData[field].length > 0) ? 'block' : 'none';
+      }
+    });
 
     // Load strategies for website type
     if (formType === 'edit') {
@@ -180,7 +193,7 @@ export async function handleEditSourceClick(sourceId) {
     }
 
     // Trigger the change handler to show/hide appropriate panels and load strategies
-    handleSourceTypeChange({ target: { value: source.type } }, 'edit');
+    handleSourceTypeChange({ target: { value: source.type } }, 'edit', source);
 
     editSourceModal.style.display = 'block'; // Show the modal
   } catch (error) {
