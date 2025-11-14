@@ -1,0 +1,5 @@
+CREATE TABLE app_settings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  key TEXT UNIQUE,
+  value TEXT
+);
