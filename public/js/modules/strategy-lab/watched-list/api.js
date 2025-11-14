@@ -1,38 +1,54 @@
 // public/js/modules/strategy-lab/watched-list/api.js
 
-/** @unused @typedef {import('../../../types.js').WatchedItem} WatchedItem */
+/** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 
-//import { apiFetch } from '../../utils/apiFetch.js';
+import { api } from '../../../utils/apiFetch.js';
 
 /**
- * Fetches the list of watched items.
- * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of watched items.
+ * Fetches the list of watched items (Trade Ideas) from the real API.
+ * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of watched items with live prices.
  */
 export async function getWatchedList() {
-  // For now, this returns mock data.
-  // Replace with a real API call when the endpoint is ready.
-  console.log('Fetching watched list from mock API...');
-  return Promise.resolve([
-    {
-      id: 1,
-      symbol: 'BTC',
-      entryPrice: 50000,
-      targetPrice: 55000,
-      notes: 'Watching for a breakout',
-    },
-    {
-      id: 2,
-      symbol: 'ETH',
-      entryPrice: 4000,
-      targetPrice: 4500,
-      notes: 'Possible dip buy',
-    },
-    {
-      id: 3,
-      symbol: 'ADA',
-      entryPrice: 2.5,
-      targetPrice: 3.0,
-      notes: 'Staking rewards are high',
-    },
-  ]);
+  // This now calls the real server endpoint
+  return api.get('/api/watched-items/ideas');
+}
+
+/**
+ * Deletes a watched idea.
+ * @param {number | string} id - The ID of the idea to delete.
+ * @returns {Promise<any>}
+ */
+export async function deleteIdea(id) {
+  return api.delete(`/api/watched-items/${id}`);
+}
+
+/**
+ * Moves a watched idea to a paper trade.
+ * @param {number | string} id - The ID of the idea to move.
+ * @returns {Promise<any>}
+ */
+export async function moveIdeaToPaper(id) {
+  // This calls the new endpoint that creates a transaction and updates the idea
+  return api.post(`/api/watched-items/${id}/to-paper`);
+}
+
+/**
+ * Gets a watched idea's data for pre-filling the Orders tab.
+ * @param {number | string} id - The ID of the idea to fetch.
+ * @returns {Promise<WatchedItem | undefined>}
+ */
+export async function getIdeaForPrefill(id) {
+  return api.get(`/api/watched-items/${id}`);
+}
+// public/js/modules/strategy-lab/watched-list/api.js
+
+// ... (existing functions getWatchedList, deleteIdea, etc.) ...
+
+/**
+ * Adds a new "Trade Idea" to the database.
+ * @param {object} ideaData - The data from the idea form.
+ * @returns {Promise<WatchedItem>} A promise that resolves to the new idea object.
+ */
+export async function addIdea(ideaData) {
+  return api.post('/api/watched-items/ideas', ideaData);
 }

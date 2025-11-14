@@ -1,8 +1,8 @@
 // public/js/modules/strategy-lab/watched-list/render.js
 
 /**
- * Renders the watched list table.
- * @param {import('../../../types.js').WatchedItem[] | null} watchedList - An array of watched items.
+ * Renders the watched list table (which displays "Trade Ideas").
+ * @param {any[] | null} watchedList - An array of watched items (ideas).
  * @param {Error | null} [error] - An optional error object.
  */
 export function renderWatchedList(watchedList, error = null) {
@@ -12,12 +12,10 @@ export function renderWatchedList(watchedList, error = null) {
     return;
   }
 
-  // --- FIX: Added error handling ---
   if (error) {
     container.innerHTML = '<p class="error">Failed to load watched list.</p>';
     return;
   }
-  // --- END FIX ---
 
   if (!watchedList || watchedList.length === 0) {
     container.innerHTML = '<p>No items in your watched list.</p>';
@@ -27,12 +25,17 @@ export function renderWatchedList(watchedList, error = null) {
   const table = document.createElement('table');
   table.className = 'strategy-table'; // Re-use the existing table style
 
+  // Columns now match the 'watched_items' table schema for "Ideas"
   table.innerHTML = `
     <thead>
       <tr>
-        <th>Symbol</th>
-        <th>Entry Price</th>
-        <th>Target Price</th>
+        <th>Ticker</th>
+        <th>Buy Price (High)</th>
+        <th>Buy Price (Low)</th>
+        <th>Take Profit (High)</th>
+        <th>Take Profit (Low)</th>
+        <th>Escape Price</th>
+        <th>Status</th>
         <th>Notes</th>
         <th>Actions</th>
       </tr>
@@ -41,14 +44,28 @@ export function renderWatchedList(watchedList, error = null) {
       ${watchedList
         .map(
           (item) => `
-        <tr>
-          <td>${item.symbol}</td>
-          <td>${item.entryPrice}</td>
-          <td>${item.targetPrice}</td>
-          <td>${item.notes}</td>
+        <tr data-id="${item.id}">
+          <td>${item.ticker || ''}</td>
+          <td>${item.buy_price_high || ''}</td>
+          <td>${item.buy_price_low || ''}</td>
+          <td>${item.take_profit_high || ''}</td>
+          <td>${item.take_profit_low || ''}</td>
+          <td>${item.escape_price || ''}</td>
+          <td>${item.status || 'WATCHING'}</td>
+          <td>${item.notes || ''}</td>
           <td>
-            <button class="small-btn" data-id="${item.id}">Edit</button>
-            <button class="small-btn" data-id="${item.id}">Delete</button>
+            <button class="btn table-action-btn idea-buy-btn" data-id="${
+              item.id
+            }">Buy</button>
+            <button class="btn table-action-btn idea-paper-btn" data-id="${
+              item.id
+            }">Paper</button>
+            <button class="btn table-action-btn idea-edit-btn" data-id="${
+              item.id
+            }">Edit</button>
+            <button class="btn table-action-btn idea-delete-btn" data-id="${
+              item.id
+            }">Delete</button>
           </td>
         </tr>
       `

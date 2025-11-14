@@ -1,12 +1,26 @@
 // public/js/modules/strategy-lab/handlers.js
 
-import { getSource, getSources } from '../../settings/sources.api.js'; // Removed updateSource as it's not directly used here
-import { openEditSourceModal } from '../../settings/sources.handlers.js'; // Import openEditSourceModal
+// --- START: FIX (Add JSDoc type imports) ---
+/** @typedef {import('../../types.js').Source} Source */
+/** @typedef {import('../../types.js').Strategy} Strategy */
+/** @typedef {import('../../types.js').WatchedItem} WatchedItem */
+// --- END: FIX ---
+
+// --- FIX: Corrected import paths from ../../ to ../ ---
+import { getSource, getSources } from '../settings/sources.api.js';
+import { openEditSourceModal } from '../settings/sources.handlers.js';
+// --- END: FIX ---
+
 import { getPaperTrades } from './paper-trades/api.js';
 import { renderPaperTrades } from './paper-trades/render.js';
 import { addStrategy, getStrategiesForSource } from './sources/api.js';
 import { renderSourceCards, renderStrategiesTable } from './sources/render.js';
-import { getWatchedList } from './watched-list/api.js';
+
+// --- START: Import addIdea and getWatchedList ---
+import { addIdea, getWatchedList } from './watched-list/api.js';
+// --- END: Import addIdea ---
+
+import * as watchedListHandlers from './watched-list/handlers.js';
 import { renderWatchedList } from './watched-list/render.js';
 
 const gridView = () => document.getElementById('source-cards-grid');
@@ -51,8 +65,6 @@ export function initializeStrategyLabSubTabs() {
   }
 }
 
-// ... (rest of the file is unchanged) ...
-
 /**
  * Handles clicks on the Strategy Lab L2 sub-tabs (Sources, Watched List, Paper Trades).
  * Deactivates all sub-panels in its section and activates the correct one.
@@ -64,15 +76,17 @@ export function handleSubTabClick(event) {
     return;
   }
   const clickedTabButton = event.target.closest('.sub-nav-btn');
-  // --- END FIX ---
+  // --- END: FIX ---
 
   if (!clickedTabButton) {
     return;
   }
   event.stopPropagation();
 
-  // @ts-ignore
-  const targetPanelId = clickedTabButton.dataset.subTab;
+  // --- FIX: Cast to HTMLElement to access dataset ---
+  const targetPanelId = /** @type {HTMLElement} */ (clickedTabButton).dataset
+    .subTab;
+  // --- END FIX ---
   const strategyLabContainer = clickedTabButton.closest(
     '#strategy-lab-page-container'
   );
@@ -121,8 +135,6 @@ export function handleSubTabClick(event) {
   }
 }
 
-// ... (rest of the file is unchanged) ...
-
 /**
  * Handles a click on a source card.
  * @param {Event} event - The click event.
@@ -134,7 +146,9 @@ export function handleSourceCardClick(event) {
   const card = event.target.closest('.source-card');
   if (!card) return;
 
-  const sourceId = card.dataset.sourceId;
+  // --- FIX: Cast to HTMLElement to access dataset ---
+  const sourceId = /** @type {HTMLElement} */ (card).dataset.sourceId;
+  // --- END FIX ---
   if (!sourceId) {
     console.error('Source card is missing a data-source-id attribute.');
     return;
@@ -154,19 +168,15 @@ export async function openSourceDetailModal(sourceId) {
     'source-feature-btn-container'
   );
   const rightPanel = document.querySelector('.source-detail-right-panel');
+  // --- FIX: Add null check for modal ---
   const closeButton = modal?.querySelector('.close-button');
-
-  console.log('Modal:', modal);
-  console.log('Profile Container:', profileContainer);
-  console.log('Feature Button Container:', featureBtnContainer);
-  console.log('Right Panel:', rightPanel);
-  console.log('Close Button:', closeButton);
 
   if (
     !modal ||
     !profileContainer ||
     !featureBtnContainer ||
     !rightPanel ||
+    // --- FIX: Check closeButton itself ---
     !closeButton
   ) {
     console.error(
@@ -183,12 +193,20 @@ export async function openSourceDetailModal(sourceId) {
       <h4>${source.name}</h4>
       <p>Type: ${source.type}</p>
       ${source.description ? `<p>${source.description}</p>` : ''}
-      ${source.url ? `<p>URL: <a href="${source.url}" target="_blank">${source.url}</a></p>` : ''}
+      ${
+        source.url
+          ? `<p>URL: <a href="${source.url}" target="_blank">${source.url}</a></p>`
+          : ''
+      }
       ${source.book_author ? `<p>Author: ${source.book_author}</p>` : ''}
       ${source.book_isbn ? `<p>ISBN: ${source.book_isbn}</p>` : ''}
       ${source.person_email ? `<p>Email: ${source.person_email}</p>` : ''}
       ${source.person_phone ? `<p>Phone: ${source.person_phone}</p>` : ''}
-      ${source.group_primary_contact ? `<p>Primary Contact: ${source.group_primary_contact}</p>` : ''}
+      ${
+        source.group_primary_contact
+          ? `<p>Primary Contact: ${source.group_primary_contact}</p>`
+          : ''
+      }
     `;
 
     // Render feature button
@@ -206,14 +224,23 @@ export async function openSourceDetailModal(sourceId) {
     }
     featureBtnContainer.innerHTML = featureButtonHtml;
 
-    // Load content for the right panel (strategies/trade ideas)
-    await loadSourceDetailContent(sourceId, source.type, rightPanel);
+    // --- FIX: Cast rightPanel to HTMLElement ---
+    await loadSourceDetailContent(
+      sourceId,
+      source.type,
+      /** @type {HTMLElement} */ (rightPanel)
+    );
+    // --- END FIX ---
 
     // Display the modal
+    // @ts-ignore
     modal.style.display = 'block';
 
     // Attach event listeners
-    closeButton.onclick = closeSourceDetailModal;
+    // --- FIX: Cast closeButton to HTMLElement ---
+    /** @type {HTMLElement} */ (closeButton).onclick = closeSourceDetailModal;
+    /** @param {MouseEvent} event */
+    // --- END FIX ---
     window.onclick = (event) => {
       if (event.target === modal) {
         closeSourceDetailModal();
@@ -226,18 +253,17 @@ export async function openSourceDetailModal(sourceId) {
     const addIdeaButton = featureBtnContainer.querySelector('#add-idea-btn');
     const editButton = featureBtnContainer.querySelector('#edit-source-btn');
 
+    // --- FIX: Add null checks for event listeners ---
     if (addStrategyButton) {
       addStrategyButton.addEventListener('click', handleShowStrategyForm);
     } else if (addIdeaButton) {
-      // TODO: Implement handleShowAddIdeaForm
-      addIdeaButton.addEventListener('click', () =>
-        alert('Add Idea functionality not yet implemented.')
-      );
+      addIdeaButton.addEventListener('click', handleShowIdeaForm);
     }
 
     if (editButton) {
       editButton.addEventListener('click', handleEditSource);
     }
+    // --- END FIX ---
   } catch (error) {
     console.error(
       `Failed to load source details for modal ${sourceId}:`,
@@ -253,6 +279,9 @@ export async function openSourceDetailModal(sourceId) {
  * @param {Event} event - The click event.
  */
 function handleEditSource(event) {
+  // --- FIX: Add guard for event.target ---
+  if (!(event.target instanceof HTMLElement)) return;
+  // --- END FIX ---
   const sourceId = event.target.dataset.sourceId;
   if (sourceId) {
     openEditSourceModal(sourceId);
@@ -267,21 +296,37 @@ function handleEditSource(event) {
 export function closeSourceDetailModal() {
   const modal = document.getElementById('source-detail-modal');
   if (modal) {
+    // @ts-ignore
     modal.style.display = 'none';
     // Clear content to ensure fresh load next time
-    document.getElementById('source-profile-container').innerHTML = '';
-    document.getElementById('source-feature-btn-container').innerHTML = '';
+    // --- FIX: Add null checks ---
+    const profile = document.getElementById('source-profile-container');
+    if (profile) profile.innerHTML = '';
+    const feature = document.getElementById('source-feature-btn-container');
+    if (feature) feature.innerHTML = '';
+    // --- END FIX ---
     const dynamicContentDiv = document.getElementById(
       'source-detail-dynamic-content'
     );
     if (dynamicContentDiv) {
       dynamicContentDiv.remove(); // Remove the dynamic content div
     }
-    // Clear the content of the new bottom panel placeholders
-    document.getElementById('open-trades-table-placeholder').innerHTML =
-      '<h4>Open Trades</h4><p>Table for open trades will go here.</p>';
-    document.getElementById('paper-trades-table-placeholder').innerHTML =
-      '<h4>Paper Trades</h4><p>Table for paper trades will go here.</p>';
+    // --- FIX: Add null checks ---
+    const openTrades = document.getElementById(
+      'open-trades-table-placeholder'
+    );
+    if (openTrades) {
+      openTrades.innerHTML =
+        '<h4>Open Trades</h4><p>Table for open trades will go here.</p>';
+    }
+    const paperTrades = document.getElementById(
+      'paper-trades-table-placeholder'
+    );
+    if (paperTrades) {
+      paperTrades.innerHTML =
+        '<h4>Paper Trades</h4><p>Table for paper trades will go here.</p>';
+    }
+    // --- END FIX ---
   }
 }
 
@@ -309,8 +354,6 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
         </div>
       `;
       await loadStrategiesForSource(sourceId);
-      // Attach form submit listener - no longer needed here as form is in its own modal
-      // document.getElementById('log-strategy-form')?.addEventListener('submit', handleLogStrategySubmit);
     } else if (sourceType === 'person' || sourceType === 'group') {
       contentDiv.innerHTML = `
         <div id="trade-ideas-table-container">
@@ -340,9 +383,8 @@ async function loadSourcesContent() {
     const sources = await getSources();
     renderSourceCards(sources);
     // Ensure the correct view is visible
-    // No longer needed as modal handles detail view
-    detailView()?.classList.remove('active'); // Keep this commented if it refers to the old detail view
-    gridView()?.classList.add('active'); // Restore this to make source cards visible
+    detailView()?.classList.remove('active');
+    gridView()?.classList.add('active');
   } catch (err) {
     console.error('Failed to load sources:', err);
     // Cast unknown 'err' to 'Error'
@@ -353,8 +395,13 @@ async function loadSourcesContent() {
 
 /**
  * Shows the "Log New Strategy" form modal.
+ * @param {Event} event - The click event.
  */
 function handleShowStrategyForm(event) {
+  // --- FIX: Add guard for event.target ---
+  if (!(event.target instanceof HTMLElement)) return;
+  // --- END FIX ---
+
   const addStrategyModal = document.getElementById('add-strategy-modal');
   const strategySourceIdInput = document.getElementById('strategy-source-id');
 
@@ -362,9 +409,10 @@ function handleShowStrategyForm(event) {
     // Get sourceId from the button that was clicked
     const sourceId = event.target.dataset.sourceId;
     if (sourceId) {
+      // @ts-ignore
       strategySourceIdInput.value = sourceId;
     }
-
+    // @ts-ignore
     addStrategyModal.style.display = 'block';
 
     // Attach listener for the new "Cancel" button
@@ -383,6 +431,7 @@ function handleShowStrategyForm(event) {
       ?.addEventListener('submit', handleLogStrategySubmit);
 
     // Attach listener for closing the modal by clicking outside
+    /** @param {MouseEvent} event */
     window.onclick = (event) => {
       if (event.target === addStrategyModal) {
         handleCancelStrategyForm();
@@ -397,6 +446,7 @@ function handleShowStrategyForm(event) {
 function handleCancelStrategyForm() {
   const addStrategyModal = document.getElementById('add-strategy-modal');
   if (addStrategyModal) {
+    // @ts-ignore
     addStrategyModal.style.display = 'none';
     // Cast form to HTMLFormElement to access reset()
     const form = /** @type {HTMLFormElement | null} */ (
@@ -432,14 +482,107 @@ async function handleLogStrategySubmit(event) {
     // Refresh the strategies table
     // @ts-ignore
     await loadStrategiesForSource(String(strategyData.source_id));
-
-    // --- FIX: Added the missing closing brace for the 'try' block ---
   } catch (error) {
-    // --- END FIX ---
     console.error('Failed to save strategy:', error);
     alert('Error: Could not save strategy. Please check the console.');
   }
 }
+
+// --- START: Add new "Add Idea" modal functions ---
+
+/**
+ * Shows the "Log New Idea" form modal.
+ * @param {Event} event - The click event.
+ */
+function handleShowIdeaForm(event) {
+  // --- FIX: Add guard for event.target ---
+  if (!(event.target instanceof HTMLElement)) return;
+  // --- END FIX ---
+
+  const addIdeaModal = document.getElementById('add-idea-modal');
+  const ideaSourceIdInput = document.getElementById('idea-source-id');
+
+  if (addIdeaModal && ideaSourceIdInput) {
+    // Get sourceId from the button that was clicked
+    const sourceId = event.target.dataset.sourceId;
+    if (sourceId) {
+      // @ts-ignore
+      ideaSourceIdInput.value = sourceId;
+    }
+    // @ts-ignore
+    addIdeaModal.style.display = 'block';
+
+    // Attach listener for the new "Cancel" button
+    document
+      .getElementById('cancel-idea-form-btn')
+      ?.addEventListener('click', handleCancelIdeaForm);
+
+    // Attach listener for the modal's close button
+    addIdeaModal
+      .querySelector('.close-button')
+      ?.addEventListener('click', handleCancelIdeaForm);
+
+    // Attach listener for the form submission
+    document
+      .getElementById('log-idea-form')
+      ?.addEventListener('submit', handleLogIdeaSubmit);
+
+    // Attach listener for closing the modal by clicking outside
+    /** @param {MouseEvent} event */
+    window.onclick = (event) => {
+      if (event.target === addIdeaModal) {
+        handleCancelIdeaForm();
+      }
+    };
+  }
+}
+
+/**
+ * Hides the "Log New Idea" form modal.
+ */
+function handleCancelIdeaForm() {
+  const addIdeaModal = document.getElementById('add-idea-modal');
+  if (addIdeaModal) {
+    // @ts-ignore
+    addIdeaModal.style.display = 'none';
+    const form = /** @type {HTMLFormElement | null} */ (
+      document.getElementById('log-idea-form')
+    );
+    if (form) form.reset();
+  }
+}
+
+/**
+ * Handles the submission of the "Log New Idea" form.
+ * @param {Event} event - The form submission event.
+ */
+async function handleLogIdeaSubmit(event) {
+  event.preventDefault(); // This STOPS the page from reloading
+  console.log('Idea form submitted.');
+
+  if (!(event.target instanceof HTMLFormElement)) {
+    return;
+  }
+  const form = event.target;
+  const formData = new FormData(form);
+  const ideaData = Object.fromEntries(formData.entries());
+
+  try {
+    // @ts-ignore
+    await addIdea(ideaData);
+    alert('Idea saved successfully!');
+    handleCancelIdeaForm(); // Hide and clear the form
+
+    // Refresh the "Watched List" tab to show the new idea
+    // Note: This won't be visible until the user clicks that tab,
+    // but the data will be fresh when they do.
+    loadWatchedListContent();
+  } catch (error) {
+    console.error('Failed to save idea:', error);
+    alert('Error: Could not save idea. Please check the console.');
+  }
+}
+// --- END: Add new "Add Idea" modal functions ---
 
 /**
  * Fetches and renders the strategies table for a given source.
@@ -467,6 +610,17 @@ async function loadWatchedListContent() {
   try {
     const watchedList = await getWatchedList();
     renderWatchedList(watchedList);
+
+    // --- START: Add event delegation ---
+    // After rendering, attach a single listener to the table for all button clicks
+    const table = document.getElementById('watched-list-table');
+    if (table) {
+      // Remove old listener to prevent duplicates, if any
+      table.removeEventListener('click', handleWatchedListClicks);
+      // Add the new listener
+      table.addEventListener('click', handleWatchedListClicks);
+    }
+    // --- END: Add event delegation ---
   } catch (err) {
     console.error('Failed to load watched list:', err);
     // Cast unknown 'err' to 'Error'
@@ -474,6 +628,41 @@ async function loadWatchedListContent() {
     renderWatchedList(null, error);
   }
 }
+
+// --- START: Add new click handler function ---
+/**
+ * Handles all clicks within the #watched-list-table.
+ * @param {Event} event
+ */
+async function handleWatchedListClicks(event) {
+  // --- FIX: Add guard for event.target ---
+  if (!(event.target instanceof HTMLElement)) return;
+  // --- END FIX ---
+  const target = event.target;
+
+  const button = target.closest('button');
+  if (!button) return;
+
+  const id = button.dataset.id;
+  if (!id) return;
+
+  let shouldRefresh = false;
+
+  if (button.classList.contains('idea-delete-btn')) {
+    shouldRefresh = await watchedListHandlers.handleDeleteIdeaClick(id);
+  } else if (button.classList.contains('idea-paper-btn')) {
+    shouldRefresh = await watchedListHandlers.handleMoveIdeaToPaperClick(id);
+  } else if (button.classList.contains('idea-buy-btn')) {
+    await watchedListHandlers.handleBuyIdeaClick(id);
+  } else if (button.classList.contains('idea-edit-btn')) {
+    await watchedListHandlers.handleEditIdeaClick(id);
+  }
+
+  if (shouldRefresh) {
+    loadWatchedListContent(); // Re-load the table data
+  }
+}
+// --- END: Add new click handler function ---
 
 /**
  * Fetches and renders the content for the "Paper Trades" sub-tab.
