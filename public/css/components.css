@@ -50,15 +50,10 @@
 
 /* Table Action Buttons */
 .table-action-btn {
+  /* Inherit from .btn */
   padding: 5px 8px; /* Smaller padding */
   font-size: 0.8rem; /* Smaller font size */
   border-radius: 3px; /* Slightly smaller border-radius */
-  /* Inherit other button styles from main.css or themes.css */
-  background-color: var(--primary-color); /* Example: using primary color */
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .table-action-btn:hover {
@@ -66,6 +61,7 @@
 }
 
 .small-btn {
+  /* Inherit from .btn */
   padding: 5px 8px; /* Smaller padding */
   font-size: 0.8rem; /* Smaller font size */
   border-radius: 3px; /* Slightly smaller border-radius */

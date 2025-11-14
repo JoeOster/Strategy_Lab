@@ -1,10 +1,24 @@
-/* --- FIX: Added styles for Strategy Lab cards --- */
-#source-cards-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important; /* 4-column layout */
+body #sources-panel #source-cards-grid {
+  grid-template-columns: repeat(4, 1fr); /* 4-column layout */
   gap: 20px;
 }
 
+/* Default hidden state for grid and detail views */
+#sources-panel #source-cards-grid,
+#source-detail-container {
+  display: none;
+}
+
+/* Active state for grid and detail views */
+#sources-panel #source-cards-grid.active {
+  display: grid;
+}
+
+#source-detail-container.active {
+  display: block;
+}
+
+/* --- FIX: Added styles for Strategy Lab cards --- */
 .source-card {
   background-color: var(--container-bg);
   border: 1px solid var(--container-border);

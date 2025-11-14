@@ -9,16 +9,13 @@
 }
 
 .main-nav .nav-btn {
+  /* Inherit from .btn */
   background-color: var(--container-bg);
   color: var(--text-color);
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s, color 0.3s;
-  border-radius: 5px;
   margin-right: 10px;
   margin-bottom: 5px;
+  font-size: 1rem; /* Explicitly set font size */
+  padding: 10px 15px; /* Explicitly set padding */
 }
 
 .main-nav .nav-btn:hover {
@@ -40,14 +37,12 @@
 }
 
 .sub-nav .sub-nav-btn {
+  /* Inherit from .btn */
   background-color: var(--container-bg);
   color: var(--text-color);
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s, color 0.3s;
-  border-radius: 5px 5px 0 0;
+  padding: 8px 12px; /* Override .btn padding */
+  font-size: 0.9rem; /* Override .btn font-size */
+  border-radius: 5px 5px 0 0; /* Override .btn border-radius */
   margin-right: 5px;
   border-bottom: 1px solid var(--container-border);
 }

@@ -1,15 +1,16 @@
 - [x] **CSS Refactoring: `main.css` Split and Redundancy Identification**
-  - [ ] Review `public/css/main.css` for current structure and content.
-  - [ ] Propose a new modular file structure for CSS files within `public/css/`
+- [x] **Refactor button styles to use a generic .btn class**
+  - [x] Review `public/css/main.css` for current structure and content.
+  - [x] Propose a new modular file structure for CSS files within `public/css/`
         based on logical components (e.g., `base.css`, `navigation.css`,
         `forms.css`, `modals.css`, `components.css`, `settings.css`,
         `strategy-lab.css`).
-  - [ ] Identify and document redundancies in styling across different
+  - [x] Identify and document redundancies in styling across different
         components (e.g., button styles, tab/sub-tab styling, list item styling,
         form input styles).
-  - [ ] Suggest opportunities for abstraction and creation of reusable CSS
+  - [x] Suggest opportunities for abstraction and creation of reusable CSS
         classes to reduce duplication.
-  - [ ] Add this proposal to `docs/CURRENT_TASK_LOG.md`.
+  - [x] Add this proposal to `docs/CURRENT_TASK_LOG.md`.
 
 **Proposal for `main.css` Refactoring**
 
