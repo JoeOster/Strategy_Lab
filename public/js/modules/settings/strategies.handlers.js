@@ -1,9 +1,16 @@
 // public/js/modules/settings/strategies.handlers.js
-import { getStrategiesBySourceId, addStrategy, updateStrategy, deleteStrategy } from './strategies.api.js';
+import {
+  addStrategy,
+  deleteStrategy,
+  getStrategiesBySourceId,
+  updateStrategy,
+} from './strategies.api.js';
 import { renderStrategiesTable } from './strategies.render.js';
 
 export async function loadStrategiesForSource(sourceId, containerId) {
-  console.log(`Handler: Loading strategies for source ID: ${sourceId} into ${containerId}`);
+  console.log(
+    `Handler: Loading strategies for source ID: ${sourceId} into ${containerId}`
+  );
   try {
     const strategies = await getStrategiesBySourceId(sourceId);
     renderStrategiesTable(strategies, containerId);
@@ -39,12 +46,18 @@ export function handleAddStrategySubmit(event) {
 }
 
 export function handleEditStrategyClick(strategyId) {
-  console.log('Handler: handleEditStrategyClick called (placeholder)', strategyId);
+  console.log(
+    'Handler: handleEditStrategyClick called (placeholder)',
+    strategyId
+  );
   // Placeholder for loading strategy data into an edit form
 }
 
 export function handleDeleteStrategyClick(strategyId) {
-  console.log('Handler: handleDeleteStrategyClick called (placeholder)', strategyId);
+  console.log(
+    'Handler: handleDeleteStrategyClick called (placeholder)',
+    strategyId
+  );
   if (confirm('Are you sure you want to delete this strategy?')) {
     deleteStrategy(strategyId)
       .then(() => {
@@ -53,7 +66,10 @@ export function handleDeleteStrategyClick(strategyId) {
         const sourceId = document.getElementById('strategy-source-id').value;
         if (sourceId) {
           loadStrategiesForSource(sourceId, 'new-source-book-strategies-table'); // Refresh the list in the new source modal
-          loadStrategiesForSource(sourceId, 'edit-source-book-strategies-table'); // Refresh the list in the edit source modal
+          loadStrategiesForSource(
+            sourceId,
+            'edit-source-book-strategies-table'
+          ); // Refresh the list in the edit source modal
         }
       })
       .catch((error) => console.error('Error deleting strategy:', error));

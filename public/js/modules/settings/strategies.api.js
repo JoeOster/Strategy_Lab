@@ -5,8 +5,22 @@ export async function getStrategiesBySourceId(sourceId) {
   // Placeholder for API call to fetch strategies
   // In a real application, this would make a fetch request to your backend
   return [
-    { id: 1, title: 'Strategy A', chapter: '1', page_number: 10, description: 'Description A', pdf_path: 'path/to/a.pdf' },
-    { id: 2, title: 'Strategy B', chapter: '2', page_number: 25, description: 'Description B', pdf_path: 'path/to/b.pdf' },
+    {
+      id: 1,
+      title: 'Strategy A',
+      chapter: '1',
+      page_number: 10,
+      description: 'Description A',
+      pdf_path: 'path/to/a.pdf',
+    },
+    {
+      id: 2,
+      title: 'Strategy B',
+      chapter: '2',
+      page_number: 25,
+      description: 'Description B',
+      pdf_path: 'path/to/b.pdf',
+    },
   ];
 }
 

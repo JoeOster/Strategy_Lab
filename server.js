@@ -118,6 +118,59 @@ app.get('/api/sources/:id', async (req, res) => {
   }
 });
 
+// API route to get all strategies for a specific source
+app.get('/api/sources/:sourceId/strategies', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { sourceId } = req.params;
+    const strategies = await db.all(
+      'SELECT * FROM strategies WHERE source_id = ? ORDER BY title',
+      sourceId
+    );
+    res.json(strategies);
+  } catch (err) {
+    console.error(
+      `Failed to get strategies for source ID ${req.params.sourceId}:`,
+      err
+    );
+    res.status(500).json({ error: 'Failed to get strategies' });
+  }
+});
+
+// API route to add a new strategy
+app.post('/api/strategies', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { source_id, title, chapter, page_number } = req.body;
+
+    if (!source_id || !title) {
+      return res
+        .status(400)
+        .json({ error: 'Source ID and title are required for a strategy.' });
+    }
+
+    const result = await db.run(
+      'INSERT INTO strategies (source_id, title, chapter, page_number) VALUES (?, ?, ?, ?)',
+      source_id,
+      title,
+      chapter || null, // Allow null for optional fields
+      page_number || null // Allow null for optional fields
+    );
+
+    const newStrategy = await db.get(
+      'SELECT * FROM strategies WHERE id = ?',
+      result.lastID
+    );
+
+    res.status(201).json(newStrategy);
+  } catch (err) {
+    console.error('Failed to add strategy:', err);
+    res
+      .status(500)
+      .json({ error: 'Failed to add strategy', details: err.message });
+  }
+});
+
 // API route to update a source
 app.put('/api/sources/:id', async (req, res) => {
   try {

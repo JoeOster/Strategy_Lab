@@ -27,7 +27,7 @@ export function renderStrategiesTable(strategies, containerId) {
       <tbody>
   `;
 
-  strategies.forEach(strategy => {
+  strategies.forEach((strategy) => {
     tableHtml += `
       <tr>
         <td>${strategy.title}</td>
