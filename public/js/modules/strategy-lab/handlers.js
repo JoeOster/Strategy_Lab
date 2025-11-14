@@ -1,13 +1,10 @@
 // public/js/modules/strategy-lab/handlers.js
 
+import { getSource, getSources } from '../../settings/sources.api.js'; // Removed updateSource as it's not directly used here
+import { openEditSourceModal } from '../../settings/sources.handlers.js'; // Import openEditSourceModal
 import { getPaperTrades } from './paper-trades/api.js';
 import { renderPaperTrades } from './paper-trades/render.js';
-import {
-  addStrategy,
-  getSource,
-  getSources,
-  getStrategiesForSource,
-} from './sources/api.js';
+import { addStrategy, getStrategiesForSource } from './sources/api.js';
 import { renderSourceCards, renderStrategiesTable } from './sources/render.js';
 import { getWatchedList } from './watched-list/api.js';
 import { renderWatchedList } from './watched-list/render.js';
@@ -224,7 +221,8 @@ export async function openSourceDetailModal(sourceId) {
     };
 
     // Attach listener for the feature button
-    const addStrategyButton = featureBtnContainer.querySelector('#add-strategy-btn');
+    const addStrategyButton =
+      featureBtnContainer.querySelector('#add-strategy-btn');
     const addIdeaButton = featureBtnContainer.querySelector('#add-idea-btn');
     const editButton = featureBtnContainer.querySelector('#edit-source-btn');
 
@@ -251,12 +249,16 @@ export async function openSourceDetailModal(sourceId) {
 }
 
 /**
- * Placeholder function for handling the edit source action.
+ * Handles the edit source action by opening the edit source modal.
  * @param {Event} event - The click event.
  */
 function handleEditSource(event) {
   const sourceId = event.target.dataset.sourceId;
-  alert(`Edit functionality for source ID: ${sourceId} not yet implemented.`);
+  if (sourceId) {
+    openEditSourceModal(sourceId);
+  } else {
+    console.error('Edit button clicked without a source ID.');
+  }
 }
 
 /**

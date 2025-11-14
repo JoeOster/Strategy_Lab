@@ -1,5 +1,11 @@
 // public/js/modules/settings/sources.handlers.js
-import { addSource, deleteSource, getSources, getSource, updateSource } from './sources.api.js';
+import {
+  addSource,
+  deleteSource,
+  getSource,
+  getSources,
+  updateSource,
+} from './sources.api.js';
 import { loadStrategiesForSource } from './strategies.handlers.js';
 
 export function handleAddNewSourceSubmit(event) {
@@ -64,11 +70,17 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
     if (urlWrapper) urlWrapper.style.display = 'block';
     if (urlLabel) urlLabel.textContent = 'Book URL:';
 
-    const bookFields = ['book_author', 'book_isbn', 'book_websites', 'book_pdfs'];
-    bookFields.forEach(field => {
+    const bookFields = [
+      'book_author',
+      'book_isbn',
+      'book_websites',
+      'book_pdfs',
+    ];
+    bookFields.forEach((field) => {
       const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
       if (wrapper) {
-        wrapper.style.display = (sourceData[field] && sourceData[field].length > 0) ? 'block' : 'none';
+        wrapper.style.display =
+          sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
       }
     });
 
@@ -79,9 +91,12 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
         loadStrategiesForSource(sourceId, 'edit-source-book-strategies-table');
       }
     } else if (formType === 'new') {
-      const newSourceStrategiesContainer = document.getElementById('new-source-book-strategies-table');
+      const newSourceStrategiesContainer = document.getElementById(
+        'new-source-book-strategies-table'
+      );
       if (newSourceStrategiesContainer) {
-        newSourceStrategiesContainer.innerHTML = '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
+        newSourceStrategiesContainer.innerHTML =
+          '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
       }
     }
   } else if (selectedType === 'website') {
@@ -90,10 +105,11 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
     if (urlLabel) urlLabel.textContent = 'Website URL:';
 
     const websiteFields = ['website_websites', 'website_pdfs'];
-    websiteFields.forEach(field => {
+    websiteFields.forEach((field) => {
       const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
       if (wrapper) {
-        wrapper.style.display = (sourceData[field] && sourceData[field].length > 0) ? 'block' : 'none';
+        wrapper.style.display =
+          sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
       }
     });
 
@@ -101,12 +117,18 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
     if (formType === 'edit') {
       const sourceId = document.getElementById('edit-source-id').value;
       if (sourceId) {
-        loadStrategiesForSource(sourceId, 'edit-source-website-strategies-table');
+        loadStrategiesForSource(
+          sourceId,
+          'edit-source-website-strategies-table'
+        );
       }
     } else if (formType === 'new') {
-      const newSourceStrategiesContainer = document.getElementById('new-source-website-strategies-table');
+      const newSourceStrategiesContainer = document.getElementById(
+        'new-source-website-strategies-table'
+      );
       if (newSourceStrategiesContainer) {
-        newSourceStrategiesContainer.innerHTML = '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
+        newSourceStrategiesContainer.innerHTML =
+          '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
       }
     }
   } else {
@@ -136,7 +158,9 @@ export async function handleSourceItemClick(sourceId) {
     }
 
     // Populate source profile container
-    const sourceProfileContainer = document.getElementById('source-profile-container');
+    const sourceProfileContainer = document.getElementById(
+      'source-profile-container'
+    );
     if (sourceProfileContainer) {
       sourceProfileContainer.innerHTML = `
         <h3>${source.name} (${source.type})</h3>
@@ -147,7 +171,9 @@ export async function handleSourceItemClick(sourceId) {
     }
 
     // Populate source feature button container (Add Strategy/Idea, Edit Strategy)
-    const sourceFeatureBtnContainer = document.getElementById('source-feature-btn-container');
+    const sourceFeatureBtnContainer = document.getElementById(
+      'source-feature-btn-container'
+    );
     if (sourceFeatureBtnContainer) {
       sourceFeatureBtnContainer.innerHTML = `
         <button id="add-strategy-btn" class="btn" data-source-id="${source.id}">Add Strategy</button>
@@ -197,7 +223,10 @@ export async function loadSourcesList() {
       // Add event listener to the source item itself to open the detail modal
       sourceElement.addEventListener('click', (event) => {
         // Prevent opening detail modal if edit/delete buttons are clicked
-        if (!event.target.classList.contains('edit-source-btn') && !event.target.classList.contains('delete-source-btn')) {
+        if (
+          !event.target.classList.contains('edit-source-btn') &&
+          !event.target.classList.contains('delete-source-btn')
+        ) {
           handleSourceItemClick(source.id);
         }
       });
@@ -205,8 +234,8 @@ export async function loadSourcesList() {
   }
 }
 
-export async function handleEditSourceClick(sourceId) {
-  console.log('Handler: handleEditSourceClick called', sourceId);
+export async function openEditSourceModal(sourceId) {
+  console.log('Handler: openEditSourceModal called', sourceId);
   const editSourceModal = document.getElementById('edit-source-modal');
   if (!editSourceModal) {
     console.error('Edit source modal not found.');
@@ -221,33 +250,71 @@ export async function handleEditSourceClick(sourceId) {
     }
 
     // Populate the edit form fields
+    // @ts-ignore
     document.getElementById('edit-source-id').value = source.id;
+    // @ts-ignore
     document.getElementById('edit-source-type').value = source.type;
+    // @ts-ignore
     document.getElementById('edit-source-name').value = source.name;
+    // @ts-ignore
     document.getElementById('edit-source-url').value = source.url || '';
-    document.getElementById('edit-source-description').value = source.description || '';
-    document.getElementById('edit-source-image-path').value = source.image_path || '';
+    // @ts-ignore
+    document.getElementById('edit-source-description').value =
+      source.description || '';
+    // @ts-ignore
+    document.getElementById('edit-source-image-path').value =
+      source.image_path || '';
 
     // Populate type-specific fields
     if (source.type === 'person') {
-      document.getElementById('edit-source-contact-email').value = source.person_email || '';
-      document.getElementById('edit-source-contact-phone').value = source.person_phone || '';
-      document.getElementById('edit-source-contact-app-type').value = source.person_app_type || '';
-      document.getElementById('edit-source-contact-app-handle').value = source.person_app_handle || '';
+      // @ts-ignore
+      document.getElementById('edit-source-contact-email').value =
+        source.person_email || '';
+      // @ts-ignore
+      document.getElementById('edit-source-contact-phone').value =
+        source.person_phone || '';
+      // @ts-ignore
+      document.getElementById('edit-source-contact-app-type').value =
+        source.person_app_type || '';
+      // @ts-ignore
+      document.getElementById('edit-source-contact-app-handle').value =
+        source.person_app_handle || '';
     } else if (source.type === 'group') {
-      document.getElementById('edit-source-group-person').value = source.group_primary_contact || '';
-      document.getElementById('edit-source-group-email').value = source.group_email || '';
-      document.getElementById('edit-source-group-phone').value = source.group_phone || '';
-      document.getElementById('edit-source-group-app-type').value = source.group_app_type || '';
-      document.getElementById('edit-source-group-app-handle').value = source.group_app_handle || '';
+      // @ts-ignore
+      document.getElementById('edit-source-group-person').value =
+        source.group_primary_contact || '';
+      // @ts-ignore
+      document.getElementById('edit-source-group-email').value =
+        source.group_email || '';
+      // @ts-ignore
+      document.getElementById('edit-source-group-phone').value =
+        source.group_phone || '';
+      // @ts-ignore
+      document.getElementById('edit-source-group-app-type').value =
+        source.group_app_type || '';
+      // @ts-ignore
+      document.getElementById('edit-source-group-app-handle').value =
+        source.group_app_handle || '';
     } else if (source.type === 'book') {
-      document.getElementById('edit-source-book-author').value = source.book_author || '';
-      document.getElementById('edit-source-book-isbn').value = source.book_isbn || '';
-      document.getElementById('edit-source-book-websites').value = source.book_websites || '';
-      document.getElementById('edit-source-book-pdfs').value = source.book_pdfs || '';
+      // @ts-ignore
+      document.getElementById('edit-source-book-author').value =
+        source.book_author || '';
+      // @ts-ignore
+      document.getElementById('edit-source-book-isbn').value =
+        source.book_isbn || '';
+      // @ts-ignore
+      document.getElementById('edit-source-book-websites').value =
+        source.book_websites || '';
+      // @ts-ignore
+      document.getElementById('edit-source-book-pdfs').value =
+        source.book_pdfs || '';
     } else if (source.type === 'website') {
-      document.getElementById('edit-source-website-websites').value = source.website_websites || '';
-      document.getElementById('edit-source-website-pdfs').value = source.website_pdfs || '';
+      // @ts-ignore
+      document.getElementById('edit-source-website-websites').value =
+        source.website_websites || '';
+      // @ts-ignore
+      document.getElementById('edit-source-website-pdfs').value =
+        source.website_pdfs || '';
     }
 
     // Trigger the change handler to show/hide appropriate panels and load strategies
@@ -264,6 +331,7 @@ export async function handleEditSourceSubmit(event) {
   console.log('Handler: handleEditSourceSubmit called');
 
   const form = event.target;
+  // @ts-ignore
   const sourceId = document.getElementById('edit-source-id').value;
   const formData = new FormData(form);
   const updatedSource = Object.fromEntries(formData.entries());
@@ -293,5 +361,31 @@ export function handleDeleteSourceClick(sourceId) {
         loadSourcesList(); // Refresh the list
       })
       .catch((error) => console.error('Error deleting source:', error));
+  }
+}
+
+/**
+ * Closes the edit source modal.
+ */
+export function closeEditSourceModal() {
+  const modal = document.getElementById('edit-source-modal');
+  const form = document.getElementById('edit-source-form');
+  if (modal && form) {
+    modal.style.display = 'none';
+    form.reset(); // Clear form fields
+    // Hide all type-specific panels
+    document.querySelectorAll('.source-type-panel').forEach((panel) => {
+      // @ts-ignore
+      if (panel.id.startsWith('edit-source-panel-')) {
+        // @ts-ignore
+        panel.style.display = 'none';
+      }
+    });
+    const fieldsContainer = document.getElementById(
+      'edit-source-fields-container'
+    );
+    if (fieldsContainer) {
+      fieldsContainer.style.display = 'none';
+    }
   }
 }
