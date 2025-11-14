@@ -268,6 +268,10 @@
                     id="new-source-book-pdfs"
                     name="book_pdfs"
                   />
+                  <div id="new-source-book-strategies-table">
+                    <h5>Strategies</h5>
+                    <p>Strategies table will be loaded here.</p>
+                  </div>
                 </div>
                 <div
                   id="new-source-panel-website"
@@ -537,6 +541,10 @@
               />
               <label for="edit-source-book-pdfs">PDFs (comma-separated):</label>
               <input type="text" id="edit-source-book-pdfs" name="book_pdfs" />
+              <div id="edit-source-book-strategies-table">
+                <h5>Strategies</h5>
+                <p>Strategies table will be loaded here.</p>
+              </div>
             </div>
             <div
               id="edit-source-panel-website"
@@ -575,6 +583,60 @@
         </form>
       </div>
     </div>
-    <script type="module" src="js/app-main.js"></script>
-  </body>
-</html>
+    <script src="./js/app-main.js" type="module"></script>
+        <div id="source-detail-modal" class="modal">
+          <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="source-detail-modal-header-body">
+              <div class="source-detail-left-panel">
+                <div id="source-profile-container">
+                  <!-- Source profile details will be rendered here -->
+                </div>
+                <div id="source-feature-btn-container">
+                  <!-- Add Strategy or Add Idea button will be rendered here -->
+                </div>
+              </div>
+              <div class="source-detail-right-panel">
+                <!-- Strategy/Trade Idea forms and tables will be rendered here -->
+              </div>
+            </div>
+            <div class="source-detail-bottom-panel">
+              <div id="open-trades-table-placeholder">
+                <h4>Open Trades</h4>
+                <p>Table for open trades will go here.</p>
+              </div>
+              <div id="paper-trades-table-placeholder">
+                <h4>Paper Trades</h4>
+                <p>Table for paper trades will go here.</p>
+              </div>
+                    </div>
+                  </div>
+                </div>
+            
+                <!-- Add Strategy Form Modal -->
+                <div id="add-strategy-modal" class="modal">
+                  <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h4>Log New Strategy</h4>
+                    <form id="log-strategy-form">
+                      <input type="hidden" id="strategy-source-id" name="source_id">
+                      <label for="strategy-title">Strategy Title:</label>
+                      <input type="text" id="strategy-title" name="title" required>
+                      <label for="strategy-chapter">Chapter:</label>
+                      <input type="text" id="strategy-chapter" name="chapter">
+                      <label for="strategy-page">Page Number:</label>
+                      <input type="number" id="strategy-page" name="page_number">
+                      
+                      <label for="strategy-description">Description:</label>
+                      <textarea id="strategy-description" name="description"></textarea>
+                      <label for="strategy-pdf-path">PDF File Path:</label>
+                      <input type="text" id="strategy-pdf-path" name="pdf_path" placeholder="pdf_repo/my_strategy.pdf">
+                      
+                      <div class="form-actions">
+                        <button type="submit" class="btn">Save Strategy</button>
+                        <button type="button" id="cancel-strategy-form-btn" class="clear-btn btn">Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </body></html>

@@ -11,6 +11,7 @@ import {
   handleAddNewSourceSubmit,
   handleDeleteSourceClick,
   handleSourceTypeChange,
+  handleEditSourceSubmit, // Import the new handler
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
 
@@ -147,7 +148,7 @@ export function initializeSettingsModule() {
   // Edit source form submission
   const editSourceForm = document.getElementById('edit-source-form');
   if (editSourceForm) {
-    editSourceForm.addEventListener('submit', handlers.handleEditSourceSubmit);
+    editSourceForm.addEventListener('submit', handleEditSourceSubmit);
   }
 
   // Placeholder for handling the edit source form submission.
