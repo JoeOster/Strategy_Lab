@@ -16,22 +16,11 @@ export async function initializeUserSelector() {
   }
 
   let allHolders = [];
-  try {
-    const holders = await getAccountHolders();
-    // Prepend default users to the list
-    const defaultHolders = [
-      { id: -1, username: 'All Users' },
-      { id: -2, username: 'Primary' },
-    ];
-    allHolders = [...defaultHolders, ...holders];
-  } catch (error) {
-    console.error('Failed to load account holders for user selector:', error);
-    // If API fails, still provide default options
-    allHolders = [
-      { id: -1, username: 'All Users' },
-      { id: -2, username: 'Primary' },
-    ];
-  }
+  // Temporarily disabled fetching account holders as per user request
+  allHolders = [
+    { id: -1, username: 'All Users' },
+    { id: -2, username: 'Primary' },
+  ];
 
   userSelectDropdown.innerHTML = ''; // Clear existing options
 
