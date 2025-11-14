@@ -1,5 +1,23 @@
-// public/js/utils/apiFetch.js
+/**
+ * @typedef {object} FetchOptions
+ * @property {object} [headers] - Custom headers for the request.
+ * @property {string} [method] - The HTTP method (e.g., 'GET', 'POST').
+ * @property {string} [body] - The request body.
+ */
 
+/**
+ * @typedef {object} ApiResponse
+ * @property {string} [message] - A message from the API.
+ * @property {string} [error] - An error message from the API.
+ */
+
+/**
+ * Generic API fetch function.
+ * @param {string} url - The URL to fetch.
+ * @param {FetchOptions} [options={}] - Fetch options.
+ * @returns {Promise<any>} - The JSON response or null if 204.
+ * @throws {Error} - Throws an error if the response is not ok.
+ */
 async function apiFetch(url, options = {}) {
   const defaultHeaders = {
     'Content-Type': 'application/json',
@@ -41,10 +59,36 @@ async function apiFetch(url, options = {}) {
 }
 
 export const api = {
+  /**
+   * Performs a GET request.
+   * @param {string} url - The URL to fetch.
+   * @param {FetchOptions} [options] - Fetch options.
+   * @returns {Promise<any>} - The JSON response.
+   */
   get: (url, options) => apiFetch(url, { ...options, method: 'GET' }),
+  /**
+   * Performs a POST request.
+   * @param {string} url - The URL to post to.
+   * @param {object} data - The data to send in the request body.
+   * @param {FetchOptions} [options] - Fetch options.
+   * @returns {Promise<any>} - The JSON response.
+   */
   post: (url, data, options) =>
     apiFetch(url, { ...options, method: 'POST', body: JSON.stringify(data) }),
+  /**
+   * Performs a PUT request.
+   * @param {string} url - The URL to put to.
+   * @param {object} data - The data to send in the request body.
+   * @param {FetchOptions} [options] - Fetch options.
+   * @returns {Promise<any>} - The JSON response.
+   */
   put: (url, data, options) =>
     apiFetch(url, { ...options, method: 'PUT', body: JSON.stringify(data) }),
+  /**
+   * Performs a DELETE request.
+   * @param {string} url - The URL to delete from.
+   * @param {FetchOptions} [options] - Fetch options.
+   * @returns {Promise<any>} - The JSON response.
+   */
   delete: (url, options) => apiFetch(url, { ...options, method: 'DELETE' }),
 };
