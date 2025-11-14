@@ -25,6 +25,7 @@ export async function handleAddHolderSubmit(event) {
 }
 
 export async function loadAccountHoldersList() {
+  return; // Temporarily disabled as per user request
   console.log('loadAccountHoldersList called');
   const accountHolderListDiv = document.getElementById('account-holder-list');
   if (!accountHolderListDiv) {

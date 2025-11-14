@@ -48,9 +48,7 @@ app.get('/api/sources', async (req, res) => {
     console.error('Failed to get sources:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get sources', details: message });
+    res.status(500).json({ error: 'Failed to get sources', details: message });
     // --- END FIX ---
   }
 });
@@ -107,9 +105,7 @@ app.post('/api/sources', async (req, res) => {
     console.error('Failed to add source:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to add source', details: message });
+    res.status(500).json({ error: 'Failed to add source', details: message });
     // --- END FIX ---
   }
 });
@@ -166,14 +162,8 @@ app.post('/api/strategies', async (req, res) => {
     const db = await getDb();
     // --- FIX: Add type hint for req.body ---
     /** @type {Partial<Strategy>} */
-    const {
-      source_id,
-      title,
-      chapter,
-      page_number,
-      description,
-      pdf_path,
-    } = req.body;
+    const { source_id, title, chapter, page_number, description, pdf_path } =
+      req.body;
     // --- END FIX ---
 
     if (!source_id || !title) {
@@ -202,9 +192,7 @@ app.post('/api/strategies', async (req, res) => {
     console.error('Failed to add strategy:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to add strategy', details: message });
+    res.status(500).json({ error: 'Failed to add strategy', details: message });
     // --- END FIX ---
   }
 });
@@ -319,9 +307,7 @@ app.get('/api/watched-items/ideas', async (req, res) => {
     console.error('Failed to get watched items (ideas):', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get ideas', details: message });
+    res.status(500).json({ error: 'Failed to get ideas', details: message });
     // --- END FIX ---
   }
 });
@@ -568,79 +554,82 @@ app.get('/api/priceV2/:ticker', async (req, res) => {
 });
 
 // API route to get all account holders
-app.get('/api/holders', async (req, res) => {
-  try {
-    const db = await getDb();
-    const holders = await db.all(
-      'SELECT * FROM account_holders ORDER BY username'
-    );
-    res.json(holders);
-  } catch (err) {
-    console.error('Failed to get account holders:', err);
-    // --- FIX: Handle 'unknown' type for err ---
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get account holders', details: message });
-    // --- END FIX ---
-  }
-});
+// API route to get all account holders
+// app.get('/api/holders', async (req, res) => {
+//   try {
+//     const db = await getDb();
+//     const holders = await db.all(
+//       'SELECT * FROM account_holders ORDER BY username'
+//     );
+//     res.json(holders);
+//   } catch (err) {
+//     console.error('Failed to get account holders:', err);
+//     // --- FIX: Handle 'unknown' type for err ---
+//     const message = err instanceof Error ? err.message : String(err);
+//     res
+//       .status(500)
+//       .json({ error: 'Failed to get account holders', details: message });
+//     // --- END FIX ---
+//   }
+// });
 
 // API route to add a new account holder
-app.post('/api/holders', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { username } = req.body;
+// API route to add a new account holder
+// app.post('/api/holders', async (req, res) => {
+//   try {
+//     const db = await getDb();
+//     const { username } = req.body;
 
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required' });
-    }
+//     if (!username) {
+//       return res.status(400).json({ error: 'Username is required' });
+//     }
 
-    const result = await db.run(
-      'INSERT INTO account_holders (username) VALUES (?)',
-      username
-    );
+//     const result = await db.run(
+//       'INSERT INTO account_holders (username) VALUES (?)',
+//       username
+//     );
 
-    const newHolder = await db.get(
-      'SELECT * FROM account_holders WHERE id = ?',
-      result.lastID
-    );
+//     const newHolder = await db.get(
+//       'SELECT * FROM account_holders WHERE id = ?',
+//       result.lastID
+//     );
 
-    res.status(201).json(newHolder);
-  } catch (err) {
-    console.error('Failed to add account holder:', err);
-    // --- FIX: Handle 'unknown' type for err ---
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to add account holder', details: message });
-    // --- END FIX ---
-  }
-});
+//     res.status(201).json(newHolder);
+//   } catch (err) {
+//     console.error('Failed to add account holder:', err);
+//     // --- FIX: Handle 'unknown' type for err ---
+//     const message = err instanceof Error ? err.message : String(err);
+//     res
+//       .status(500)
+//       .json({ error: 'Failed to add account holder', details: message });
+//     // --- END FIX ---
+//   }
+// });
 
 // API route to delete an account holder
-app.delete('/api/holders/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { id } = req.params;
+// API route to delete an account holder
+// app.delete('/api/holders/:id', async (req, res) => {
+//   try {
+//     const db = await getDb();
+//     const { id } = req.params;
 
-    const result = await db.run('DELETE FROM account_holders WHERE id = ?', id);
+//     const result = await db.run('DELETE FROM account_holders WHERE id = ?', id);
 
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Account holder not found' });
-    }
+//     if (result.changes === 0) {
+//       return res.status(404).json({ error: 'Account holder not found' });
+//     }
 
-    res.status(204).send();
-  } catch (err) {
-    console.error('Failed to delete account holder:', err);
-    // --- FIX: Handle 'unknown' type for err ---
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to delete account holder', details: message });
-    // --- END FIX ---
-  }
-});
+//     res.status(204).send();
+//   } catch (err) {
+//     console.error('Failed to delete account holder:', err);
+//     // --- FIX: Handle 'unknown' type for err ---
+//     const message = err instanceof Error ? err.message : String(err);
+//     res
+//       .status(500)
+//       .json({ error: 'Failed to delete account holder', details: message });
+//     // --- END FIX ---
+//   }
+// });
 
 // API route to get all settings
 app.get('/api/settings', async (req, res) => {
@@ -668,9 +657,7 @@ app.get('/api/settings', async (req, res) => {
     console.error('Failed to get settings:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get settings', details: message });
+    res.status(500).json({ error: 'Failed to get settings', details: message });
     // --- END FIX ---
   }
 });
@@ -740,9 +727,7 @@ app.post('/api/exchanges', async (req, res) => {
     console.error('Failed to add exchange:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to add exchange', details: message });
+    res.status(500).json({ error: 'Failed to add exchange', details: message });
     // --- END FIX ---
   }
 });
@@ -777,9 +762,7 @@ app.get('/api/webapps', async (req, res) => {
     console.error('Failed to get web apps:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get web apps', details: message });
+    res.status(500).json({ error: 'Failed to get web apps', details: message });
     // --- END FIX ---
   }
 });
@@ -801,9 +784,7 @@ app.post('/api/webapps', async (req, res) => {
     console.error('Failed to add web app:', err);
     // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to add web app', details: message });
+    res.status(500).json({ error: 'Failed to add web app', details: message });
     // --- END FIX ---
   }
 });
