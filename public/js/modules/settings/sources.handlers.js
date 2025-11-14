@@ -230,6 +230,26 @@ export async function loadSourcesList() {
           handleSourceItemClick(source.id);
         }
       });
+
+      // **NEW:** Add event listener for the edit button
+      const editButton = sourceElement.querySelector('.edit-source-btn');
+      if (editButton) {
+        editButton.addEventListener('click', (event) => {
+          event.stopPropagation(); // Prevent handleSourceItemClick from firing
+          // @ts-ignore
+          openEditSourceModal(event.target.dataset.id);
+        });
+      }
+
+      // **NEW:** Add event listener for the delete button
+      const deleteButton = sourceElement.querySelector('.delete-source-btn');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', (event) => {
+          event.stopPropagation(); // Prevent handleSourceItemClick from firing
+          // @ts-ignore
+          handleDeleteSourceClick(event.target.dataset.id);
+        });
+      }
     }
   }
 }
