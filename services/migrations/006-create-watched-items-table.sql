@@ -1,4 +1,4 @@
-CREATE TABLE watched_items (
+CREATE TABLE IF NOT EXISTS watched_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   is_paper_trade INTEGER NOT NULL DEFAULT 0,
   user_id INTEGER,

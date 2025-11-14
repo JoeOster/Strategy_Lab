@@ -1,4 +1,4 @@
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   is_paper_trade INTEGER NOT NULL DEFAULT 0,
   user_id INTEGER,

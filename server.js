@@ -160,11 +160,9 @@ app.get('/api/sources/:sourceId/strategies', async (req, res) => {
 app.post('/api/strategies', async (req, res) => {
   try {
     const db = await getDb();
-    // --- FIX: Add type hint for req.body ---
     /** @type {Partial<Strategy>} */
     const { source_id, title, chapter, page_number, description, pdf_path } =
       req.body;
-    // --- END FIX ---
 
     if (!source_id || !title) {
       return res
@@ -172,15 +170,37 @@ app.post('/api/strategies', async (req, res) => {
         .json({ error: 'Source ID and title are required for a strategy.' });
     }
 
-    const result = await db.run(
-      'INSERT INTO strategies (source_id, title, chapter, page_number, description, pdf_path) VALUES (?, ?, ?, ?, ?, ?)',
+    // --- START: FIX ---
+    // Add created_date and updated_date to match the 007 migration schema
+    const now = new Date().toISOString();
+    const columns = [
+      'source_id',
+      'title',
+      'chapter',
+      'page_number',
+      'description',
+      'pdf_path',
+      'created_date',
+      'updated_date',
+    ];
+    const values = [
       source_id,
       title,
       chapter || null,
       page_number || null,
       description || null,
-      pdf_path || null
+      pdf_path || null,
+      now, // created_date
+      now, // updated_date
+    ];
+
+    const placeholders = columns.map(() => '?').join(',');
+
+    const result = await db.run(
+      `INSERT INTO strategies (${columns.join(',')}) VALUES (${placeholders})`,
+      values
     );
+    // --- END: FIX ---
 
     const newStrategy = await db.get(
       'SELECT * FROM strategies WHERE id = ?',
@@ -190,10 +210,8 @@ app.post('/api/strategies', async (req, res) => {
     res.status(201).json(newStrategy);
   } catch (err) {
     console.error('Failed to add strategy:', err);
-    // --- FIX: Handle 'unknown' type for err ---
     const message = err instanceof Error ? err.message : String(err);
     res.status(500).json({ error: 'Failed to add strategy', details: message });
-    // --- END FIX ---
   }
 });
 
@@ -222,9 +240,11 @@ app.post('/api/watched-items/ideas', async (req, res) => {
       'status',
       'notes',
       'created_date',
+      'updated_date', // <-- ADDED THIS
     ];
 
     // Map values from the request body, providing defaults
+    const now = new Date().toISOString(); // <-- GET CURRENT TIME
     const values = [
       1, // is_paper_trade
       idea.user_id || 1, // user_id (default to 1 for now)
@@ -239,7 +259,8 @@ app.post('/api/watched-items/ideas', async (req, res) => {
       idea.escape_price || null,
       'WATCHING', // status
       idea.notes || null,
-      new Date().toISOString(), // created_date
+      now, // created_date <-- USE 'now'
+      now, // updated_date <-- USE 'now'
     ];
 
     const placeholders = columns.map(() => '?').join(',');
@@ -380,30 +401,39 @@ app.post('/api/watched-items/:id/to-paper', async (req, res) => {
         .json({ error: 'Could not fetch current price to create paper trade' });
     }
 
-    // 3. Create a new "Paper Trade" transaction
+    // --- START: FIX ---
+    // 3. Create a new "Paper Trade" transaction, including date fields
+    const now = new Date().toISOString();
     const result = await db.run(
       `INSERT INTO transactions 
-         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         1, // is_paper_trade = 1
         idea.user_id,
         idea.source_id,
         id, // Link to the original idea
-        new Date().toISOString(),
+        now, // transaction_date
         idea.ticker,
         'BUY',
         1, // Default quantity to 1 for now
         entryPrice,
         1, // quantity_remaining
+        now, // created_date
+        now, // updated_date
       ]
     );
+    // --- END: FIX ---
 
     // 4. Mark the original idea as 'EXECUTED'
-    await db.run('UPDATE watched_items SET status = ? WHERE id = ?', [
-      'EXECUTED',
-      id,
-    ]);
+    await db.run(
+      'UPDATE watched_items SET status = ?, updated_date = ? WHERE id = ?',
+      [
+        'EXECUTED',
+        now, // Update the timestamp
+        id,
+      ]
+    );
 
     res.status(201).json({
       message: 'Paper trade created',

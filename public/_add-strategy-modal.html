@@ -1,0 +1,38 @@
+    <div id="add-strategy-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Add New Strategy</h3>
+          <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="log-strategy-form">
+            <input type="hidden" id="strategy-source-id" name="source_id" />
+            <label for="strategy-title">Title:</label>
+            <input type="text" id="strategy-title" name="title" required />
+
+            <label for="strategy-chapter">Chapter:</label>
+            <input type="text" id="strategy-chapter" name="chapter" />
+
+            <label for="strategy-page-number">Page Number:</label>
+            <input type="text" id="strategy-page-number" name="page_number" />
+
+            <label for="strategy-description">Description:</label>
+            <textarea id="strategy-description" name="description"></textarea>
+
+            <label for="strategy-pdf-path">PDF Path:</label>
+            <input type="text" id="strategy-pdf-path" name="pdf_path" />
+
+            <div class="form-actions">
+              <button type="submit" class="btn">Save Strategy</button>
+              <button
+                type="button"
+                id="cancel-strategy-form-btn"
+                class="btn secondary-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>

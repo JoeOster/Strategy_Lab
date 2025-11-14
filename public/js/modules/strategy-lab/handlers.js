@@ -1,6 +1,6 @@
 // public/js/modules/strategy-lab/handlers.js
 
-// --- START: FIX (Add JSDoc type imports) ---
+// --- START: JSDoc Type Imports (Our "Dictionary") ---
 /** @typedef {import('../../types.js').Source} Source */
 /** @typedef {import('../../types.js').Strategy} Strategy */
 /** @typedef {import('../../types.js').WatchedItem} WatchedItem */
@@ -209,20 +209,13 @@ export async function openSourceDetailModal(sourceId) {
       }
     `;
 
-    // Render feature button
-    let featureButtonHtml = '';
-    if (source.type === 'book' || source.type === 'website') {
-      featureButtonHtml = `
-        <button class="btn" id="add-strategy-btn" data-source-id="${source.id}">Add Strategy</button>
-        <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
-      `;
-    } else if (source.type === 'person' || source.type === 'group') {
-      featureButtonHtml = `
-        <button class="btn" id="add-idea-btn" data-source-id="${source.id}">Add Idea</button>
-        <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
-      `;
-    }
-    featureBtnContainer.innerHTML = featureButtonHtml;
+    // --- START: REFACTOR (Layout Change) ---
+    // Render ONLY the Edit button in the left panel's footer
+    featureBtnContainer.innerHTML = `
+      <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
+    `;
+    // The "Add Strategy" / "Add Idea" button will be rendered in loadSourceDetailContent
+    // --- END: REFACTOR ---
 
     // --- FIX: Cast rightPanel to HTMLElement ---
     await loadSourceDetailContent(
@@ -247,13 +240,12 @@ export async function openSourceDetailModal(sourceId) {
       }
     };
 
+    // --- START: REFACTOR (Layout Change) ---
     // Attach listener for the feature button
-    const addStrategyButton =
-      featureBtnContainer.querySelector('#add-strategy-btn');
-    const addIdeaButton = featureBtnContainer.querySelector('#add-idea-btn');
     const editButton = featureBtnContainer.querySelector('#edit-source-btn');
+    const addStrategyButton = rightPanel.querySelector('#add-strategy-btn');
+    const addIdeaButton = rightPanel.querySelector('#add-idea-btn');
 
-    // --- FIX: Add null checks for event listeners ---
     if (addStrategyButton) {
       addStrategyButton.addEventListener('click', handleShowStrategyForm);
     } else if (addIdeaButton) {
@@ -263,7 +255,7 @@ export async function openSourceDetailModal(sourceId) {
     if (editButton) {
       editButton.addEventListener('click', handleEditSource);
     }
-    // --- END FIX ---
+    // --- END: REFACTOR ---
   } catch (error) {
     console.error(
       `Failed to load source details for modal ${sourceId}:`,
@@ -311,20 +303,11 @@ export function closeSourceDetailModal() {
     if (dynamicContentDiv) {
       dynamicContentDiv.remove(); // Remove the dynamic content div
     }
-    // --- FIX: Add null checks ---
-    const openTrades = document.getElementById('open-trades-table-placeholder');
-    if (openTrades) {
-      openTrades.innerHTML =
-        '<h4>Open Trades</h4><p>Table for open trades will go here.</p>';
-    }
-    const paperTrades = document.getElementById(
-      'paper-trades-table-placeholder'
-    );
-    if (paperTrades) {
-      paperTrades.innerHTML =
-        '<h4>Paper Trades</h4><p>Table for paper trades will go here.</p>';
-    }
-    // --- END FIX ---
+
+    // --- START: REFACTOR ---
+    // Remove the logic that cleared the placeholders.
+    // They are static and should not be cleared.
+    // --- END: REFACTOR ---
   }
 }
 
@@ -345,22 +328,32 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
 
   try {
     if (sourceType === 'book' || sourceType === 'website') {
+      // --- START: REFACTOR (Layout Change) ---
       contentDiv.innerHTML = `
-        <div id="strategy-table-container">
+        <div class="source-detail-right-header">
           <h4>Logged Strategies</h4>
+          <button class="btn" id="add-strategy-btn" data-source-id="${sourceId}">Add Strategy</button>
+        </div>
+        <div id="strategy-table-container">
           <div id="strategy-table"></div> 
         </div>
       `;
+      // --- END: REFACTOR ---
       await loadStrategiesForSource(sourceId);
     } else if (sourceType === 'person' || sourceType === 'group') {
+      // --- START: REFACTOR (Layout Change) ---
       contentDiv.innerHTML = `
-        <div id="trade-ideas-table-container">
+        <div class="source-detail-right-header">
           <h4>Logged Trade Ideas</h4>
+          <button class="btn" id="add-idea-btn" data-source-id="${sourceId}">Add Idea</button>
+        </div>
+        <div id="trade-ideas-table-container">
           <div id="trade-ideas-table">
             <p>No trade ideas logged for this source yet.</p>
           </div>
         </div>
       `;
+      // --- END: REFACTOR ---
       // TODO: Implement loadTradeIdeasForSource
     }
   } catch (error) {

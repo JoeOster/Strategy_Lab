@@ -1,0 +1,163 @@
+<div id="edit-source-modal" class="modal" style="display: none">
+  <div class="modal-content">
+    <div class="source-detail-header">
+      <h3 class="source-detail-title">Edit Advice Source</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <form id="edit-source-form">
+      <input type="hidden" id="edit-source-id" />
+      <label for="edit-source-type">Type:</label>
+      <select id="edit-source-type" name="type">
+        <option value="" selected disabled>Select a type...</option>
+        <option value="person">Person</option>
+        <option value="group">Group</option>
+        <option value="book">Book</option>
+        <option value="website">Website</option>
+      </select>
+
+      <div id="edit-source-fields-container" style="display: none">
+        <div id="edit-source-name-wrapper">
+          <label for="edit-source-name">Name:</label>
+          <input type="text" id="edit-source-name" name="name" required />
+        </div>
+        <div id="edit-source-url-wrapper" style="display: none">
+          <label for="edit-source-url">URL:</label>
+          <input type="url" id="edit-source-url" name="url" />
+        </div>
+        <div id="edit-source-description-wrapper">
+          <label for="edit-source-description">Description:</label>
+          <textarea id="edit-source-description" name="description"></textarea>
+        </div>
+        <div id="edit-source-image-path-wrapper">
+          <label for="edit-source-image-path">Image Path:</label>
+          <input type="text" id="edit-source-image-path" name="image_path" />
+        </div>
+
+        <div
+          id="edit-source-panel-person"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Person Details</h5>
+          <label for="edit-source-contact-email">Email:</label>
+          <input
+            type="email"
+            id="edit-source-contact-email"
+            name="person_email"
+          />
+          <label for="edit-source-contact-phone">Phone:</label>
+          <input
+            type="tel"
+            id="edit-source-contact-phone"
+            name="person_phone"
+          />
+          <label for="edit-source-contact-app-type">Contact App:</label>
+          <input
+            type="text"
+            id="edit-source-contact-app-type"
+            name="person_app_type"
+          />
+          <label for="edit-source-contact-app-handle">App Handle:</label>
+          <input
+            type="text"
+            id="edit-source-contact-app-handle"
+            name="person_app_handle"
+          />
+        </div>
+        <div
+          id="edit-source-panel-group"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Group Details</h5>
+          <label for="edit-source-group-person">Primary Contact:</label>
+          <input
+            type="text"
+            id="edit-source-group-person"
+            name="group_primary_contact"
+          />
+          <label for="edit-source-group-email">Contact Email:</label>
+          <input
+            type="email"
+            id="edit-source-group-email"
+            name="group_email"
+          />
+          <label for="edit-source-group-phone">Group Phone:</label>
+          <input
+            type="tel"
+            id="edit-source-group-phone"
+            name="group_phone"
+          />
+          <label for="edit-source-group-app-type">Group App:</label>
+          <input
+            type="text"
+            id="edit-source-group-app-type"
+            name="group_app_type"
+          />
+          <label for="edit-source-group-app-handle">Group App Handle:</label>
+          <input
+            type="text"
+            id="edit-source-group-app-handle"
+            name="group_app_handle"
+          />
+        </div>
+        <div
+          id="edit-source-panel-book"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Book Details</h5>
+          <label for="edit-source-book-author">Author:</label>
+          <input
+            type="text"
+            id="edit-source-book-author"
+            name="book_author"
+          />
+          <label for="edit-source-book-isbn">ISBN:</label>
+          <input type="text" id="edit-source-book-isbn" name="book_isbn" />
+          <label for="edit-source-book-websites">Book URL:</label>
+          <input
+            type="text"
+            id="edit-source-book-websites"
+            name="book_websites"
+          />
+          <label for="edit-source-book-pdfs">PDFs (comma-separated):</label>
+          <input type="text" id="edit-source-book-pdfs" name="book_pdfs" />
+        </div>
+        <div
+          id="edit-source-panel-website"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Website Details</h5>
+          <label for="edit-source-website-websites"
+            >Relevant Links (comma-separated):</label
+          >
+          <input
+            type="text"
+            id="edit-source-website-websites"
+            name="website_websites"
+          />
+          <label for="edit-source-website-pdfs"
+            >Saved Docs (comma-separated):</label
+          >
+          <input
+            type="text"
+            id="edit-source-website-pdfs"
+            name="website_pdfs"
+          />
+        </div>
+        <div class="modal-footer">
+          <button type="submit">Save Changes</button>
+          <button
+            type="button"
+            id="clear-edit-source-button"
+            class="clear-btn"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

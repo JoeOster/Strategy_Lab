@@ -1,4 +1,4 @@
-CREATE TABLE app_settings (
+CREATE TABLE IF NOT EXISTS app_settings (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   key TEXT UNIQUE,
   value TEXT

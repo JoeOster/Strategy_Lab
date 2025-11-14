@@ -60,8 +60,8 @@
   cursor: pointer;
 }
 
-/* Source Detail Modal Specific Styles */
-.source-detail-modal-header-body {
+/* This is the flex container for the left/right panels */
+.modal-body {
   display: flex;
   gap: 20px; /* Space between left and right panels */
 }
@@ -70,24 +70,29 @@
   flex: 0 0 250px; /* Fixed width for the left panel */
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-#source-feature-btn-container {
-  /* Styling for the button container */
-  padding: 10px;
-  border: 1px solid var(--container-border);
-  border-radius: 5px;
-  background-color: var(--info-panel-bg);
-  text-align: center;
-}
-
-#source-profile-container {
-  /* Styling for the profile container */
+  /* gap: 15px; */ /* Gap removed to allow footer to stick */
   padding: 15px;
   border: 1px solid var(--container-border);
   border-radius: 5px;
   background-color: var(--info-panel-bg);
+}
+
+#source-feature-btn-container {
+  padding-top: 15px; /* Add space above button */
+  border-top: 1px solid var(--container-border); /* Add a separator */
+  text-align: right; /* Align button to the right */
+  margin-top: auto; /* Pushes it to the bottom of the flex column */
+  /* Remove margin/padding to fit panel */
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-bottom: -15px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+  border-radius: 0 0 5px 5px;
+}
+
+#source-profile-container {
   flex-grow: 1; /* Allows it to take up remaining space */
 }
 
@@ -99,8 +104,22 @@
   background-color: var(--info-panel-bg);
 }
 
+/* Header for the right panel */
+.source-detail-right-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--container-border);
+}
+
+.source-detail-right-header h4 {
+  margin: 0; /* Remove default margin from h4 */
+}
+
+/* This is the new full-width bottom panel */
 .source-detail-bottom-panel {
-  /* New full-width panel */
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -112,9 +131,10 @@
 
 #open-trades-table-placeholder,
 #paper-trades-table-placeholder {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid var(--container-border);
-  border-radius: 5px;
-  background-color: var(--info-panel-bg);
+  /* These are now just content blocks, no need for special layout */
+  /* You can add more specific styles here if needed */
+  margin-top: 0;
+  padding: 0;
+  border: none;
+  background-color: transparent;
 }
