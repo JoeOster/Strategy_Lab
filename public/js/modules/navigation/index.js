@@ -20,15 +20,12 @@ export const loadPageContent = async (tab) => {
 
     // Use dynamic import to load the module and call its initializeModule function
     try {
-      // Handle the non-refactored 'strategy-lab' module path
-      const modulePath =
-        tab === 'strategy-lab'
-          ? `../${tab}.js`
-          : `../${tab}/index.js`;
+      // All modules now follow the same '/index.js' pattern.
+      const modulePath = `../${tab}/index.js`;
 
       const module = await import(modulePath);
       // --- THIS IS THE BIOME-SAFE VERSION ---
-      if (module && module.initializeModule) {
+      if (module?.initializeModule) {
         module.initializeModule();
       }
     } catch (scriptError) {
@@ -61,14 +58,26 @@ export const initializeNavigation = () => {
 
   for (const button of navButtons) {
     button.addEventListener('click', (event) => {
-      const tab = event.target.dataset.tab;
+      const target = event.currentTarget;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      const tab = target.dataset.tab;
+
+      // --- FIX: Add a type guard to ensure 'tab' is not undefined ---
+      if (!tab) {
+        console.error('Button is missing a data-tab attribute', target);
+        return;
+      }
+      // --- END FIX ---
 
       // Deactivate all other buttons
       for (const btn of navButtons) {
         btn.classList.remove('active');
       }
       // Activate the clicked button
-      event.target.classList.add('active');
+      target.classList.add('active');
 
       if (tab === 'settings') {
         // --- THIS IS THE FIX ---
@@ -78,7 +87,7 @@ export const initializeNavigation = () => {
       } else {
         // Hide the modal and load the tab content
         settingsModal.style.display = 'none';
-        loadPageContent(tab);
+        loadPageContent(tab); // This is now type-safe
       }
     });
   }

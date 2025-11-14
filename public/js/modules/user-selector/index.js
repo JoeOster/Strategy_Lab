@@ -5,7 +5,11 @@ import { getAccountHolders } from '../settings/users.api.js'; //Do not change th
 const USER_STORAGE_KEY = 'selectedUser';
 
 export async function initializeUserSelector() {
-  const userSelectDropdown = document.getElementById('user-select-dropdown');
+  // --- FIX: Cast to HTMLSelectElement ---
+  const userSelectDropdown = /** @type {HTMLSelectElement | null} */ (
+    document.getElementById('user-select-dropdown')
+  );
+  // --- END FIX ---
   if (!userSelectDropdown) {
     console.error('User select dropdown not found.');
     return;
@@ -46,11 +50,15 @@ export async function initializeUserSelector() {
   // Load saved user from local storage
   const savedUser = localStorage.getItem(USER_STORAGE_KEY);
   if (savedUser) {
+    // This is now type-safe because userSelectDropdown is a HTMLSelectElement
     userSelectDropdown.value = savedUser;
   }
 
   userSelectDropdown.addEventListener('change', (event) => {
-    const selectedUser = event.target.value;
+    // --- FIX: Cast event.target to HTMLSelectElement ---
+    const selectedUser = /** @type {HTMLSelectElement} */ (event.target).value;
+    // --- END FIX ---
+
     localStorage.setItem(USER_STORAGE_KEY, selectedUser);
     console.log('Selected user:', selectedUser);
     // Dispatch a custom event for other modules to react to

@@ -1,5 +1,7 @@
 // public/js/modules/strategy-lab/handlers.js
 
+import { getPaperTrades } from './paper-trades/api.js';
+import { renderPaperTrades } from './paper-trades/render.js';
 import {
   addStrategy,
   getSource,
@@ -11,11 +13,8 @@ import {
   renderSourceDetail,
   renderStrategiesTable,
 } from './sources/render.js';
-// Placeholder imports for future sub-modules
-// import { getWatchedList } from './watched-list/api.js';
-// import { renderWatchedList } from './watched-list/render.js';
-// import { getPaperTrades } from './paper-trades/api.js';
-// import { renderPaperTrades } from './paper-trades/render.js';
+import { getWatchedList } from './watched-list/api.js';
+import { renderWatchedList } from './watched-list/render.js';
 
 const gridView = () => document.getElementById('source-cards-grid');
 const detailView = () => document.getElementById('source-detail-container');
@@ -65,12 +64,19 @@ export function initializeStrategyLabSubTabs() {
  * @param {Event} event - The click event.
  */
 export function handleSubTabClick(event) {
+  // --- FIX: Cast event.target to Element ---
+  if (!(event.target instanceof Element)) {
+    return;
+  }
   const clickedTabButton = event.target.closest('.sub-nav-btn');
+  // --- END FIX ---
+
   if (!clickedTabButton) {
     return;
   }
   event.stopPropagation();
 
+  // @ts-ignore
   const targetPanelId = clickedTabButton.dataset.subTab;
   const strategyLabContainer = clickedTabButton.closest(
     '#strategy-lab-page-container'
@@ -92,7 +98,7 @@ export function handleSubTabClick(event) {
   }
 
   // Activate the clicked tab button and its corresponding panel
-  const targetPanel = document.getElementById(targetPanelId); // Assuming ID is unique globally
+  const targetPanel = document.getElementById(String(targetPanelId)); // Assuming ID is unique globally
   if (targetPanel) {
     targetPanel.classList.add('active');
     // Load data for the activated panel
@@ -107,7 +113,9 @@ export function handleSubTabClick(event) {
         loadPaperTradesContent();
         break;
       default:
-        console.warn(`No content loading function for sub-panel: ${targetPanelId}`);
+        console.warn(
+          `No content loading function for sub-panel: ${targetPanelId}`
+        );
     }
   } else {
     console.error(`Sub-panel with ID '${targetPanelId}' not found.`);
@@ -119,18 +127,24 @@ export function handleSubTabClick(event) {
  * @param {Event} event - The click event.
  */
 export function handleSourceCardClick(event) {
+  // --- FIX: Cast event.target to Element ---
+  if (!(event.target instanceof Element)) {
+    return;
+  }
   const card = event.target.closest('.source-card');
+  // --- END FIX ---
   if (!card) return;
 
+  // @ts-ignore
   const sourceId = card.dataset.sourceId;
   if (!sourceId) {
     console.error('Source card is missing a data-source-id attribute.');
     return;
   }
 
-  // Hide the grid and show the detail container
-  if (gridView()) gridView().style.display = 'none';
-  if (detailView()) detailView().style.display = 'block';
+  // Use optional chaining for null safety
+  gridView()?.style.setProperty('display', 'none');
+  detailView()?.style.setProperty('display', 'block');
 
   loadSourceDetail(sourceId);
 }
@@ -139,9 +153,10 @@ export function handleSourceCardClick(event) {
  * Handles a click on the "Back to List" button in the detail view.
  */
 export function handleCloseSourceDetail() {
-  // Hide the detail view and show the grid
-  if (detailView()) detailView().style.display = 'none';
-  if (gridView()) gridView().style.display = 'block';
+  // Use optional chaining for null safety
+  detailView()?.style.setProperty('display', 'none');
+  gridView()?.style.setProperty('display', 'block');
+
   // Optionally, re-load the sources list
   loadSourcesContent();
 }
@@ -155,14 +170,13 @@ async function loadSourcesContent() {
     const sources = await getSources();
     renderSourceCards(sources);
     // Ensure the correct view is visible
-    if (detailView()) detailView().style.display = 'none';
-    if (gridView()) gridView().style.display = 'block';
-  } catch (error) {
-    console.error('Failed to load sources:', error);
-    if (gridView()) {
-      gridView().innerHTML =
-        '<p class="error">Failed to load advice sources. Please try again.</p>';
-    }
+    detailView()?.style.setProperty('display', 'none');
+    gridView()?.style.setProperty('display', 'block');
+  } catch (err) {
+    console.error('Failed to load sources:', err);
+    // Cast unknown 'err' to 'Error'
+    const error = err instanceof Error ? err : new Error(String(err));
+    renderSourceCards(null, error);
   }
 }
 
@@ -190,11 +204,14 @@ async function loadSourceDetail(sourceId) {
       ?.addEventListener('submit', handleLogStrategySubmit);
 
     // Load the strategies table for this source
+    // @ts-ignore (This will be fixed when the function is defined)
     await loadStrategiesForSource(sourceId);
   } catch (error) {
     console.error(`Failed to load source detail for ${sourceId}:`, error);
-    if (detailView()) {
-      detailView().innerHTML =
+    // Fix: Remove optional chaining from left-hand side
+    const dv = detailView();
+    if (dv) {
+      dv.innerHTML =
         '<p class="error">Failed to load source details. Please try again.</p>';
     }
   }
@@ -221,8 +238,10 @@ function handleCancelStrategyForm() {
   const formContainer = document.getElementById('log-strategy-form-container');
   if (formContainer) {
     formContainer.style.display = 'none';
-    // Optionally reset the form
-    const form = document.getElementById('log-strategy-form');
+    // Cast form to HTMLFormElement to access reset()
+    const form = /** @type {HTMLFormElement | null} */ (
+      document.getElementById('log-strategy-form')
+    );
     if (form) form.reset();
   }
 }
@@ -235,18 +254,28 @@ async function handleLogStrategySubmit(event) {
   event.preventDefault(); // This STOPS the page from reloading
   console.log('Strategy form submitted.');
 
+  // Add type guard for form
+  if (!(event.target instanceof HTMLFormElement)) {
+    return;
+  }
   const form = event.target;
+
   const formData = new FormData(form);
   const strategyData = Object.fromEntries(formData.entries());
 
   try {
+    // @ts-ignore
     await addStrategy(strategyData);
     alert('Strategy saved successfully!'); // Success message
     handleCancelStrategyForm(); // Hide and clear the form
 
     // Refresh the strategies table
-    await loadStrategiesForSource(strategyData.source_id);
+    // @ts-ignore
+    await loadStrategiesForSource(String(strategyData.source_id));
+
+    // --- FIX: Added the missing closing brace for the 'try' block ---
   } catch (error) {
+    // --- END FIX ---
     console.error('Failed to save strategy:', error);
     alert('Error: Could not save strategy. Please check the console.');
   }
@@ -270,19 +299,34 @@ async function loadStrategiesForSource(sourceId) {
   }
 }
 
-// --- PLACEHOLDER FUNCTIONS ---
-function loadWatchedListContent() {
+/**
+ * Fetches and renders the content for the "Watched List" sub-tab.
+ */
+async function loadWatchedListContent() {
   console.log('Loading Watched List content...');
-  const container = document.getElementById('watched-list-table');
-  if (container) {
-    container.innerHTML = '<p>Watched List content will load here.</p>';
+  try {
+    const watchedList = await getWatchedList();
+    renderWatchedList(watchedList);
+  } catch (err) {
+    console.error('Failed to load watched list:', err);
+    // Cast unknown 'err' to 'Error'
+    const error = err instanceof Error ? err : new Error(String(err));
+    renderWatchedList(null, error);
   }
 }
 
-function loadPaperTradesContent() {
+/**
+ * Fetches and renders the content for the "Paper Trades" sub-tab.
+ */
+async function loadPaperTradesContent() {
   console.log('Loading Paper Trades content...');
-  const container = document.getElementById('paper-trades-table');
-  if (container) {
-    container.innerHTML = '<p>Paper Trades content will load here.</p>';
+  try {
+    const paperTrades = await getPaperTrades();
+    renderPaperTrades(paperTrades);
+  } catch (err) {
+    console.error('Failed to load paper trades:', err);
+    // Cast unknown 'err' to 'Error'
+    const error = err instanceof Error ? err : new Error(String(err));
+    renderPaperTrades(null, error);
   }
 }

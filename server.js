@@ -16,7 +16,10 @@ const __dirname = path.dirname(__filename);
 
 // Middleware to log requests
 app.use((req, res, next) => {
-  fs.appendFileSync(path.join(__dirname, '.gemini', 'tmp', 'request_log.txt'), `Request URL: ${req.url}\n`);
+  fs.appendFileSync(
+    path.join(__dirname, '.gemini', 'tmp', 'request_log.txt'),
+    `Request URL: ${req.url}\n`
+  );
   next();
 });
 
@@ -25,8 +28,6 @@ app.use(express.json());
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
-
-
 
 // API route to get all sources
 app.get('/api/sources', async (req, res) => {
@@ -404,11 +405,16 @@ app.get('/api/priceV2/:ticker', async (req, res) => {
     if (price !== null) {
       res.json({ ticker, price, timestamp: Date.now() });
     } else {
-      res.status(404).json({ error: `Price for ${ticker} not found or invalid.` });
+      res
+        .status(404)
+        .json({ error: `Price for ${ticker} not found or invalid.` });
     }
   } catch (err) {
     console.error(`Failed to get price for ${ticker} using V2 service:`, err);
-    res.status(500).json({ error: `Failed to get price for ${ticker} using V2 service`, details: err.message });
+    res.status(500).json({
+      error: `Failed to get price for ${ticker} using V2 service`,
+      details: err.message,
+    });
   }
 });
 

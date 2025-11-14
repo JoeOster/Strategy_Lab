@@ -19,7 +19,9 @@ export async function getPriceV2(ticker) {
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.error(`Finnhub API returned status ${response.status} for ${ticker}`);
+      console.error(
+        `Finnhub API returned status ${response.status} for ${ticker}`
+      );
       return null;
     }
 
@@ -28,10 +30,11 @@ export async function getPriceV2(ticker) {
     if (data && typeof data.c === 'number' && data.c > 0) {
       console.log(`Successfully fetched price for ${ticker}: ${data.c}`);
       return data.c;
-    } else {
-      console.warn(`Invalid price data received for ${ticker}: ${JSON.stringify(data)}`);
-      return null;
     }
+    console.warn(
+      `Invalid price data received for ${ticker}: ${JSON.stringify(data)}`
+    );
+    return null;
   } catch (error) {
     console.error(`Error fetching price for ${ticker}:`, error);
     return null;

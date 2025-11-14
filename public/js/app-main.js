@@ -4,7 +4,7 @@ import {
   loadAppearanceSettings,
 } from './modules/settings/index.js';
 import { initializeUserSelector } from './modules/user-selector/index.js';
-import * as strategyLab from './modules/strategy-lab/index.js'; // Import the strategy-lab module
+// --- FIX: Removed the premature import of strategyLab ---
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Strategy Lab App Main script loaded.');
@@ -12,5 +12,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeNavigation();
   initializeSettingsModule();
   initializeUserSelector();
-
 });

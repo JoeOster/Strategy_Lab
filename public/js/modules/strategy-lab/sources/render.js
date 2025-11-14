@@ -2,9 +2,10 @@
 
 /**
  * Renders the list of advice sources as cards in the grid.
- * @param {Array<Object>} sources - An array of source objects from the API.
+ * @param {import('../../../types.js').Source[] | null} sources - An array of source objects from the API.
+ * @param {Error | null} [error] - An optional error object.
  */
-export function renderSourceCards(sources) {
+export function renderSourceCards(sources, error = null) {
   const grid = document.getElementById('source-cards-grid');
   if (!grid) {
     console.error('Source cards grid container not found.');
@@ -12,6 +13,12 @@ export function renderSourceCards(sources) {
   }
 
   grid.innerHTML = ''; // Clear any existing content
+
+  if (error) {
+    grid.innerHTML =
+      '<p class="error">Failed to load advice sources. Please try again.</p>';
+    return;
+  }
 
   if (!sources || sources.length === 0) {
     grid.innerHTML =
@@ -22,7 +29,7 @@ export function renderSourceCards(sources) {
   for (const source of sources) {
     const card = document.createElement('div');
     card.className = 'source-card';
-    card.dataset.sourceId = source.id;
+    card.dataset.sourceId = String(source.id); // Cast to string for dataset
 
     // Build the card's inner HTML
     card.innerHTML = `
@@ -40,7 +47,7 @@ export function renderSourceCards(sources) {
 
 /**
  * Renders the detailed view for a single advice source.
- * @param {Object} source - The source object to render.
+ * @param {import('../../../types.js').Source} source - The source object to render.
  */
 export function renderSourceDetail(source) {
   const container = document.getElementById('source-detail-container');
@@ -127,7 +134,7 @@ export function renderSourceDetail(source) {
 
 /**
  * Renders the table of logged strategies for a source.
- * @param {Array<Object>} strategies - An array of strategy objects.
+ * @param {import('../../../types.js').Strategy[]} strategies - An array of strategy objects.
  */
 export function renderStrategiesTable(strategies) {
   const container = document.getElementById('strategy-table');
@@ -160,20 +167,23 @@ export function renderStrategiesTable(strategies) {
   `;
 
   const tbody = container.querySelector('tbody');
-  for (const strategy of strategies) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${strategy.title || ''}</td>
-      <td>${strategy.chapter || ''}</td>
-      <td>${strategy.page_number || ''}</td>
-      <td>${strategy.description || ''}</td>
-      <td>${strategy.pdf_path || ''}</td>
-      <td>
-        <button class="table-action-btn" data-strategy-id="${
-          strategy.id
-        }">Add Idea</button>
-      </td>
-    `;
-    tbody.appendChild(row);
+
+  if (tbody) {
+    for (const strategy of strategies) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${strategy.title || ''}</td>
+        <td>${strategy.chapter || ''}</td>
+        <td>${strategy.page_number || ''}</td>
+        <td>${strategy.description || ''}</td>
+        <td>${strategy.pdf_path || ''}</td>
+        <td>
+          <button class="table-action-btn" data-strategy-id="${
+            strategy.id
+          }">Add Idea</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    }
   }
 }

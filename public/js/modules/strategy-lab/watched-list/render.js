@@ -2,14 +2,22 @@
 
 /**
  * Renders the watched list table.
- * @param {Array<object>} watchedList - An array of watched items.
+ * @param {import('../../../types.js').WatchedItem[] | null} watchedList - An array of watched items.
+ * @param {Error | null} [error] - An optional error object.
  */
-export function renderWatchedList(watchedList) {
+export function renderWatchedList(watchedList, error = null) {
   const container = document.getElementById('watched-list-table');
   if (!container) {
     console.error('Watched list container not found.');
     return;
   }
+
+  // --- FIX: Added error handling ---
+  if (error) {
+    container.innerHTML = '<p class="error">Failed to load watched list.</p>';
+    return;
+  }
+  // --- END FIX ---
 
   if (!watchedList || watchedList.length === 0) {
     container.innerHTML = '<p>No items in your watched list.</p>';

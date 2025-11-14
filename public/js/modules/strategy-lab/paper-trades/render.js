@@ -2,14 +2,22 @@
 
 /**
  * Renders the paper trades table.
- * @param {Array<object>} paperTrades - An array of paper trade items.
+ * @param {import('../../../types.js').PaperTrade[] | null} paperTrades - An array of paper trade items.
+ * @param {Error | null} [error] - An optional error object.
  */
-export function renderPaperTrades(paperTrades) {
+export function renderPaperTrades(paperTrades, error = null) {
   const container = document.getElementById('paper-trades-table');
   if (!container) {
     console.error('Paper trades container not found.');
     return;
   }
+
+  // --- FIX: Added error handling ---
+  if (error) {
+    container.innerHTML = '<p class="error">Failed to load paper trades.</p>';
+    return;
+  }
+  // --- END FIX ---
 
   if (!paperTrades || paperTrades.length === 0) {
     container.innerHTML = '<p>No paper trades recorded.</p>';
@@ -40,7 +48,9 @@ export function renderPaperTrades(paperTrades) {
           <td>${trade.entryPrice}</td>
           <td>${trade.exitPrice}</td>
           <td>${trade.quantity}</td>
-          <td style="color: ${trade.profit >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">${trade.profit}</td>
+          <td style="color: ${
+            trade.profit >= 0 ? 'var(--success-color)' : 'var(--danger-color)'
+          };">${trade.profit}</td>
           <td>${trade.date}</td>
           <td>
             <button class="small-btn" data-id="${trade.id}">Details</button>
