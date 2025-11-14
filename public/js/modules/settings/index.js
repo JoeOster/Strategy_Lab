@@ -7,12 +7,7 @@ import {
 } from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as handlers from './handlers.js';
-import {
-  handleAddNewSourceSubmit,
-  handleDeleteSourceClick,
-  handleEditSourceSubmit, // Import the new handler
-  handleSourceTypeChange,
-} from './sources.handlers.js';
+import * as sourcesHandlers from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
 
 import { loadAccountHoldersList } from './users.handlers.js';
@@ -56,10 +51,10 @@ export function initializeSettingsModule() {
           handleFontChange(event);
           break;
         case 'new-source-type':
-          handleSourceTypeChange(event, 'new');
+          sourcesHandlers.handleSourceTypeChange(event, 'new');
           break;
         case 'edit-source-type':
-          handleSourceTypeChange(event, 'edit');
+          sourcesHandlers.handleSourceTypeChange(event, 'edit');
           break;
       }
     });
@@ -67,7 +62,7 @@ export function initializeSettingsModule() {
     // Trigger once to set initial state for the new source form
     const newSourceType = document.getElementById('new-source-type');
     if (newSourceType) {
-      handleSourceTypeChange({ target: newSourceType }, 'new');
+      sourcesHandlers.handleSourceTypeChange({ target: newSourceType }, 'new');
     }
   } else {
     console.error('Settings modal not found.');
@@ -92,7 +87,10 @@ export function initializeSettingsModule() {
   // Add new source form submission
   const addNewSourceForm = document.getElementById('add-new-source-form');
   if (addNewSourceForm) {
-    addNewSourceForm.addEventListener('submit', handleAddNewSourceSubmit);
+    addNewSourceForm.addEventListener(
+      'submit',
+      sourcesHandlers.handleAddNewSourceSubmit
+    );
   }
 
   // Add new exchange form submission
@@ -148,7 +146,24 @@ export function initializeSettingsModule() {
   // Edit source form submission
   const editSourceForm = document.getElementById('edit-source-form');
   if (editSourceForm) {
-    editSourceForm.addEventListener('submit', handleEditSourceSubmit);
+    editSourceForm.addEventListener(
+      'submit',
+      sourcesHandlers.handleEditSourceSubmit
+    );
+  }
+
+  // Close button for edit-source-modal
+  const editSourceModal = document.getElementById('edit-source-modal');
+  if (editSourceModal) {
+    const closeButton = editSourceModal.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.addEventListener(
+        'click',
+        sourcesHandlers.closeEditSourceModal
+      );
+    } else {
+      console.error('Close button not found within edit source modal.');
+    }
   }
 
   // Close button for source-detail-modal
@@ -170,7 +185,7 @@ export function initializeSettingsModule() {
     sourcesContainer.addEventListener('click', (event) => {
       if (event.target.classList.contains('delete-source-btn')) {
         const sourceId = event.target.dataset.id;
-        handleDeleteSourceClick(sourceId);
+        sourcesHandlers.handleDeleteSourceClick(sourceId);
       }
     });
   }
