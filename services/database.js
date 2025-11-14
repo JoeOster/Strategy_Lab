@@ -74,6 +74,26 @@ export async function getDb() {
           value TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS watched_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          is_paper_trade INTEGER NOT NULL,
+          user_id INTEGER,
+          source_id INTEGER,
+          strategy_id INTEGER,
+          ticker TEXT NOT NULL,
+          order_type TEXT,
+          buy_price_high REAL,
+          buy_price_low REAL,
+          take_profit_high REAL,
+          take_profit_low REAL,
+          escape_price REAL,
+          status TEXT NOT NULL,
+          notes TEXT,
+          created_date TEXT NOT NULL,
+          FOREIGN KEY (source_id) REFERENCES advice_sources(id),
+          FOREIGN KEY (strategy_id) REFERENCES strategies(id)
+        );
+
         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('family-name', '');
         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('take-profit-percent', '10');
         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('stop-loss-percent', '5');
