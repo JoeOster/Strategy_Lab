@@ -10,8 +10,8 @@ import * as handlers from './handlers.js';
 import {
   handleAddNewSourceSubmit,
   handleDeleteSourceClick,
-  handleSourceTypeChange,
   handleEditSourceSubmit, // Import the new handler
+  handleSourceTypeChange,
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
 

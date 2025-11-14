@@ -46,93 +46,6 @@ export function renderSourceCards(sources, error = null) {
 }
 
 /**
- * Renders the detailed view for a single advice source.
- * @param {import('../../../types.js').Source} source - The source object to render.
- */
-export function renderSourceDetail(source) {
-  const container = document.getElementById('source-detail-container');
-  if (!container) {
-    console.error('Source detail container not found.');
-    return;
-  }
-
-  let actionButtons = '';
-  let strategySection = '';
-
-  // Conditionally render placeholder buttons and strategy section based on type
-  if (source.type === 'book' || source.type === 'website') {
-    actionButtons = `
-      <button class="source-detail-btn" id="source-strategy-btn" data-source-id="${source.id}">
-        Add Strategy
-      </button>
-    `;
-    // Add the "housing" for the form and table
-    strategySection = `
-      <div id="log-strategy-form-container" class="strategy-form-container" style="display:none;">
-        <h4>Log New Strategy</h4>
-        <form id="log-strategy-form">
-          <input type="hidden" id="strategy-source-id" name="source_id" value="${source.id}">
-          <label for="strategy-title">Strategy Title:</label>
-          <input type="text" id="strategy-title" name="title" required>
-          <label for="strategy-chapter">Chapter:</label>
-          <input type="text" id="strategy-chapter" name="chapter">
-          <label for="strategy-page">Page Number:</label>
-          <input type="number" id="strategy-page" name="page_number">
-          
-          <label for="strategy-description">Description:</label>
-          <textarea id="strategy-description" name="description"></textarea>
-          <label for="strategy-pdf-path">PDF File Path:</label>
-          <input type="text" id="strategy-pdf-path" name="pdf_path" placeholder="pdf_repo/my_strategy.pdf">
-          
-          <div class="form-actions">
-            <button type="submit">Save Strategy</button>
-            <button type="button" id="cancel-strategy-form-btn" class="clear-btn">Cancel</button>
-          </div>
-        </form>
-      </div>
-      <div id="strategy-table-container">
-        <h4>Logged Strategies</h4>
-        <div id="strategy-table"></div> 
-      </div>
-    `;
-  } else if (source.type === 'person' || source.type === 'group') {
-    actionButtons = `
-      <button class="source-detail-btn" id="source-add-idea-btn" data-source-id="${source.id}">
-        Add Trade Idea
-      </button>
-    `;
-    // Placeholder for future "Trade Ideas" table
-    strategySection = `
-      <div id="trade-ideas-table-container">
-        <h4>Logged Trade Ideas</h4>
-        <div id="trade-ideas-table">
-          <p>No trade ideas logged for this source yet.</p>
-        </div>
-      </div>
-    `;
-  }
-
-  container.innerHTML = `
-    <div class="source-detail-header">
-      <h3 class="source-detail-title">${source.name}</h3>
-      <button id="close-source-detail-btn" class="table-action-btn">Back to List</button>
-    </div>
-    <p class="source-detail-type">${source.type}</p>
-    ${
-      source.description
-        ? `<p class="source-detail-description">${source.description}</p>`
-        : ''
-    }
-    <div class="source-detail-actions">
-      ${actionButtons}
-    </div>
-    <div class="source-detail-content">
-      ${strategySection}
-    </div>
-  `;
-}
-
-/**
  * Renders the table of logged strategies for a source.
  * @param {import('../../../types.js').Strategy[]} strategies - An array of strategy objects.
  */
@@ -178,7 +91,7 @@ export function renderStrategiesTable(strategies) {
         <td>${strategy.description || ''}</td>
         <td>${strategy.pdf_path || ''}</td>
         <td>
-          <button class="table-action-btn" data-strategy-id="${
+          <button class="table-action-btn btn" data-strategy-id="${
             strategy.id
           }">Add Idea</button>
         </td>
