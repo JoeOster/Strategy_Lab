@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import dotenv from 'dotenv';
 dotenv.config();
 import path from 'node:path';
@@ -13,22 +14,19 @@ const PORT = process.env.PORT || 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Middleware to log requests
+app.use((req, res, next) => {
+  fs.appendFileSync(path.join(__dirname, '.gemini', 'tmp', 'request_log.txt'), `Request URL: ${req.url}\n`);
+  next();
+});
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Explicitly set MIME type for JavaScript modules to prevent "text/html" errors
-app.get('/js/modules/:moduleName/:fileName', (req, res) => {
-  const modulePath = path.join(__dirname, 'public', 'js', 'modules', req.params.moduleName, req.params.fileName);
-  res.type('application/javascript').sendFile(modulePath);
-});
 
-app.get('/js/modules/:fileName', (req, res) => {
-  const modulePath = path.join(__dirname, 'public', 'js', 'modules', req.params.fileName);
-  res.type('application/javascript').sendFile(modulePath);
-});
 
 // API route to get all sources
 app.get('/api/sources', async (req, res) => {
