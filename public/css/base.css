@@ -1,0 +1,58 @@
+/* General Body and App Layout */
+body {
+  font-family: var(--body-font);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.header {
+  background-color: var(--container-bg);
+  color: var(--heading-color);
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--container-border);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* General Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading-color);
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+p {
+  margin-bottom: 10px;
+}
+
+.header-logo {
+  width: 480px;
+  height: 120px;
+}

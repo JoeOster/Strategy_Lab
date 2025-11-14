@@ -1,45 +1,118 @@
----
+- [x] **CSS Refactoring: `main.css` Split and Redundancy Identification**
+  - [ ] Review `public/css/main.css` for current structure and content.
+  - [ ] Propose a new modular file structure for CSS files within `public/css/`
+        based on logical components (e.g., `base.css`, `navigation.css`,
+        `forms.css`, `modals.css`, `components.css`, `settings.css`,
+        `strategy-lab.css`).
+  - [ ] Identify and document redundancies in styling across different
+        components (e.g., button styles, tab/sub-tab styling, list item styling,
+        form input styles).
+  - [ ] Suggest opportunities for abstraction and creation of reusable CSS
+        classes to reduce duplication.
+  - [ ] Add this proposal to `docs/CURRENT_TASK_LOG.md`.
 
-## Task: Proposal for `main.css` Splitting and Redundancy Identification
+**Proposal for `main.css` Refactoring**
 
-**Objective:** Propose a strategy to refactor the large `public/css/main.css` file into a more modular and maintainable structure, aligning with the architectural principles outlined in `Strategy_Lab_V2_Plan.md`. This includes identifying redundancies and suggesting a plan for splitting the file into smaller, purpose-specific CSS files.
+The `main.css` file currently serves as a monolithic stylesheet, containing
+styles for general layout, typography, navigation, modals, forms, and various
+list components (account holders, advice sources, exchanges, web apps, strategy
+lab cards). As the application grows, this approach will become increasingly
+difficult to manage, leading to potential issues with maintainability,
+scalability, and performance.
 
-**Proposed Steps:**
+**Goals of Refactoring:**
 
-1.  **Initial Assessment & Redundancy Scan:**
-    *   **Action:** Conduct a thorough review of `public/css/main.css` to identify:
-        *   **Duplicate rules:** Identical CSS declarations applied to different selectors.
-        *   **Overlapping rules:** Styles that target similar elements or properties, potentially leading to unnecessary overrides or complex specificity.
-        *   **Potential for utility classes:** Identify recurring style patterns (e.g., spacing, text alignment, common button styles) that could be abstracted into reusable utility classes.
-    *   **Method:** This would involve a combination of manual inspection and potentially using `search_file_content` with specific regex patterns to find duplicate declarations or common patterns.
+1.  **Modularity:** Break down the stylesheet into smaller, more manageable
+    files based on logical components or features.
+2.  **Maintainability:** Improve the ease of locating and modifying styles for
+    specific parts of the application.
+3.  **Readability:** Enhance the overall readability and organization of the
+    CSS.
+4.  **Reduce Redundancy:** Identify and eliminate duplicate or very similar
+    styles.
+5.  **Performance (Potential):** While not the primary goal, a modular approach
+    can sometimes lead to better caching and loading strategies.
 
-2.  **Define Module-Specific CSS Files:**
-    *   **Action:** Based on the existing JavaScript module structure (e.g., `public/js/modules/navigation`, `public/js/modules/settings`, `public/js/modules/dashboard`), propose creating corresponding CSS files.
-    *   **Example Structure:**
-        *   `public/css/modules/navigation.css`
-        *   `public/css/modules/settings.css`
-        *   `public/css/modules/dashboard.css`
-        *   `public/css/modules/strategy-lab.css` (for styles specific to the main Strategy Lab tab and its sub-modules)
-    *   **Rationale:** This approach directly mirrors the modular JavaScript architecture, making it easier to locate, manage, and potentially lazy-load styles relevant to specific components or pages.
+**Proposed Split Structure:**
 
-3.  **Create a Base/Utility CSS File:**
-    *   **Action:** Extract foundational styles (e.g., `body`, `html` resets, typography defaults), global variables (if not already in `themes.css`), and the identified common utility classes into a new file, such as `public/css/base.css` or `public/css/utilities.css`.
-    *   **Rationale:** Centralizes core, project-wide styles and promotes reusability, reducing repetition across module-specific CSS files.
+I recommend organizing the CSS files within the `public/css/` directory,
+mirroring the JavaScript module structure where appropriate.
 
-4.  **Conceptual Migration Strategy (No Code Changes in this Proposal):**
-    *   **Action:** Outline the high-level process for moving styles from `main.css` to the new modular files.
-    *   **Steps:**
-        *   For each JavaScript module, identify and move all CSS rules from `main.css` that *exclusively* style elements within that module's HTML to its dedicated CSS file (e.g., `settings.css`).
-        *   Move global styles, resets, and utility classes to the `base.css`/`utilities.css` file.
-        *   Ensure `public/css/themes.css` continues to hold theme-specific variables and overrides, maintaining its current role.
-        *   The `index.html` (and any other relevant HTML files) would then need to be updated to include these new CSS files in the correct order (e.g., `base.css` first, then `themes.css`, then module-specific CSS files).
-    *   **Considerations:** During actual implementation, careful attention would be needed to manage CSS specificity and avoid unintended style changes.
+- **`base.css`**:
+  - General body and app layout (`body`, `.app-container`, `.header`, `h1`,
+    `p`).
+  - General typography (`h1` to `h6`).
+  - Any global utility classes that are truly generic.
+- **`navigation.css`**:
+  - Main navigation (`.main-nav`, `.main-nav .nav-btn`).
+  - Sub-navigation (`.sub-nav`, `.sub-nav .sub-nav-btn`).
+- **`forms.css`**:
+  - All form-related styles (`#general-settings-form`, `label`, `input`,
+    `select`, `textarea`, `button` within forms).
+  - General button styles that are not specific to navigation or modals.
+- **`modals.css`**:
+  - Modal styles (`.modal`, `.modal-content`, `.close-button`).
+  - Modal footer styles (`.modal-footer`).
+- **`components.css`**:
+  - Styles for reusable UI components that appear in multiple places or are
+    distinct enough to warrant their own section.
+  - This would include the various list styles that mimic tables (e.g.,
+    `.account-holder-item`, `.advice-source-item`, `.exchange-item`,
+    `.webapp-item`).
+  - User selector dropdown (`.user-select-container`, `.user-select-dropdown`).
+  - Table action buttons (`.table-action-btn`, `.small-btn`).
+- **`settings.css`**:
+  - Specific styles for the settings module (`.settings-tabs`,
+    `.settings-sub-tabs`, `.settings-panel`, `.sub-panel`, `.sub-tab-content`).
+- **`strategy-lab.css`**:
+  - Specific styles for the strategy lab module (`#source-cards-grid`,
+    `.source-card`, `.source-card-title`, `.source-card-type`,
+    `.source-card-description`).
 
-5.  **Future Enhancements (Beyond Current Scope):**
-    *   **Action:** Suggest potential future improvements for CSS management.
-    *   **Examples:**
-        *   **CSS Preprocessor:** Introduce a preprocessor like Sass or Less for advanced features such as variables, mixins, and nesting, further enhancing organization.
-        *   **Build-time Optimization:** Integrate tools like PurgeCSS to remove unused CSS during the build process, optimizing file size.
-        *   **Component-Based Styling:** Explore CSS-in-JS or scoped CSS solutions if the project adopts a more advanced component-based frontend framework.
+**Identified Redundancies and Opportunities for Abstraction:**
 
-**Status:** Proposed. No code changes have been made.
+1.  **Button Styles:**
+    - Many buttons (`.main-nav .nav-btn`, `.settings-tabs button`,
+      `.settings-sub-tabs button`, `.modal-footer button`,
+      `#add-new-source-form button`, etc.) share common properties like
+      `border: none;`, `cursor: pointer;`, `font-size: 1rem;`,
+      `border-radius: 5px;`.
+    - **Recommendation:** Create a base button class (e.g., `.btn`) in
+      `forms.css` or `base.css` that defines these common styles. Then, specific
+      button types can extend or override these base styles.
+    - The `.table-action-btn` and `.small-btn` already attempt to create smaller
+      buttons. These could be variations of a base button class.
+
+2.  **Tab/Sub-Tab Styling:**
+    - `.main-nav .nav-btn`, `.settings-tabs button`, and
+      `.settings-sub-tabs button` have very similar styling for their active and
+      hover states.
+    - **Recommendation:** Abstract common tab/button styling into a reusable
+      class or mixin (if using a preprocessor, which we are not currently). For
+      plain CSS, define a common set of properties for active/hover states that
+      can be applied to different tab-like elements.
+
+3.  **List Item Styling (Mimicking Tables):**
+    - `#account-holder-list ul`, `.account-holder-item`
+    - `#advice-source-list`, `.advice-source-item`
+    - `#exchange-list ul`, `.exchange-item`
+    - `#webapp-list ul`, `.webapp-item`
+    - These all share a very similar structure and styling for displaying items
+      in a list that looks like a table row
+      (`display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--container-border);`).
+    - **Recommendation:** Create a generic list component class (e.g.,
+      `.list-table`, `.list-table-item`) in `components.css` that encapsulates
+      these common styles. Specific lists can then use these classes and add
+      their unique styles.
+
+4.  **Form Input Styles:**
+    - `input`, `select`, `textarea` within forms share common padding, border,
+      background, color, and border-radius.
+    - **Recommendation:** Define a base style for form controls (e.g.,
+      `.form-control`) in `forms.css` to apply these common properties.
+
+5.  **Shadow and Border Colors:**
+    - `box-shadow` and `border` properties frequently use `var(--shadow-color)`
+      and `var(--container-border)`. This is already good practice using CSS
+      variables, but it highlights the consistent use of these visual elements
+      across different components.

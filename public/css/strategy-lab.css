@@ -1,0 +1,41 @@
+/* --- FIX: Added styles for Strategy Lab cards --- */
+#source-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important; /* 4-column layout */
+  gap: 20px;
+}
+
+.source-card {
+  background-color: var(--container-bg);
+  border: 1px solid var(--container-border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+
+.source-card:hover {
+  box-shadow: 0 4px 8px var(--shadow-color);
+  transform: translateY(-2px);
+}
+
+.source-card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--heading-color);
+  margin-bottom: 8px;
+}
+
+.source-card-type {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted-color);
+  margin-bottom: 15px;
+}
+
+.source-card-description {
+  font-size: 1rem;
+  color: var(--text-color);
+}
+/* --- END FIX --- */

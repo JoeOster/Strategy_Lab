@@ -58,6 +58,8 @@ export function initializeStrategyLabSubTabs() {
   }
 }
 
+// ... (rest of the file is unchanged) ...
+
 /**
  * Handles clicks on the Strategy Lab L2 sub-tabs (Sources, Watched List, Paper Trades).
  * Deactivates all sub-panels in its section and activates the correct one.
@@ -97,7 +99,11 @@ export function handleSubTabClick(event) {
     content.classList.remove('active');
   }
 
-  // Activate the clicked tab button and its corresponding panel
+  // --- FIX: Add the .active class back to the clicked button ---
+  clickedTabButton.classList.add('active');
+  // --- END FIX ---
+
+  // Activate the corresponding panel
   const targetPanel = document.getElementById(String(targetPanelId)); // Assuming ID is unique globally
   if (targetPanel) {
     targetPanel.classList.add('active');
@@ -113,14 +119,14 @@ export function handleSubTabClick(event) {
         loadPaperTradesContent();
         break;
       default:
-        console.warn(
-          `No content loading function for sub-panel: ${targetPanelId}`
-        );
+        console.warn(`No content loading function for sub-panel: ${targetPanelId}`);
     }
   } else {
     console.error(`Sub-panel with ID '${targetPanelId}' not found.`);
   }
 }
+
+// ... (rest of the file is unchanged) ...
 
 /**
  * Handles a click on a source card.

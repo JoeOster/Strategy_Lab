@@ -1,0 +1,70 @@
+/* Form Styles */
+#general-settings-form,
+#appearance-settings-form,
+#add-new-source-form,
+#add-exchange-form,
+#add-holder-form,
+#add-webapp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#general-settings-form label,
+#appearance-settings-form label,
+#add-new-source-form label,
+#add-exchange-form label,
+#add-holder-form label {
+  font-weight: bold;
+  margin-bottom: -10px;
+  color: var(--heading-color);
+}
+
+#general-settings-form input,
+#appearance-settings-form select,
+#add-new-source-form input,
+#add-new-source-form select,
+#add-new-source-form textarea,
+#add-exchange-form input,
+#add-holder-form input {
+  padding: 10px;
+  border: 1px solid var(--container-border);
+  background-color: var(--info-panel-bg);
+  color: var(--text-color);
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#appearance-settings-form select {
+  width: 50%;
+}
+
+#add-new-source-form button,
+#add-exchange-form button,
+#add-holder-form button,
+#add-webapp-form button {
+  padding: 10px 15px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+#add-new-source-form button:hover,
+#add-exchange-form button:hover,
+#add-holder-form button:hover,
+#add-webapp-form button:hover {
+  background-color: var(--primary-hover);
+}
+
+.clear-btn {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+}
+
+.clear-btn:hover {
+  background-color: var(--button-secondary-hover);
+}
