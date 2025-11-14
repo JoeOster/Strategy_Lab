@@ -151,12 +151,18 @@ export function initializeSettingsModule() {
     editSourceForm.addEventListener('submit', handleEditSourceSubmit);
   }
 
-  // Placeholder for handling the edit source form submission.
-  // This will be replaced with actual logic when the edit modal is properly implemented.
-  // export function handleEditSourceSubmit(event) {
-  //   console.log('handleEditSourceSubmit called (placeholder)');
-  //   event.preventDefault();
-  // }
+  // Close button for source-detail-modal
+  const sourceDetailModal = document.getElementById('source-detail-modal');
+  if (sourceDetailModal) {
+    const closeButton = sourceDetailModal.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', () => {
+        sourceDetailModal.style.display = 'none';
+      });
+    } else {
+      console.error('Close button not found within source detail modal.');
+    }
+  }
 
   // Event delegation for deleting sources
   const sourcesContainer = document.getElementById('advice-source-list');

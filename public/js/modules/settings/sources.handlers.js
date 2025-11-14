@@ -120,6 +120,55 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
   }
 }
 
+export async function handleSourceItemClick(sourceId) {
+  console.log('Handler: handleSourceItemClick called', sourceId);
+  const sourceDetailModal = document.getElementById('source-detail-modal');
+  if (!sourceDetailModal) {
+    console.error('Source detail modal not found.');
+    return;
+  }
+
+  try {
+    const source = await getSource(sourceId);
+    if (!source) {
+      console.error('Source not found for ID:', sourceId);
+      return;
+    }
+
+    // Populate source profile container
+    const sourceProfileContainer = document.getElementById('source-profile-container');
+    if (sourceProfileContainer) {
+      sourceProfileContainer.innerHTML = `
+        <h3>${source.name} (${source.type})</h3>
+        <p>Description: ${source.description || 'N/A'}</p>
+        <p>URL: <a href="${source.url}" target="_blank">${source.url || 'N/A'}</a></p>
+        ${source.image_path ? `<img src="${source.image_path}" alt="${source.name}" style="max-width: 100px;">` : ''}
+      `;
+    }
+
+    // Populate source feature button container (Add Strategy/Idea, Edit Strategy)
+    const sourceFeatureBtnContainer = document.getElementById('source-feature-btn-container');
+    if (sourceFeatureBtnContainer) {
+      sourceFeatureBtnContainer.innerHTML = `
+        <button id="add-strategy-btn" class="btn" data-source-id="${source.id}">Add Strategy</button>
+        <button id="edit-strategy-btn" class="btn" data-source-id="${source.id}">Edit Strategy</button>
+        <button id="add-idea-btn" class="btn" data-source-id="${source.id}">Add Idea</button>
+      `;
+    }
+
+    // Load strategies for book/website types
+    if (source.type === 'book') {
+      loadStrategiesForSource(source.id, 'source-detail-strategies-table');
+    } else if (source.type === 'website') {
+      loadStrategiesForSource(source.id, 'source-detail-strategies-table');
+    }
+
+    sourceDetailModal.style.display = 'block'; // Show the modal
+  } catch (error) {
+    console.error('Error fetching source for detail view:', error);
+  }
+}
+
 export async function loadSourcesList() {
   console.log('Handler: loadSourcesList called (placeholder)');
   const sources = await getSources();
@@ -129,6 +178,7 @@ export async function loadSourcesList() {
     for (const source of sources) {
       const sourceElement = document.createElement('div');
       sourceElement.className = 'advice-source-item'; // Add a class for consistent styling of list items
+      sourceElement.dataset.id = source.id; // Store source ID on the element
 
       const infoSpan = document.createElement('span');
       infoSpan.classList.add('source-info');
@@ -143,6 +193,14 @@ export async function loadSourcesList() {
       `;
       sourceElement.appendChild(actionsDiv);
       sourcesContainer.appendChild(sourceElement);
+
+      // Add event listener to the source item itself to open the detail modal
+      sourceElement.addEventListener('click', (event) => {
+        // Prevent opening detail modal if edit/delete buttons are clicked
+        if (!event.target.classList.contains('edit-source-btn') && !event.target.classList.contains('delete-source-btn')) {
+          handleSourceItemClick(source.id);
+        }
+      });
     }
   }
 }
