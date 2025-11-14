@@ -1,5 +1,12 @@
 // public/js/modules/strategy-lab/handlers.js
 
+import { getWatchedList } from './watched-list/api.js';
+import { renderWatchedList } from './watched-list/render.js';
+import { getPaperTrades } from './paper-trades/api.js';
+import { renderPaperTrades } from './paper-trades/render.js';
+import { getSources } from './sources/api.js';
+import { renderSourceCards } from './sources/render.js';
+
 /**
  * Initializes the sub-tabs within the Strategy Lab module.
  * Sets the default sub-tab ('sources-panel') and its panel to active.
@@ -85,18 +92,32 @@ export function handleSubTabClick(event) {
     }
 }
 
-// Placeholder functions for loading content
-function loadSourcesContent() {
+async function loadSourcesContent() {
     console.log('Loading Sources content...');
-    // Future: Call sources.render.js and sources.api.js functions
+    try {
+        const sources = await getSources();
+        renderSourceCards(sources);
+    } catch (error) {
+        console.error('Failed to load sources:', error);
+    }
 }
 
-function loadWatchedListContent() {
+async function loadWatchedListContent() {
     console.log('Loading Watched List content...');
-    // Future: Call watched-list.render.js and watched-list.api.js functions
+    try {
+        const watchedList = await getWatchedList();
+        renderWatchedList(watchedList);
+    } catch (error) {
+        console.error('Failed to load watched list:', error);
+    }
 }
 
-function loadPaperTradesContent() {
+async function loadPaperTradesContent() {
     console.log('Loading Paper Trades content...');
-    // Future: Call paper-trades.render.js and paper-trades.api.js functions
+    try {
+        const paperTrades = await getPaperTrades();
+        renderPaperTrades(paperTrades);
+    } catch (error) {
+        console.error('Failed to load paper trades:', error);
+    }
 }
