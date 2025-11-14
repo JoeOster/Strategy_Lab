@@ -312,9 +312,7 @@ export function closeSourceDetailModal() {
       dynamicContentDiv.remove(); // Remove the dynamic content div
     }
     // --- FIX: Add null checks ---
-    const openTrades = document.getElementById(
-      'open-trades-table-placeholder'
-    );
+    const openTrades = document.getElementById('open-trades-table-placeholder');
     if (openTrades) {
       openTrades.innerHTML =
         '<h4>Open Trades</h4><p>Table for open trades will go here.</p>';
@@ -472,6 +470,7 @@ async function handleLogStrategySubmit(event) {
 
   const formData = new FormData(form);
   const strategyData = Object.fromEntries(formData.entries());
+  console.log('Strategy data being sent:', strategyData); // Add this line for debugging
 
   try {
     // @ts-ignore
