@@ -48,6 +48,15 @@ body[data-theme="dark"] {
   --table-header-bg: #4b5563;
   --table-row-even-bg: #4b5563;
   --shadow-color: rgba(0, 0, 0, 0.2);
+
+  /* Link colors for dark theme */
+  a {
+    color: #60a5fa; /* Light blue for links */
+  }
+
+  a:visited {
+    color: #93c5fd; /* Slightly different light blue for visited links */
+  }
 }
 
 body[data-theme="sepia"] {
