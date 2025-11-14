@@ -76,13 +76,13 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
       'book_websites',
       'book_pdfs',
     ];
-    bookFields.forEach((field) => {
+    for (const field of bookFields) {
       const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
       if (wrapper) {
         wrapper.style.display =
           sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
       }
-    });
+    }
 
     // Load strategies for book type
     if (formType === 'edit') {
@@ -105,13 +105,13 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
     if (urlLabel) urlLabel.textContent = 'Website URL:';
 
     const websiteFields = ['website_websites', 'website_pdfs'];
-    websiteFields.forEach((field) => {
+    for (const field of websiteFields) {
       const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
       if (wrapper) {
         wrapper.style.display =
           sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
       }
-    });
+    }
 
     // Load strategies for website type
     if (formType === 'edit') {
@@ -394,13 +394,13 @@ export function closeEditSourceModal() {
     modal.style.display = 'none';
     form.reset(); // Clear form fields
     // Hide all type-specific panels
-    document.querySelectorAll('.source-type-panel').forEach((panel) => {
+    for (const panel of document.querySelectorAll('.source-type-panel')) {
       // @ts-ignore
       if (panel.id.startsWith('edit-source-panel-')) {
         // @ts-ignore
         panel.style.display = 'none';
       }
-    });
+    }
     const fieldsContainer = document.getElementById(
       'edit-source-fields-container'
     );

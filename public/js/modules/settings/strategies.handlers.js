@@ -3,7 +3,6 @@ import {
   addStrategy,
   deleteStrategy,
   getStrategiesBySourceId,
-  updateStrategy,
 } from './strategies.api.js';
 import { renderStrategiesTable } from './strategies.render.js';
 
