@@ -36,8 +36,12 @@ export function renderStrategiesTable(strategies, containerId) {
         <td>${strategy.description || ''}</td>
         <td>${strategy.pdf_path || ''}</td>
         <td>
-          <button class="edit-strategy-btn table-action-btn" data-id="${strategy.id}">Edit</button>
-          <button class="delete-strategy-btn table-action-btn" data-id="${strategy.id}">Delete</button>
+          <button class="edit-strategy-btn table-action-btn btn-secondary" data-id="${
+            strategy.id
+          }">Edit</button>
+          <button class="delete-strategy-btn table-action-btn btn-danger" data-id="${
+            strategy.id
+          }">Delete</button>
         </td>
       </tr>
     `;

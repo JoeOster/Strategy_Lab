@@ -148,3 +148,28 @@
   z-index: 1010;
 }
 /* --- END: z-index FIX --- */
+/* joeoster/strategy_lab/Strategy_Lab-feature-beautification/public/css/modals.css */
+
+/* ... (existing modal styles) ... */
+
+#source-profile-container {
+  flex-grow: 1; /* Allows it to take up remaining space */
+}
+
+/* --- START: NEW STYLE --- */
+.source-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* This makes it a circle */
+  object-fit: cover; /* Ensures the image covers the area, not stretched */
+  border: 2px solid var(--container-border);
+  margin-bottom: 15px; /* Space below the image */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* --- END: NEW STYLE --- */
+
+.source-detail-right-panel {
+  flex-grow: 1; /* Takes up the rest of the space */
+/* ... (rest of the file) ... */

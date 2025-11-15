@@ -1,4 +1,4 @@
-// public/js/modules/strategy-lab/sources/modal.handlers.js
+// joeoster/strategy_lab/Strategy_Lab-feature-beautification/public/js/modules/strategy-lab/sources/modal.handlers.js
 
 /** @typedef {import('../../../types.js').Source} Source */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
@@ -78,8 +78,44 @@ export async function openSourceDetailModal(sourceId) {
   try {
     const source = await getSource(sourceId);
 
-    // Populate profile container
+    // --- START: MODIFICATION ---
+
+    // 1. Determine the folder path based on source type
+    let folderPath = 'images/'; // Generic fallback folder
+    switch (source.type) {
+      case 'person':
+        folderPath = 'images/contacts/';
+        break;
+      case 'group':
+        folderPath = 'images/group/';
+        break;
+      case 'book':
+        folderPath = 'images/books/';
+        break;
+      case 'website':
+        folderPath = 'images/url/';
+        break;
+    }
+
+    // 2. Determine the filename (use image_path or a folder-specific default)
+    const imageFile = source.image_path
+      ? source.image_path
+      : source.type === 'person'
+        ? 'default.png'
+        : 'default.svg';
+    const finalImagePath = folderPath + imageFile;
+
+    // 3. Define a root-level generic placeholder in case the specific one fails
+    const genericPlaceholder = 'images/default-placeholder.svg';
+
+    // 4. Populate profile container with the new logic
     profileContainer.innerHTML = `
+      <img 
+        src="${finalImagePath}" 
+        alt="${source.name}" 
+        class="source-profile-image"
+        onerror="this.onerror=null; this.src='${genericPlaceholder}';"
+      >
       <h3>${source.name}</h3> 
       <p>Type: ${source.type}</p>
       ${source.description ? `<p>${source.description}</p>` : ''}
@@ -98,6 +134,7 @@ export async function openSourceDetailModal(sourceId) {
           : ''
       }
     `;
+    // --- END: MODIFICATION ---
 
     // Render ONLY the Edit button in the left panel's footer
     featureBtnContainer.innerHTML = `

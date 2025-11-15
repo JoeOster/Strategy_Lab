@@ -48,10 +48,19 @@ export function handleSourceTypeChange(event, formType, sourceData = {}) {
     `${formPrefix}-panel-${selectedType}`
   );
   console.log('Selected panel:', selectedPanel);
-  if (selectedPanel) {
-    selectedPanel.style.display = 'block';
-  }
-
+      if (selectedPanel) {
+        selectedPanel.style.display = 'block';
+      }
+  
+      // Pre-fill image_path for new 'person' sources if empty
+      if (formType === 'new' && selectedType === 'person') {
+        const imagePathInput = document.getElementById('new-source-image-path');
+        // @ts-ignore
+        if (imagePathInput && !imagePathInput.value) {
+          // @ts-ignore
+          imagePathInput.value = 'images/contacts/default.png';
+        }
+      }
   // Show/hide the fields container
   const fieldsContainer = document.getElementById(
     `${formPrefix}-fields-container`

@@ -83,3 +83,21 @@
 .clear-btn:hover {
   background-color: var(--button-secondary-hover);
 }
+
+/* --- START: NEW BUTTON STYLES --- */
+.btn.btn-secondary {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+}
+.btn.btn-secondary:hover {
+  background-color: var(--button-secondary-hover);
+}
+
+.btn.btn-danger {
+  background-color: var(--negative-color);
+  color: white;
+}
+.btn.btn-danger:hover {
+  opacity: 0.85; /* Simple hover for danger */
+}
+/* --- END: NEW BUTTON STYLES --- */

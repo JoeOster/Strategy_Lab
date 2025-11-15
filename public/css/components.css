@@ -57,7 +57,9 @@
 }
 
 .table-action-btn:hover {
-  background-color: var(--primary-hover); /* Example: using primary hover color */
+  background-color: var(
+    --primary-hover
+  ); /* Example: using primary hover color */
 }
 
 .small-btn {
@@ -165,3 +167,46 @@
   display: flex;
   gap: 5px;
 }
+
+/* --- START: NEW TABLE STYLES --- */
+.strategy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  /* Remove any outer border to blend with the panel */
+  border: none;
+}
+
+.strategy-table thead th {
+  background-color: var(--container-bg); /* Slightly different from panel bg */
+  border-bottom: 2px solid var(--primary-color);
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--heading-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.strategy-table tbody td {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--container-bg); /* Row divider */
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.strategy-table tbody tr:nth-child(even) td {
+  background-color: var(--container-bg); /* Zebra striping */
+}
+
+.strategy-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Tweak for buttons inside tables to ensure alignment */
+.strategy-table .table-action-btn {
+  margin-right: 4px;
+  margin-bottom: 0; /* Ensure no extra margin */
+}
+/* --- END: NEW TABLE STYLES --- */

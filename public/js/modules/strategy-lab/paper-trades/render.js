@@ -49,10 +49,10 @@ export function renderPaperTrades(paperTrades, error = null) {
           <td>${trade.quantity}</td>
           <td>${trade.price}</td>
           <td>
-            <button class="small-btn btn paper-details-btn" data-id="${
+            <button class="small-btn btn btn-secondary paper-details-btn" data-id="${
               trade.id
             }">Details</button>
-            <button class="small-btn btn paper-delete-btn" data-id="${
+            <button class="small-btn btn btn-danger paper-delete-btn" data-id="${
               trade.id
             }">Delete</button>
           </td>

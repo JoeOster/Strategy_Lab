@@ -53,10 +53,10 @@ export function renderOpenTradesForSource(trades, containerId, error = null) {
           <td>${trade.quantity || ''}</td>
           <td>${formatCurrency(trade.price)}</td>
           <td>
-            <button class="btn table-action-btn real-sell-btn" data-id="${
+            <button class="btn table-action-btn btn-danger real-sell-btn" data-id="${
               trade.id
             }">Sell</button>
-            <button class="btn table-action-btn real-edit-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${
               trade.id
             }">Edit</button>
           </td>
@@ -126,10 +126,10 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
             trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : ''
           }</td>
           <td>
-            <button class="btn table-action-btn paper-details-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${
               trade.id
             }">Details</button>
-            <button class="btn table-action-btn paper-delete-btn" data-id="${
+            <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${
               trade.id
             }">Delete</button>
           </td>

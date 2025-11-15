@@ -96,7 +96,7 @@ export function renderStrategiesTable(strategies) {
         <td>${strategy.description || ''}</td>
         <td>${strategy.pdf_path || ''}</td>
         <td>
-          <button class="table-action-btn btn" data-strategy-id="${
+          <button class="table-action-btn btn btn-secondary" data-strategy-id="${
             strategy.id
           }">Add Idea</button>
         </td>
@@ -165,13 +165,13 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
             <button class="btn table-action-btn idea-buy-btn" data-id="${
               item.id
             }">Buy</button>
-            <button class="btn table-action-btn idea-paper-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary idea-paper-btn" data-id="${
               item.id
             }">Paper</button>
-            <button class="btn table-action-btn idea-edit-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary idea-edit-btn" data-id="${
               item.id
             }">Edit</button>
-            <button class="btn table-action-btn idea-delete-btn" data-id="${
+            <button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${
               item.id
             }">Delete</button>
           </td>
