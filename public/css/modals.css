@@ -1,4 +1,4 @@
-/* ... (existing modal styles) ... */
+/* public/css/modals.css */
 
 /* General Modal Styles */
 .modal {
@@ -10,24 +10,34 @@
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  /* This is a theme-agnostic backdrop, which is safe */
+  background-color: rgba(0, 0, 0, 0.4);
   justify-content: center; /* Center content horizontally */
   align-items: center; /* Center content vertically */
 }
 
 .modal-content {
-  background-color: var(--bg-color);
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
+  /* --- START: FIX --- */
+  /* Use the correct theme variables for a "card" */
+  background-color: var(--container-bg);
+  color: var(--text-color);
   border: 1px solid var(--container-border);
+  /* --- END: FIX --- */
+  margin: 5% auto; /* 5% from top, not 15% */
+  padding: 20px;
   width: 80%; /* Could be more or less, depending on screen size */
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow:
+    0 4px 8px 0 var(--shadow-color),
+    0 6px 20px 0 var(--shadow-color);
   border-radius: 8px;
   position: relative; /* For absolute positioning of close button */
 }
 
 .close-button {
-  color: #aaa;
+  /* --- START: FIX --- */
+  /* Use theme variable for muted text */
+  color: var(--text-muted-color);
+  /* --- END: FIX --- */
   float: right;
   font-size: 28px;
   font-weight: bold;
@@ -36,7 +46,10 @@
 
 .close-button:hover,
 .close-button:focus {
-  color: black;
+  /* --- START: FIX --- */
+  /* Use theme variable for primary heading/text */
+  color: var(--heading-color);
+  /* --- END: FIX --- */
   text-decoration: none;
   cursor: pointer;
 }

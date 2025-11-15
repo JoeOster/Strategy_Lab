@@ -1,10 +1,10 @@
 // public/js/app-main.js
 
 import { initializeNavigation } from './modules/navigation/index.js';
-import {
-  initializeSettingsModule,
-  loadAppearanceSettings,
-} from './modules/settings/index.js';
+// --- START: FIX ---
+// Import directly from the handler file to avoid breaking the app
+import { applyInitialAppearance } from './modules/settings/appearance.handlers.js';
+// --- END: FIX ---
 import { initializeUserSelector } from './modules/user-selector/index.js';
 import { loadHtmlPartial } from './utils/loadHtmlPartial.js';
 
@@ -12,14 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('Strategy Lab App Main script loaded.');
 
   // Dynamically load modal HTML partials first
-  // --- START: FIX ---
-  // This line was causing the initial duplication. It's been removed.
-  // await loadHtmlPartial('/_settings-page.html', 'app-container');
-  // --- END: FIX ---
-  // --- START: MODIFICATION ---
-  // Renamed _edit-source-modal.html to _source-form-modal.html
   await loadHtmlPartial('/_source-form-modal.html', 'app-container');
-  // --- END: MODIFICATION ---
   await loadHtmlPartial('/_source-detail-modal.html', 'app-container');
   await loadHtmlPartial('/_add-strategy-modal.html', 'app-container');
   await loadHtmlPartial('/_sell-trade-modal.html', 'app-container');
@@ -28,8 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadHtmlPartial('/_add-idea-modal.html', 'app-container');
 
   // Then initialize modules that depend on these elements being present
-  loadAppearanceSettings();
+  // --- START: FIX ---
+  // This will now run correctly, applying themes
+  applyInitialAppearance();
+  // This will now run correctly, fixing the broken tabs
   initializeNavigation();
-  initializeSettingsModule();
+  // --- END: FIX ---
   initializeUserSelector();
 });

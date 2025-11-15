@@ -3,7 +3,7 @@
 import {
   handleFontChange,
   handleThemeChange,
-  loadAppearanceSettings,
+  initializeAppearanceTab,
 } from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as handlers from './handlers.js';
@@ -20,12 +20,33 @@ import {
 import * as usersHandlers from './users.handlers.js'; // This import is now USED
 import { loadAccountHoldersList } from './users.handlers.js';
 
-export { loadAppearanceSettings };
-
-export function initializeSettingsModule() {
+export function initializeModule() {
   console.log('Settings module initialized.');
-  // handlers.loadGeneralSettings(); // This will now be called by handleMainTabClick
+
+  initializeAppearanceTab();
   loadAccountHoldersList();
+
+  // Stop the General Settings form from reloading the page
+  const generalForm = document.getElementById('general-settings-form');
+  if (generalForm) {
+    generalForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      console.log('General settings save clicked');
+      // TODO: Add logic to save general settings
+      alert('General settings saved (demo)');
+    });
+  }
+
+  // Stop the Appearance Settings form from reloading the page
+  const appearanceForm = document.getElementById('appearance-settings-form');
+  if (appearanceForm) {
+    appearanceForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      console.log('Appearance settings save clicked');
+      // Note: Themes/fonts are already saved *on change*
+      alert('Appearance settings saved!');
+    });
+  }
 
   // Main tab navigation
   for (const button of document.querySelectorAll('.settings-tab')) {
@@ -107,6 +128,16 @@ export function initializeSettingsModule() {
     });
   }
 
+  // --- START: FIX ---
+  // Listener for the "Add New Source" button
+  const addSourceBtn = document.getElementById('open-add-source-btn');
+  if (addSourceBtn) {
+    addSourceBtn.addEventListener('click', () => {
+      openSourceFormModal(null); // Open in "Add" mode
+    });
+  }
+  // --- END: FIX ---
+
   // Save settings button
   const saveSettingsButton = document.getElementById('save-settings-button');
   if (saveSettingsButton) {
@@ -118,7 +149,7 @@ export function initializeSettingsModule() {
 
   // Clear general settings button
   const clearGeneralSettingsBtn = document.getElementById(
-    'clear-general-settings-button'
+    'clear-general-settings-btn'
   );
   if (clearGeneralSettingsBtn) {
     clearGeneralSettingsBtn.addEventListener('click', () =>
