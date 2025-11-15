@@ -35,8 +35,7 @@ router.post('/ideas', async (req, res) => {
       idea.user_id || 1, // user_id (default to 1 for now)
       idea.source_id || null,
       idea.strategy_id || null,
-      idea.ticker,
-      idea.order_type || 'Buy Limit',
+      idea.ticker.toUpperCase(),
       idea.buy_price_high || null,
       idea.buy_price_low || null,
       idea.take_profit_high || null,
@@ -149,7 +148,7 @@ router.post('/:id/to-paper', async (req, res) => {
         notes = ?
       WHERE id = ?`,
       [
-        idea.ticker,
+        idea.ticker.toUpperCase(),
         idea.buy_price_low,
         idea.buy_price_high,
         idea.take_profit_low,
@@ -273,7 +272,7 @@ router.post('/:id/to-real', async (req, res) => {
         notes = ?
       WHERE id = ?`,
       [
-        idea.ticker,
+        idea.ticker.toUpperCase(),
         idea.buy_price_low,
         idea.buy_price_high,
         idea.take_profit_low,
