@@ -7,9 +7,17 @@ import {
 } from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as handlers from './handlers.js';
-import * as sourcesHandlers from './sources.handlers.js';
-import * as usersHandlers from './users.handlers.js';
-
+// Import all needed functions from sources.handlers.js
+import {
+  closeSourceFormModal,
+  handleClearSourceForm, // Import the new clear function
+  handleDeleteSourceClick, // Added missing import
+  handleSourceFormSubmit,
+  handleSourceTypeChange,
+  openSourceFormModal,
+  updateImagePreview,
+} from './sources.handlers.js';
+import * as usersHandlers from './users.handlers.js'; // This import is now USED
 import { loadAccountHoldersList } from './users.handlers.js';
 
 export { loadAppearanceSettings };
@@ -42,54 +50,89 @@ export function initializeSettingsModule() {
 
     // Delegated event listener for all change events within the modal
     settingsModal.addEventListener('change', (event) => {
-      const targetId = event.target.id;
-      switch (targetId) {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      switch (target.id) {
         case 'theme-selector':
           handleThemeChange(event);
           break;
         case 'font-selector':
           handleFontChange(event);
           break;
-        case 'new-source-type':
-          sourcesHandlers.handleSourceTypeChange(event, 'new');
+        // --- START: MODIFICATION ---
+        case 'source-form-type':
+          // Pass the value directly, not the event
+          handleSourceTypeChange(
+            /** @type {HTMLSelectElement} */ (target).value
+          );
           break;
-        case 'edit-source-type':
-          sourcesHandlers.handleSourceTypeChange(event, 'edit');
-          break;
+        // --- END: MODIFICATION ---
       }
     });
 
-    // Trigger once to set initial state for the new source form
-    const newSourceType = document.getElementById('new-source-type');
-    if (newSourceType) {
-      sourcesHandlers.handleSourceTypeChange({ target: newSourceType }, 'new');
+    // Add listener for the new "Add New Source" button
+    const addSourceBtn = document.getElementById('open-add-source-btn');
+    if (addSourceBtn) {
+      addSourceBtn.addEventListener('click', () => openSourceFormModal(null));
     }
   } else {
     console.error('Settings modal not found.');
   }
 
+  // Listeners for the new single modal
+  const sourceFormModal = document.getElementById('source-form-modal');
+  if (sourceFormModal) {
+    // Form submission
+    const sourceForm = document.getElementById('source-form-form');
+    if (sourceForm) {
+      sourceForm.addEventListener('submit', handleSourceFormSubmit);
+    }
+
+    // Close button
+    const closeButton = sourceFormModal.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', closeSourceFormModal);
+    }
+
+    // Clear button
+    const clearButton = document.getElementById('source-form-clear-btn');
+    if (clearButton) {
+      clearButton.addEventListener('click', handleClearSourceForm); // Use the new function
+    }
+
+    // Live image preview listener
+    sourceFormModal.addEventListener('input', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+
+      if (target.id === 'source-form-image-path') {
+        const typeSelect = /** @type {HTMLSelectElement | null} */ (
+          document.getElementById('source-form-type')
+        );
+        if (typeSelect) {
+          updateImagePreview(typeSelect.value, target.value);
+        }
+      }
+    });
+  }
+
   // Save settings button
-  document
-    .getElementById('save-settings-button')
-    .addEventListener('click', handlers.handleSaveAllSettings);
+  const saveSettingsButton = document.getElementById('save-settings-button');
+  if (saveSettingsButton) {
+    saveSettingsButton.addEventListener(
+      'click',
+      handlers.handleSaveAllSettings
+    );
+  }
 
   // Clear general settings button
   const clearGeneralSettingsBtn = document.getElementById(
     'clear-general-settings-button'
   );
   if (clearGeneralSettingsBtn) {
-    clearGeneralSettingsBtn.addEventListener(
-      'click',
-      handlers.handleClearGeneralAndAppearanceForms
-    );
-  }
-
-  // Add new source form submission
-  const addNewSourceForm = document.getElementById('add-new-source-form');
-  if (addNewSourceForm) {
-    addNewSourceForm.addEventListener(
-      'submit',
-      sourcesHandlers.handleAddNewSourceSubmit
+    clearGeneralSettingsBtn.addEventListener('click', () =>
+      handlers.handleClearGeneralAndAppearanceForms()
     );
   }
 
@@ -102,68 +145,29 @@ export function initializeSettingsModule() {
     );
   }
 
-  // Clear new source form button
-  const clearNewSourceBtn = document.getElementById('clear-new-source-btn');
-  if (clearNewSourceBtn) {
-    clearNewSourceBtn.addEventListener(
-      'click',
-      handlers.handleClearNewSourceForm
-    );
-  }
-
   // Clear exchange form button
   const clearExchangeBtn = document.getElementById('clear-exchange-btn');
   if (clearExchangeBtn) {
-    clearExchangeBtn.addEventListener(
-      'click',
-      handlers.handleClearExchangeForm
+    clearExchangeBtn.addEventListener('click', () =>
+      handlers.handleClearExchangeForm()
     );
   }
 
   // Clear holder form button
   const clearHolderBtn = document.getElementById('clear-holder-btn');
   if (clearHolderBtn) {
-    clearHolderBtn.addEventListener('click', handlers.handleClearHolderForm);
+    // @ts-ignore
+    clearHolderBtn.addEventListener('click', () =>
+      usersHandlers.handleClearHolderForm()
+    );
   }
 
   // Clear web app form button
   const clearWebAppBtn = document.getElementById('clear-webapp-btn');
   if (clearWebAppBtn) {
-    clearWebAppBtn.addEventListener('click', handlers.handleClearWebAppForm);
-  }
-
-  // Clear edit source form button
-  const clearEditSourceBtn = document.getElementById(
-    'clear-edit-source-button'
-  );
-  if (clearEditSourceBtn) {
-    clearEditSourceBtn.addEventListener(
-      'click',
-      handlers.handleClearEditSourceForm
+    clearWebAppBtn.addEventListener('click', () =>
+      handlers.handleClearWebAppForm()
     );
-  }
-
-  // Edit source form submission
-  const editSourceForm = document.getElementById('edit-source-form');
-  if (editSourceForm) {
-    editSourceForm.addEventListener(
-      'submit',
-      sourcesHandlers.handleEditSourceSubmit
-    );
-  }
-
-  // Close button for edit-source-modal
-  const editSourceModal = document.getElementById('edit-source-modal');
-  if (editSourceModal) {
-    const closeButton = editSourceModal.querySelector('.close-button');
-    if (closeButton) {
-      closeButton.addEventListener(
-        'click',
-        sourcesHandlers.closeEditSourceModal
-      );
-    } else {
-      console.error('Close button not found within edit source modal.');
-    }
   }
 
   // Close button for source-detail-modal
@@ -172,6 +176,7 @@ export function initializeSettingsModule() {
     const closeButton = sourceDetailModal.querySelector('.close-button');
     if (closeButton) {
       closeButton.addEventListener('click', () => {
+        // @ts-ignore
         sourceDetailModal.style.display = 'none';
       });
     } else {
@@ -179,13 +184,20 @@ export function initializeSettingsModule() {
     }
   }
 
-  // Event delegation for deleting sources
+  // Event delegation for deleting/editing sources
   const sourcesContainer = document.getElementById('advice-source-list');
   if (sourcesContainer) {
     sourcesContainer.addEventListener('click', (event) => {
-      if (event.target.classList.contains('delete-source-btn')) {
-        const sourceId = event.target.dataset.id;
-        sourcesHandlers.handleDeleteSourceClick(sourceId);
+      if (!(event.target instanceof HTMLElement)) return;
+      const target = event.target;
+      // @ts-ignore
+      const sourceId = target.dataset.id;
+
+      if (target.classList.contains('delete-source-btn') && sourceId) {
+        handleDeleteSourceClick(sourceId);
+      }
+      if (target.classList.contains('edit-source-btn') && sourceId) {
+        openSourceFormModal(sourceId);
       }
     });
   }
@@ -199,18 +211,25 @@ export function initializeSettingsModule() {
     );
   }
 
-  // Event delegation for deleting holders
+  // Event delegation for user-list actions
   const accountHolderList = document.getElementById('account-holder-list');
   if (accountHolderList) {
     accountHolderList.addEventListener('click', (event) => {
-      if (event.target.classList.contains('delete-holder-btn')) {
-        const holderId = event.target.dataset.id;
+      if (!(event.target instanceof HTMLElement)) return;
+      const target = event.target;
+      // @ts-ignore
+      const holderId = target.dataset.id;
+
+      if (!holderId) return;
+
+      if (target.classList.contains('delete-holder-btn')) {
+        // @ts-ignore
         usersHandlers.handleDeleteHolderClick(holderId);
-      } else if (event.target.classList.contains('set-default-holder-btn')) {
-        const holderId = event.target.dataset.id;
+      } else if (target.classList.contains('set-default-holder-btn')) {
+        // @ts-ignore
         usersHandlers.handleSetDefaultHolderClick(event, holderId);
-      } else if (event.target.classList.contains('manage-subscriptions-btn')) {
-        const holderId = event.target.dataset.id;
+      } else if (target.classList.contains('manage-subscriptions-btn')) {
+        // @ts-ignore
         usersHandlers.handleManageSubscriptionsClick(event, holderId);
       }
     });
@@ -220,9 +239,14 @@ export function initializeSettingsModule() {
   const exchangesContainer = document.getElementById('exchange-list');
   if (exchangesContainer) {
     exchangesContainer.addEventListener('click', (event) => {
-      if (event.target.classList.contains('delete-exchange-btn')) {
-        const exchangeId = event.target.dataset.id;
-        exchangesHandlers.handleDeleteExchangeClick(exchangeId);
+      if (!(event.target instanceof HTMLElement)) return;
+      const target = event.target;
+      if (target.classList.contains('delete-exchange-btn')) {
+        // @ts-ignore
+        const exchangeId = target.dataset.id;
+        if (exchangeId) {
+          exchangesHandlers.handleDeleteExchangeClick(exchangeId);
+        }
       }
     });
   }

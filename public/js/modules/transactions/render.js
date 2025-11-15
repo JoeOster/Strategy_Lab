@@ -1,6 +1,9 @@
 // public/js/modules/transactions/render.js
 
 /** @typedef {import('../../types.js').Transaction} Transaction */
+// --- START: NEW IMPORT ---
+/** @typedef {import('../../types.js').PaperTradeSummary} PaperTradeSummary */
+// --- END: NEW IMPORT ---
 
 import { formatCurrency } from '../../utils/formatters.js';
 
@@ -71,7 +74,7 @@ export function renderOpenTradesForSource(trades, containerId, error = null) {
 
 /**
  * Renders the table of "Paper Trades" for a source.
- * @param {Transaction[] | null} trades - An array of Transaction objects.
+ * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
  * @param {string} containerId - The ID of the element to render into.
  * @param {Error | null} [error] - An optional error object.
  */
@@ -122,9 +125,7 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
           <td>${trade.exit_date ? trade.exit_date.split('T')[0] : ''}</td>
           <td>${trade.exit_price ? formatCurrency(trade.exit_price) : ''}</td>
           <td>${trade.pnl ? formatCurrency(trade.pnl) : ''}</td>
-          <td>${
-            trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : ''
-          }</td>
+          <td>${trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : ''}</td>
           <td>
             <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${
               trade.id

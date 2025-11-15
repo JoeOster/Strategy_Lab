@@ -1,0 +1,122 @@
+<div id="source-form-modal" class="modal" style="display: none">
+  <div class="modal-content">
+    <div class="source-detail-header">
+      <h3 id="source-form-title" class="source-detail-title">Source Form</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <form id="source-form-form">
+      <input type="hidden" id="source-form-id" name="id" />
+
+      <label for="source-form-type">Type:</label>
+      <select id="source-form-type" name="type">
+        <option value="" selected disabled>Select a type...</option>
+        <option value="person">Person</option>
+        <option value="group">Group</option>
+        <option value="book">Book</option>
+        <option value="website">Website</option>
+      </select>
+
+      <div id="source-form-fields-container" style="display: none">
+        <div id="source-form-name-wrapper">
+          <label for="source-form-name">Name:</label>
+          <input type="text" id="source-form-name" name="name" required />
+        </div>
+        <div id="source-form-url-wrapper" style="display: none">
+          <label for="source-form-url">URL:</label>
+          <input type="url" id="source-form-url" name="url" />
+        </div>
+        <div id="source-form-description-wrapper">
+          <label for="source-form-description">Description:</label>
+          <textarea id="source-form-description" name="description"></textarea>
+        </div>
+
+        <div id="source-form-image-path-wrapper" style="display: none">
+          <img
+            id="source-form-image-preview"
+            class="source-form-image-preview"
+            alt="Image Preview"
+            style="display: none"
+          />
+          <label for="source-form-image-path">Image Filename:</label>
+          <input type="text" id="source-form-image-path" name="image_path" />
+        </div>
+        <div
+          id="source-form-panel-person"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Person Details</h5>
+          <label for="source-form-person-email">Email:</label>
+          <input
+            type="email"
+            id="source-form-person-email"
+            name="person_email"
+          />
+          <label for="source-form-person-phone">Phone:</label>
+          <input type="tel" id="source-form-person-phone" name="person_phone" />
+          <label for="source-form-person-app-type">Contact App:</label>
+          <select id="source-form-person-app-type" name="person_app_type">
+            <option value="">Select app...</option>
+          </select>
+          <label for="source-form-person-app-handle">App Handle:</label>
+          <input
+            type="text"
+            id="source-form-person-app-handle"
+            name="person_app_handle"
+          />
+        </div>
+
+        <div
+          id="source-form-panel-group"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Group Details</h5>
+          <label for="source-form-group-person">Primary Contact:</label>
+          <input
+            type="text"
+            id="source-form-group-person"
+            name="group_primary_contact"
+          />
+          <label for="source-form-group-email">Contact Email:</label>
+          <input type="email" id="source-form-group-email" name="group_email" />
+          <label for="source-form-group-phone">Group Phone:</label>
+          <input type="tel" id="source-form-group-phone" name="group_phone" />
+          <label for="source-form-group-app-type">Group App:</label>
+          <select id="source-form-group-app-type" name="group_app_type">
+            <option value="">Select app...</option>
+          </select>
+          <label for="source-form-group-app-handle">Group App Handle:</label>
+          <input
+            type="text"
+            id="source-form-group-app-handle"
+            name="group_app_handle"
+          />
+        </div>
+
+        <div
+          id="source-form-panel-book"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Book Details</h5>
+        </div>
+
+        <div
+          id="source-form-panel-website"
+          class="source-type-panel"
+          style="display: none"
+        >
+          <h5>Website Details</h5>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="source-form-submit-btn">Save</button>
+          <button type="button" id="source-form-clear-btn" class="clear-btn">
+            Clear
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

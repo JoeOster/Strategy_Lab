@@ -1,3 +1,5 @@
+// public/js/app-main.js
+
 import { initializeNavigation } from './modules/navigation/index.js';
 import {
   initializeSettingsModule,
@@ -11,17 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Dynamically load modal HTML partials first
   await loadHtmlPartial('/_settings-modal.html', 'app-container');
-  await loadHtmlPartial('/_edit-source-modal.html', 'app-container');
+  // --- START: MODIFICATION ---
+  // Renamed _edit-source-modal.html to _source-form-modal.html
+  await loadHtmlPartial('/_source-form-modal.html', 'app-container');
+  // --- END: MODIFICATION ---
   await loadHtmlPartial('/_source-detail-modal.html', 'app-container');
   await loadHtmlPartial('/_add-strategy-modal.html', 'app-container');
   await loadHtmlPartial('/_sell-trade-modal.html', 'app-container');
   await loadHtmlPartial('/_edit-trade-modal.html', 'app-container');
   await loadHtmlPartial('/_paper-trade-details-modal.html', 'app-container');
-
-  // --- THIS LINE IS THE LIKELY FIX ---
-  await loadHtmlPartial('/_add-idea-modal.html', 'app-container');
-
-  // --- THIS LINE IS THE LIKELY FIX ---
   await loadHtmlPartial('/_add-idea-modal.html', 'app-container');
 
   // Then initialize modules that depend on these elements being present

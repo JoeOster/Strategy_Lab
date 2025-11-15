@@ -48,3 +48,17 @@
   /* Added .sub-tab-content.active */
   display: block; /* Show active panel */
 }
+
+/* --- START: NEW PREVIEW STYLE --- */
+.source-form-image-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Makes it a circle */
+  object-fit: cover; /* Prevents stretching */
+  border: 2px solid var(--container-border);
+  margin-bottom: 15px;
+  display: none; /* Hidden by default, JS will show it */
+  margin-left: auto;
+  margin-right: auto;
+}
+/* --- END: NEW PREVIEW STYLE --- */

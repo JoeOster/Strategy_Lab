@@ -57,9 +57,7 @@
 }
 
 .table-action-btn:hover {
-  background-color: var(
-    --primary-hover
-  ); /* Example: using primary hover color */
+  background-color: var(--primary-hover); /* Example: using primary hover color */
 }
 
 .small-btn {

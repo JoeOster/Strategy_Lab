@@ -169,9 +169,9 @@ router.post('/:id/to-paper', async (req, res) => {
     }
     const entryPrice = await getPriceV2(updatedIdea.ticker);
     if (!entryPrice) {
-      return res
-        .status(400)
-        .json({ error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.` });
+      return res.status(400).json({
+        error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.`,
+      });
     }
     const now = new Date().toISOString();
     const result = await db.run(
@@ -193,10 +193,10 @@ router.post('/:id/to-paper', async (req, res) => {
         now,
       ]
     );
-    await db.run(
-      'UPDATE watched_items SET status = ? WHERE id = ?',
-      ['EXECUTED', id]
-    );
+    await db.run('UPDATE watched_items SET status = ? WHERE id = ?', [
+      'EXECUTED',
+      id,
+    ]);
     res.status(201).json({
       message: 'Paper trade created',
       newTransactionId: result.lastID,
@@ -293,9 +293,9 @@ router.post('/:id/to-real', async (req, res) => {
     }
     const entryPrice = await getPriceV2(updatedIdea.ticker);
     if (!entryPrice) {
-      return res
-        .status(400)
-        .json({ error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.` });
+      return res.status(400).json({
+        error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.`,
+      });
     }
     const now = new Date().toISOString();
     const result = await db.run(
@@ -317,10 +317,10 @@ router.post('/:id/to-real', async (req, res) => {
         now,
       ]
     );
-    await db.run(
-      'UPDATE watched_items SET status = ? WHERE id = ?',
-      ['EXECUTED', id]
-    );
+    await db.run('UPDATE watched_items SET status = ? WHERE id = ?', [
+      'EXECUTED',
+      id,
+    ]);
     res.status(201).json({
       message: 'Real trade created',
       newTransactionId: result.lastID,

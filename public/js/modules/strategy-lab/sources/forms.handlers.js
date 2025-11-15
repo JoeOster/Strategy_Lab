@@ -5,21 +5,17 @@
 
 import {
   addIdea,
-  updateIdea,
   moveIdeaToPaper,
   moveIdeaToRealTrade,
+  updateIdea,
 } from '../watched-list/api.js';
-import { loadWatchedListContent } from '../watched-list/handlers.js';
+// Import the content loaders for each sub-tab
 import { addStrategy } from './api.js';
-// --- START: FIX ---
-// Import the modal's refresh functions instead of redefining them
 import {
-  closeSourceDetailModal,
   loadOpenIdeasForSource,
   loadPaperTradesForSource,
   loadStrategiesForSource,
 } from './modal.handlers.js';
-// --- END: FIX ---
 
 // --- START: "Log New Strategy" Modal Functions ---
 
@@ -90,6 +86,7 @@ export function handleCancelStrategyForm() {
     document
       .getElementById('log-strategy-form')
       ?.removeEventListener('submit', handleLogStrategySubmit);
+    // @ts-ignore
     window.onclick = null; // Be careful if other modals use this
   }
 }
@@ -132,7 +129,11 @@ async function handleLogStrategySubmit(event) {
 
 /**
  * Shows the "Log New Idea" form modal.
- * @param {Event} event - The click event.
+ * @param {Event | null} event - The click event (can be null).
+ * @param {string | null} sourceId - The source ID.
+ * @param {string | null} strategyId - The strategy ID (optional).
+ * @param {boolean} [isPaperTrade=false] - Is this to create a paper trade?
+ * @param {boolean} [isRealTrade=false] - Is this to create a real trade?
  */
 export function handleShowIdeaForm(
   event,
@@ -144,9 +145,9 @@ export function handleShowIdeaForm(
   const addIdeaModal = document.getElementById('add-idea-modal');
   const ideaSourceIdInput = document.getElementById('idea-source-id');
   const ideaStrategyIdInput = document.getElementById('idea-strategy-id');
-  const modalTitle = addIdeaModal.querySelector('.modal-title');
+  const modalTitle = addIdeaModal?.querySelector('.modal-title');
   const quantityContainer = document.getElementById('quantity-container');
-  const saveButton = addIdeaModal.querySelector('button[type="submit"]');
+  const saveButton = addIdeaModal?.querySelector('button[type="submit"]');
 
   if (
     addIdeaModal &&
@@ -174,33 +175,45 @@ export function handleShowIdeaForm(
       // @ts-ignore
       ideaSourceIdInput.value = sourceId;
     }
-    if (event && event.target) {
+    // --- START: LINT FIX ---
+    if (event?.target) {
+      // @ts-ignore
       const buttonSourceId = event.target.dataset.sourceId;
       if (buttonSourceId) {
         // @ts-ignore
         ideaSourceIdInput.value = buttonSourceId;
       }
     }
+    // --- END: LINT FIX ---
     if (strategyId) {
       // @ts-ignore
       ideaStrategyIdInput.value = strategyId;
     }
-    if (isPaperTrade) {
-      const paperTradeInput = document.createElement('input');
-      paperTradeInput.type = 'hidden';
-      paperTradeInput.name = 'is_paper_trade';
-      paperTradeInput.value = 'true';
-      const form = document.getElementById('log-idea-form');
-      form.appendChild(paperTradeInput);
+
+    const form = document.getElementById('log-idea-form');
+    if (form) {
+      // Clear any previous hidden inputs
+      const oldPaperInput = form.querySelector('input[name="is_paper_trade"]');
+      if (oldPaperInput) oldPaperInput.remove();
+      const oldRealInput = form.querySelector('input[name="is_real_trade"]');
+      if (oldRealInput) oldRealInput.remove();
+
+      if (isPaperTrade) {
+        const paperTradeInput = document.createElement('input');
+        paperTradeInput.type = 'hidden';
+        paperTradeInput.name = 'is_paper_trade';
+        paperTradeInput.value = 'true';
+        form.appendChild(paperTradeInput);
+      }
+      if (isRealTrade) {
+        const realTradeInput = document.createElement('input');
+        realTradeInput.type = 'hidden';
+        realTradeInput.name = 'is_real_trade';
+        realTradeInput.value = 'true';
+        form.appendChild(realTradeInput);
+      }
     }
-    if (isRealTrade) {
-      const realTradeInput = document.createElement('input');
-      realTradeInput.type = 'hidden';
-      realTradeInput.name = 'is_real_trade';
-      realTradeInput.value = 'true';
-      const form = document.getElementById('log-idea-form');
-      form.appendChild(realTradeInput);
-    }
+
     // @ts-ignore
     addIdeaModal.style.display = 'block';
 
@@ -251,6 +264,7 @@ export function handleCancelIdeaForm() {
     document
       .getElementById('log-idea-form')
       ?.removeEventListener('submit', handleLogIdeaSubmit);
+    // @ts-ignore
     window.onclick = null; // Be careful if other modals use this
   }
 }
@@ -276,24 +290,35 @@ async function handleLogIdeaSubmit(event) {
   }
 
   try {
+    // @ts-ignore
     if (ideaData.is_paper_trade) {
+      // @ts-ignore
       await moveIdeaToPaper(ideaData.id, ideaData);
       alert('Idea moved to Paper Trades.');
       if (ideaData.source_id) {
+        // @ts-ignore
         loadPaperTradesForSource(ideaData.source_id);
       }
+      // @ts-ignore
     } else if (ideaData.is_real_trade) {
+      // @ts-ignore
       await moveIdeaToRealTrade(ideaData.id, ideaData);
       alert('Idea moved to Real Trades.');
       if (ideaData.source_id) {
+        // @ts-ignore
         loadOpenIdeasForSource(ideaData.source_id);
+        // @ts-ignore
         loadPaperTradesForSource(ideaData.source_id);
+        // @ts-ignore
         loadStrategiesForSource(ideaData.source_id);
       }
+      // @ts-ignore
     } else if (ideaData.id) {
+      // @ts-ignore
       await updateIdea(ideaData.id, ideaData);
       alert('Idea updated successfully!');
     } else {
+      // @ts-ignore
       await addIdea(ideaData);
       alert('Idea saved successfully!');
     }
@@ -301,15 +326,13 @@ async function handleLogIdeaSubmit(event) {
 
     // Also refresh the "Open Ideas" table in the modal if it's open
     if (ideaData.source_id) {
+      // @ts-ignore
       loadOpenIdeasForSource(ideaData.source_id);
     }
   } catch (error) {
     console.error('Failed to save idea:', error);
+    // @ts-ignore
     alert(`Error: ${error.message}`);
   }
 }
 // --- END: "Log New Idea" Modal Functions ---
-
-// --- START: FIX ---
-// REMOVED the duplicate functions loadStrategiesForSource and loadOpenIdeasForSource
-// --- END: FIX ---

@@ -1,5 +1,12 @@
 // public/js/modules/settings/strategies.render.js
 
+/** @typedef {import('../../types.js').Strategy} Strategy */
+
+/**
+ * Renders the strategies table in the settings modal.
+ * @param {Strategy[]} strategies - An array of strategy objects.
+ * @param {string} containerId - The ID of the element to render into.
+ */
 export function renderStrategiesTable(strategies, containerId) {
   const container = document.getElementById(containerId);
   if (!container) {

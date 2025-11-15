@@ -18,6 +18,10 @@
  * @property {string | null} [person_app_type]
  * @property {string | null} [person_app_handle]
  * @property {string | null} [group_primary_contact]
+ * @property {string | null} [group_email]
+ * @property {string | null} [group_phone]
+ * @property {string | null} [group_app_type]
+ * @property {string | null} [group_app_handle]
  * @property {string | null} [book_author]
  * @property {string | null} [book_isbn]
  * @property {string | null} [book_websites]
@@ -90,6 +94,23 @@
  * @property {number} profit
  * @property {string} date
  */
+
+// --- START: NEW TYPE ---
+/**
+ * Represents a calculated Paper Trade summary, as returned by the
+ * /api/sources/:sourceId/paper-trades endpoint.
+ * @typedef {object} PaperTradeSummary
+ * @property {number} id - The ID of the original 'BUY' transaction.
+ * @property {string} ticker
+ * @property {string} entry_date
+ * @property {number} entry_price
+ * @property {number} quantity
+ * @property {string | null} [exit_date]
+ * @property {number | null} [exit_price]
+ * @property {number | null} [pnl]
+ * @property {number | null} [return_pct]
+ */
+// --- END: NEW TYPE ---
 
 // This export is necessary to make this file a module that can be imported
 // by JSDoc/TypeScript.

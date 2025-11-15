@@ -43,7 +43,9 @@ async function apiFetch(url, options = {}) {
       } else {
         errorData.message = await response.text();
       }
-      throw new Error(errorData.error || errorData.message || 'An unknown error occurred');
+      throw new Error(
+        errorData.error || errorData.message || 'An unknown error occurred'
+      );
     }
 
     // Handle cases where response might be 204 No Content

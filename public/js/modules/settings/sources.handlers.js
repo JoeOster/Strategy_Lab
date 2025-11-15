@@ -6,214 +6,177 @@ import {
   getSources,
   updateSource,
 } from './sources.api.js';
-import { loadStrategiesForSource } from './strategies.handlers.js';
+import { getWebApps } from './webapps.api.js';
 
-export function handleAddNewSourceSubmit(event) {
-  event.preventDefault();
-  console.log('Handler: handleAddNewSourceSubmit called');
+/**
+ * Updates the image preview in the add/edit source forms.
+ * @param {string} type - The source type (e.g., 'person', 'book').
+ * @param {string | null} filename - The filename from the input field.
+ */
+export function updateImagePreview(type, filename) {
+  const previewImg = /** @type {HTMLImageElement | null} */ (
+    document.getElementById('source-form-image-preview')
+  );
+  if (!previewImg) return;
 
-  const form = event.target;
-  const formData = new FormData(form);
-  const newSource = Object.fromEntries(formData.entries());
+  let folderPath = 'images/';
+  switch (type) {
+    case 'person':
+      folderPath = 'images/contacts/';
+      break;
+    case 'group':
+      folderPath = 'images/group/';
+      break;
+    case 'book':
+      folderPath = 'images/books/';
+      break;
+    case 'website':
+      folderPath = 'images/url/';
+      break;
+    default:
+      // If no type, hide the image
+      previewImg.style.display = 'none';
+      return;
+  }
 
-  addSource(newSource)
-    .then((addedSource) => {
-      console.log('Source added:', addedSource);
-      form.reset();
-      handleSourceTypeChange({ target: { value: '' } }, 'new'); // Hide dynamic fields
-      loadSourcesList(); // Refresh the list
-    })
-    .catch((error) => console.error('Error adding source:', error));
+  // Use 'default.png' if filename is empty or null
+  const file = filename || 'default.png';
+  previewImg.src = folderPath + file;
+  previewImg.style.display = 'block'; // Show the image
+
+  // Set fallback image for broken links or typos
+  const genericPlaceholder = 'images/default-placeholder.svg';
+  // @ts-ignore
+  previewImg.onerror = () => {
+    previewImg.onerror = null; // prevent infinite loops
+    // @ts-ignore
+    previewImg.src = genericPlaceholder;
+  };
 }
 
-export function handleSourceTypeChange(event, formType, sourceData = {}) {
-  const selectedType = event.target.value;
-  const formPrefix = formType === 'new' ? 'new-source' : 'edit-source';
-  console.log('handleSourceTypeChange called with:', {
-    selectedType,
-    formPrefix,
-  });
+/**
+ * Fetches web apps and populates the app type dropdowns.
+ * @param {string | null} [personAppType] - The value to pre-select for person.
+ * @param {string | null} [groupAppType] - The value to pre-select for group.
+ */
+async function populateWebAppDropdowns(
+  personAppType = null,
+  groupAppType = null
+) {
+  const personSelect = /** @type {HTMLSelectElement | null} */ (
+    document.getElementById('source-form-person-app-type')
+  );
+  const groupSelect = /** @type {HTMLSelectElement | null} */ (
+    document.getElementById('source-form-group-app-type')
+  );
 
+  if (!personSelect || !groupSelect) return;
+
+  // Clear existing options (except the first "Select..." option)
+  personSelect.length = 1;
+  groupSelect.length = 1;
+
+  try {
+    const webApps = await getWebApps();
+    for (const app of webApps) {
+      personSelect.add(new Option(app.name, app.name));
+      groupSelect.add(new Option(app.name, app.name));
+    }
+
+    // Pre-select values if provided (for edit mode)
+    if (personAppType) personSelect.value = personAppType;
+    if (groupAppType) groupSelect.value = groupAppType;
+  } catch (error) {
+    console.error('Failed to load web apps for dropdowns:', error);
+  }
+}
+
+/**
+ * Handles changes to the source type dropdown.
+ * @param {string} selectedType - The new type, e.g., 'person', 'book'.
+ * @param {Partial<import('../../types.js').Source>} [sourceData={}] - Optional source data for pre-filling.
+ */
+export function handleSourceTypeChange(selectedType, sourceData = {}) {
   // Hide all dynamic panels first
   const panels = document.querySelectorAll(
-    `#${formPrefix}-fields-container .source-type-panel`
+    '#source-form-fields-container .source-type-panel'
   );
-  console.log('Found panels:', panels);
   for (const panel of panels) {
+    // @ts-ignore
     panel.style.display = 'none';
   }
 
   // Show the selected panel
   const selectedPanel = document.getElementById(
-    `${formPrefix}-panel-${selectedType}`
+    `source-form-panel-${selectedType}`
   );
-  console.log('Selected panel:', selectedPanel);
-      if (selectedPanel) {
-        selectedPanel.style.display = 'block';
-      }
-  
-      // Pre-fill image_path for new 'person' sources if empty
-      if (formType === 'new' && selectedType === 'person') {
-        const imagePathInput = document.getElementById('new-source-image-path');
-        // @ts-ignore
-        if (imagePathInput && !imagePathInput.value) {
-          // @ts-ignore
-          imagePathInput.value = 'images/contacts/default.png';
-        }
-      }
+  if (selectedPanel) {
+    // @ts-ignore
+    selectedPanel.style.display = 'block';
+  }
+
   // Show/hide the fields container
   const fieldsContainer = document.getElementById(
-    `${formPrefix}-fields-container`
+    'source-form-fields-container'
   );
   if (fieldsContainer) {
+    // @ts-ignore
     fieldsContainer.style.display = selectedType ? 'block' : 'none';
   }
 
+  // --- START: Image Preview Logic ---
+  const imgPathWrapper = document.getElementById(
+    'source-form-image-path-wrapper'
+  );
+  if (imgPathWrapper) {
+    if (selectedType) {
+      imgPathWrapper.style.display = 'block';
+      // @ts-ignore
+      updateImagePreview(selectedType, sourceData.image_path || 'default.png');
+    } else {
+      imgPathWrapper.style.display = 'none';
+      updateImagePreview(selectedType, null); // Will hide the image
+    }
+  }
+  // --- END: Image Preview Logic ---
+
   // Handle label changes and URL field visibility
-  const nameLabel = document.querySelector(`label[for="${formPrefix}-name"]`);
-  const urlWrapper = document.getElementById(`${formPrefix}-url-wrapper`);
-  const urlLabel = document.querySelector(`label[for="${formPrefix}-url"]`);
+  const nameLabel = document.querySelector('label[for="source-form-name"]');
+  const urlWrapper = document.getElementById('source-form-url-wrapper');
+  const urlLabel = document.querySelector('label[for="source-form-url"]');
+
+  if (!nameLabel || !urlWrapper || !urlLabel) return;
 
   if (selectedType === 'book') {
-    if (nameLabel) nameLabel.textContent = 'Title:';
-    if (urlWrapper) urlWrapper.style.display = 'block';
-    if (urlLabel) urlLabel.textContent = 'Book URL:';
-
-    const bookFields = [
-      'book_author',
-      'book_isbn',
-      'book_websites',
-      'book_pdfs',
-    ];
-    for (const field of bookFields) {
-      const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
-      if (wrapper) {
-        wrapper.style.display =
-          sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
-      }
-    }
-
-    // Load strategies for book type
-    if (formType === 'edit') {
-      const sourceId = document.getElementById('edit-source-id').value;
-      if (sourceId) {
-        loadStrategiesForSource(sourceId, 'edit-source-book-strategies-table');
-      }
-    } else if (formType === 'new') {
-      const newSourceStrategiesContainer = document.getElementById(
-        'new-source-book-strategies-table'
-      );
-      if (newSourceStrategiesContainer) {
-        newSourceStrategiesContainer.innerHTML =
-          '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
-      }
-    }
+    nameLabel.textContent = 'Title:';
+    urlWrapper.style.display = 'block';
+    urlLabel.textContent = 'Book URL:';
   } else if (selectedType === 'website') {
-    if (nameLabel) nameLabel.textContent = 'Website Name:';
-    if (urlWrapper) urlWrapper.style.display = 'block';
-    if (urlLabel) urlLabel.textContent = 'Website URL:';
-
-    const websiteFields = ['website_websites', 'website_pdfs'];
-    for (const field of websiteFields) {
-      const wrapper = document.getElementById(`${formPrefix}-${field}-wrapper`);
-      if (wrapper) {
-        wrapper.style.display =
-          sourceData[field] && sourceData[field].length > 0 ? 'block' : 'none';
-      }
-    }
-
-    // Load strategies for website type
-    if (formType === 'edit') {
-      const sourceId = document.getElementById('edit-source-id').value;
-      if (sourceId) {
-        loadStrategiesForSource(
-          sourceId,
-          'edit-source-website-strategies-table'
-        );
-      }
-    } else if (formType === 'new') {
-      const newSourceStrategiesContainer = document.getElementById(
-        'new-source-website-strategies-table'
-      );
-      if (newSourceStrategiesContainer) {
-        newSourceStrategiesContainer.innerHTML =
-          '<h5>Strategies</h5><p>Strategies will appear here after the source is created.</p>';
-      }
-    }
+    nameLabel.textContent = 'Website Name:';
+    urlWrapper.style.display = 'block';
+    urlLabel.textContent = 'Website URL:';
   } else {
-    if (nameLabel) nameLabel.textContent = 'Name:';
-    if (selectedType === 'person' || selectedType === 'group') {
-      if (urlWrapper) urlWrapper.style.display = 'none';
-    } else {
-      if (urlWrapper) urlWrapper.style.display = 'block';
-      if (urlLabel) urlLabel.textContent = 'URL:';
-    }
-  }
-}
-
-export async function handleSourceItemClick(sourceId) {
-  console.log('Handler: handleSourceItemClick called', sourceId);
-  const sourceDetailModal = document.getElementById('source-detail-modal');
-  if (!sourceDetailModal) {
-    console.error('Source detail modal not found.');
-    return;
-  }
-
-  try {
-    const source = await getSource(sourceId);
-    if (!source) {
-      console.error('Source not found for ID:', sourceId);
-      return;
-    }
-
-    // Populate source profile container
-    const sourceProfileContainer = document.getElementById(
-      'source-profile-container'
-    );
-    if (sourceProfileContainer) {
-      sourceProfileContainer.innerHTML = `
-        <h3>${source.name} (${source.type})</h3>
-        <p>Description: ${source.description || 'N/A'}</p>
-        <p>URL: <a href="${source.url}" target="_blank">${source.url || 'N/A'}</a></p>
-        ${source.image_path ? `<img src="${source.image_path}" alt="${source.name}" style="max-width: 100px;">` : ''}
-      `;
-    }
-
-    // Populate source feature button container (Add Strategy/Idea, Edit Strategy)
-    const sourceFeatureBtnContainer = document.getElementById(
-      'source-feature-btn-container'
-    );
-    if (sourceFeatureBtnContainer) {
-      sourceFeatureBtnContainer.innerHTML = `
-        <button id="add-strategy-btn" class="btn" data-source-id="${source.id}">Add Strategy</button>
-        <button id="edit-strategy-btn" class="btn" data-source-id="${source.id}">Edit Strategy</button>
-        <button id="add-idea-btn" class="btn" data-source-id="${source.id}">Add Idea</button>
-      `;
-    }
-
-    // Load strategies for book/website types
-    if (source.type === 'book') {
-      loadStrategiesForSource(source.id, 'source-detail-strategies-table');
-    } else if (source.type === 'website') {
-      loadStrategiesForSource(source.id, 'source-detail-strategies-table');
-    }
-
-    sourceDetailModal.style.display = 'block'; // Show the modal
-  } catch (error) {
-    console.error('Error fetching source for detail view:', error);
+    nameLabel.textContent = 'Name:';
+    urlWrapper.style.display =
+      selectedType === 'person' || selectedType === 'group' ? 'none' : 'block';
+    urlLabel.textContent = 'URL:';
   }
 }
 
 export async function loadSourcesList() {
-  console.log('Handler: loadSourcesList called (placeholder)');
+  console.log('Handler: loadSourcesList called');
   const sources = await getSources();
   const sourcesContainer = document.getElementById('advice-source-list');
   if (sourcesContainer) {
     sourcesContainer.innerHTML = ''; // Clear existing list
+    if (sources.length === 0) {
+      sourcesContainer.innerHTML = '<p>No advice sources found.</p>';
+      return;
+    }
     for (const source of sources) {
       const sourceElement = document.createElement('div');
-      sourceElement.className = 'advice-source-item'; // Add a class for consistent styling of list items
-      sourceElement.dataset.id = source.id; // Store source ID on the element
+      sourceElement.className = 'advice-source-item';
+      sourceElement.dataset.id = String(source.id); // Ensure ID is string
 
       const infoSpan = document.createElement('span');
       infoSpan.classList.add('source-info');
@@ -223,198 +186,239 @@ export async function loadSourcesList() {
       const actionsDiv = document.createElement('div');
       actionsDiv.classList.add('source-actions');
       actionsDiv.innerHTML = `
-        <button class="edit-source-btn table-action-btn" data-id="${source.id}">Edit</button>
-        <button class="delete-source-btn table-action-btn" data-id="${source.id}">Delete</button>
+        <button class="edit-source-btn table-action-btn btn-secondary" data-id="${source.id}">Edit</button>
+        <button class="delete-source-btn table-action-btn btn-danger" data-id="${source.id}">Delete</button>
       `;
       sourceElement.appendChild(actionsDiv);
       sourcesContainer.appendChild(sourceElement);
 
-      // Add event listener to the source item itself to open the detail modal
-      sourceElement.addEventListener('click', (event) => {
-        // Prevent opening detail modal if edit/delete buttons are clicked
-        if (
-          !event.target.classList.contains('edit-source-btn') &&
-          !event.target.classList.contains('delete-source-btn')
-        ) {
-          handleSourceItemClick(source.id);
-        }
-      });
-
-      // **NEW:** Add event listener for the edit button
-      const editButton = sourceElement.querySelector('.edit-source-btn');
-      if (editButton) {
-        editButton.addEventListener('click', (event) => {
-          event.stopPropagation(); // Prevent handleSourceItemClick from firing
-          // @ts-ignore
-          openEditSourceModal(event.target.dataset.id);
-        });
-      }
-
-      // **NEW:** Add event listener for the delete button
-      const deleteButton = sourceElement.querySelector('.delete-source-btn');
-      if (deleteButton) {
-        deleteButton.addEventListener('click', (event) => {
-          event.stopPropagation(); // Prevent handleSourceItemClick from firing
-          // @ts-ignore
-          handleDeleteSourceClick(event.target.dataset.id);
-        });
-      }
+      // Event listener is now handled by delegation in settings/index.js
     }
   }
 }
 
-export async function openEditSourceModal(sourceId) {
-  console.log('Handler: openEditSourceModal called', sourceId);
-  const editSourceModal = document.getElementById('edit-source-modal');
-  if (!editSourceModal) {
-    console.error('Edit source modal not found.');
+/**
+ * Opens the single modal for adding or editing a source.
+ * @param {string | null} sourceId - The ID of the source to edit, or null to add.
+ */
+export async function openSourceFormModal(sourceId = null) {
+  const modal = document.getElementById('source-form-modal');
+  const form = /** @type {HTMLFormElement | null} */ (
+    document.getElementById('source-form-form')
+  );
+  const title = document.getElementById('source-form-title');
+  const submitBtn = document.getElementById('source-form-submit-btn');
+
+  if (!modal || !form || !title || !submitBtn) {
+    console.error('Source form modal elements not found.');
     return;
   }
 
-  try {
-    const source = await getSource(sourceId);
-    if (!source) {
-      console.error('Source not found for ID:', sourceId);
+  // --- START: DICTIONARY PATTERN ---
+  const elements = {
+    id: /** @type {HTMLInputElement} */ (form.elements.namedItem('id')),
+    type: /** @type {HTMLSelectElement} */ (form.elements.namedItem('type')),
+    name: /** @type {HTMLInputElement} */ (form.elements.namedItem('name')),
+    url: /** @type {HTMLInputElement} */ (form.elements.namedItem('url')),
+    description: /** @type {HTMLTextAreaElement} */ (
+      form.elements.namedItem('description')
+    ),
+    image_path: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('image_path')
+    ),
+    person_email: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('person_email')
+    ),
+    person_phone: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('person_phone')
+    ),
+    person_app_handle: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('person_app_handle')
+    ),
+    group_primary_contact: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('group_primary_contact')
+    ),
+    group_email: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('group_email')
+    ),
+    group_phone: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('group_phone')
+    ),
+    group_app_handle: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('group_app_handle')
+    ),
+    book_author: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('book_author')
+    ),
+    book_isbn: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('book_isbn')
+    ),
+    website_websites: /** @type {HTMLInputElement} */ (
+      form.elements.namedItem('website_websites')
+    ),
+  };
+  // --- END: DICTIONARY PATTERN ---
+
+  form.reset(); // Clear the form
+
+  if (sourceId) {
+    // --- EDIT MODE ---
+    title.textContent = 'Edit Source';
+    submitBtn.textContent = 'Save Changes';
+    try {
+      const source = await getSource(sourceId);
+      if (!source) {
+        console.error('Source not found for ID:', sourceId);
+        return;
+      }
+
+      // Populate common fields
+      elements.id.value = source.id.toString();
+      elements.type.value = source.type;
+      elements.name.value = source.name;
+      elements.url.value = source.url || '';
+      elements.description.value = source.description || '';
+      elements.image_path.value = source.image_path || '';
+
+      // Populate person fields
+      elements.person_email.value = source.person_email || '';
+      elements.person_phone.value = source.person_phone || '';
+      elements.person_app_handle.value = source.person_app_handle || '';
+
+      // Populate group fields
+      elements.group_primary_contact.value = source.group_primary_contact || '';
+      elements.group_email.value = source.group_email || '';
+      elements.group_phone.value = source.group_phone || '';
+      elements.group_app_handle.value = source.group_app_handle || '';
+
+      // Populate book/website fields (add as needed)
+      if (elements.book_author)
+        elements.book_author.value = source.book_author || '';
+      if (elements.book_isbn) elements.book_isbn.value = source.book_isbn || '';
+      if (elements.website_websites)
+        elements.website_websites.value = source.website_websites || '';
+
+      // Populate dropdowns AND pre-select values
+      await populateWebAppDropdowns(
+        source.person_app_type,
+        source.group_app_type
+      );
+
+      // Trigger change handler to show panels and image
+      handleSourceTypeChange(elements.type.value, source);
+    } catch (error) {
+      console.error('Error fetching source for editing:', error);
       return;
     }
+  } else {
+    // --- ADD MODE ---
+    title.textContent = 'Add New Source';
+    submitBtn.textContent = 'Save Source';
+    elements.id.value = ''; // Ensure ID is empty
 
-    // Populate the edit form fields
-    // @ts-ignore
-    document.getElementById('edit-source-id').value = source.id;
-    // @ts-ignore
-    document.getElementById('edit-source-type').value = source.type;
-    // @ts-ignore
-    document.getElementById('edit-source-name').value = source.name;
-    // @ts-ignore
-    document.getElementById('edit-source-url').value = source.url || '';
-    // @ts-ignore
-    document.getElementById('edit-source-description').value =
-      source.description || '';
-    // @ts-ignore
-    document.getElementById('edit-source-image-path').value =
-      source.image_path || '';
-
-    // Populate type-specific fields
-    if (source.type === 'person') {
-      // @ts-ignore
-      document.getElementById('edit-source-contact-email').value =
-        source.person_email || '';
-      // @ts-ignore
-      document.getElementById('edit-source-contact-phone').value =
-        source.person_phone || '';
-      // @ts-ignore
-      document.getElementById('edit-source-contact-app-type').value =
-        source.person_app_type || '';
-      // @ts-ignore
-      document.getElementById('edit-source-contact-app-handle').value =
-        source.person_app_handle || '';
-    } else if (source.type === 'group') {
-      // @ts-ignore
-      document.getElementById('edit-source-group-person').value =
-        source.group_primary_contact || '';
-      // @ts-ignore
-      document.getElementById('edit-source-group-email').value =
-        source.group_email || '';
-      // @ts-ignore
-      document.getElementById('edit-source-group-phone').value =
-        source.group_phone || '';
-      // @ts-ignore
-      document.getElementById('edit-source-group-app-type').value =
-        source.group_app_type || '';
-      // @ts-ignore
-      document.getElementById('edit-source-group-app-handle').value =
-        source.group_app_handle || '';
-    } else if (source.type === 'book') {
-      // @ts-ignore
-      document.getElementById('edit-source-book-author').value =
-        source.book_author || '';
-      // @ts-ignore
-      document.getElementById('edit-source-book-isbn').value =
-        source.book_isbn || '';
-      // @ts-ignore
-      document.getElementById('edit-source-book-websites').value =
-        source.book_websites || '';
-      // @ts-ignore
-      document.getElementById('edit-source-book-pdfs').value =
-        source.book_pdfs || '';
-    } else if (source.type === 'website') {
-      // @ts-ignore
-      document.getElementById('edit-source-website-websites').value =
-        source.website_websites || '';
-      // @ts-ignore
-      document.getElementById('edit-source-website-pdfs').value =
-        source.website_pdfs || '';
-    }
-
-    // Trigger the change handler to show/hide appropriate panels and load strategies
-    handleSourceTypeChange({ target: { value: source.type } }, 'edit', source);
-
-    editSourceModal.style.display = 'block'; // Show the modal
-  } catch (error) {
-    console.error('Error fetching source for editing:', error);
+    // Populate dropdowns with no pre-selection
+    await populateWebAppDropdowns();
+    // Trigger change handler to reset/hide panels
+    handleSourceTypeChange(elements.type.value);
   }
+
+  // @ts-ignore
+  modal.style.display = 'block'; // Show the modal
 }
 
-export async function handleEditSourceSubmit(event) {
+/**
+ * Handles the submission of the "Add New Source" form.
+ * @param {Event} event - The form submission event.
+ */
+export async function handleSourceFormSubmit(event) {
   event.preventDefault();
-  console.log('Handler: handleEditSourceSubmit called');
+  console.log('Handler: handleSourceFormSubmit called');
 
-  const form = event.target;
-  // @ts-ignore
-  const sourceId = document.getElementById('edit-source-id').value;
+  const form = /** @type {HTMLFormElement} */ (event.target);
   const formData = new FormData(form);
-  const updatedSource = Object.fromEntries(formData.entries());
-
-  // Remove the 'type' from updatedSource if it's not meant to be updated this way
-  // or if the backend handles it automatically. For now, we'll keep it.
+  const sourceData = Object.fromEntries(formData.entries());
+  const sourceId = sourceData.id;
 
   try {
-    await updateSource(sourceId, updatedSource);
-    console.log('Source updated:', sourceId);
+    if (sourceId) {
+      // --- UPDATE (EDIT) ---
+      await updateSource(/** @type {string} */ (sourceData.id), sourceData);
+      console.log('Source updated:', sourceId);
+    } else {
+      // --- CREATE (ADD) ---
+      await addSource(sourceData);
+      console.log('Source added');
+    }
     loadSourcesList(); // Refresh the list
-    document.getElementById('edit-source-modal').style.display = 'none'; // Hide the modal
+    closeSourceFormModal(); // Hide the modal
   } catch (error) {
-    console.error('Error updating source:', error);
+    console.error('Error saving source:', error);
+    alert('Error saving source. See console for details.');
   }
 }
 
+/**
+ * @param {string} sourceId
+ */
 export function handleDeleteSourceClick(sourceId) {
-  console.log(
-    'Handler: handleDeleteSourceClick called (placeholder)',
-    sourceId
-  );
+  console.log('Handler: handleDeleteSourceClick called', sourceId);
   if (confirm('Are you sure you want to delete this source?')) {
     deleteSource(sourceId)
       .then(() => {
         console.log('Source deleted:', sourceId);
         loadSourcesList(); // Refresh the list
       })
-      .catch((error) => console.error('Error deleting source:', error));
+      .catch((error) => {
+        console.error('Error deleting source:', error);
+        alert('Error deleting source. See console for details.');
+      });
   }
 }
 
 /**
  * Closes the edit source modal.
  */
-export function closeEditSourceModal() {
-  const modal = document.getElementById('edit-source-modal');
-  const form = document.getElementById('edit-source-form');
+export function closeSourceFormModal() {
+  const modal = document.getElementById('source-form-modal');
+  const form = /** @type {HTMLFormElement | null} */ (
+    document.getElementById('source-form-form')
+  );
   if (modal && form) {
+    // @ts-ignore
     modal.style.display = 'none';
     form.reset(); // Clear form fields
-    // Hide all type-specific panels
-    for (const panel of document.querySelectorAll('.source-type-panel')) {
-      // @ts-ignore
-      if (panel.id.startsWith('edit-source-panel-')) {
-        // @ts-ignore
-        panel.style.display = 'none';
-      }
-    }
-    const fieldsContainer = document.getElementById(
-      'edit-source-fields-container'
+    // Manually trigger type change to hide all panels
+    const typeSelect = /** @type {HTMLSelectElement | null} */ (
+      document.getElementById('source-form-type')
     );
-    if (fieldsContainer) {
-      fieldsContainer.style.display = 'none';
+    if (typeSelect) {
+      typeSelect.value = '';
+      handleSourceTypeChange(typeSelect.value);
     }
+  }
+}
+
+/**
+ * Handles clearing the source form.
+ */
+export function handleClearSourceForm() {
+  const form = /** @type {HTMLFormElement | null} */ (
+    document.getElementById('source-form-form')
+  );
+  if (!form) return;
+
+  // --- START: DICTIONARY PATTERN ---
+  const elements = {
+    id: /** @type {HTMLInputElement} */ (form.elements.namedItem('id')),
+    type: /** @type {HTMLSelectElement} */ (form.elements.namedItem('type')),
+  };
+  // --- END: DICTIONARY PATTERN ---
+
+  if (elements.id && elements.type) {
+    const id = elements.id.value; // Preserve ID if editing
+    form.reset();
+    elements.id.value = id; // Restore ID
+    elements.type.value = ''; // Reset dropdown
+    handleSourceTypeChange(elements.type.value); // Trigger UI reset
   }
 }

@@ -1,5 +1,7 @@
 // public/js/modules/strategy-lab/paper-trades/render.js
 
+import { formatCurrency } from '../../../utils/formatters.js';
+
 /**
  * Renders the paper trades table.
  * @param {import('../../../types.js').Transaction[] | null} paperTrades - An array of paper trade items.
@@ -34,7 +36,7 @@ export function renderPaperTrades(paperTrades, error = null) {
         <th>Symbol</th>
         <th>Type</th>
         <th>Quantity</th>
-        <th>Entry Price</th>
+        <th>Price</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -47,12 +49,12 @@ export function renderPaperTrades(paperTrades, error = null) {
           <td>${trade.ticker}</td>
           <td>${trade.transaction_type}</td>
           <td>${trade.quantity}</td>
-          <td>${trade.price}</td>
+          <td>${formatCurrency(trade.price)}</td>
           <td>
-            <button class="small-btn btn btn-secondary paper-details-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${
               trade.id
             }">Details</button>
-            <button class="small-btn btn btn-danger paper-delete-btn" data-id="${
+            <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${
               trade.id
             }">Delete</button>
           </td>

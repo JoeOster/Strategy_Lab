@@ -1,11 +1,17 @@
-// joeoster/strategy_lab/Strategy_Lab-feature-beautification/public/js/modules/strategy-lab/sources/modal.handlers.js
+// public/js/modules/strategy-lab/sources/modal.handlers.js
 
 /** @typedef {import('../../../types.js').Source} Source */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
+// --- START: NEW IMPORT ---
+/** @typedef {import('../../../types.js').PaperTradeSummary} PaperTradeSummary */
+// --- END: NEW IMPORT ---
 
 import { getSource } from '../../settings/sources.api.js';
-import { openEditSourceModal } from '../../settings/sources.handlers.js';
+// --- START: MODIFICATION ---
+// Replaced openEditSourceModal with openSourceFormModal from the refactor
+import { openSourceFormModal } from '../../settings/sources.handlers.js';
+// --- END: MODIFICATION ---
 import {
   renderOpenTradesForSource,
   renderPaperTradesForSource,
@@ -78,10 +84,8 @@ export async function openSourceDetailModal(sourceId) {
   try {
     const source = await getSource(sourceId);
 
-    // --- START: MODIFICATION ---
-
-    // 1. Determine the folder path based on source type
-    let folderPath = 'images/'; // Generic fallback folder
+    // --- START: IMAGE PATH LOGIC (from previous fix) ---
+    let folderPath = 'images/';
     switch (source.type) {
       case 'person':
         folderPath = 'images/contacts/';
@@ -96,19 +100,11 @@ export async function openSourceDetailModal(sourceId) {
         folderPath = 'images/url/';
         break;
     }
-
-    // 2. Determine the filename (use image_path or a folder-specific default)
-    const imageFile = source.image_path
-      ? source.image_path
-      : source.type === 'person'
-        ? 'default.png'
-        : 'default.svg';
+    const imageFile = source.image_path ? source.image_path : 'default.png';
     const finalImagePath = folderPath + imageFile;
-
-    // 3. Define a root-level generic placeholder in case the specific one fails
     const genericPlaceholder = 'images/default-placeholder.svg';
 
-    // 4. Populate profile container with the new logic
+    // Populate profile container
     profileContainer.innerHTML = `
       <img 
         src="${finalImagePath}" 
@@ -134,7 +130,7 @@ export async function openSourceDetailModal(sourceId) {
           : ''
       }
     `;
-    // --- END: MODIFICATION ---
+    // --- END: IMAGE PATH LOGIC ---
 
     // Render ONLY the Edit button in the left panel's footer
     featureBtnContainer.innerHTML = `
@@ -174,7 +170,16 @@ export async function openSourceDetailModal(sourceId) {
     if (addStrategyButton) {
       addStrategyButton.addEventListener('click', handleShowStrategyForm);
     } else if (addIdeaButton) {
-      addIdeaButton.addEventListener('click', handleShowIdeaForm);
+      // --- START: MODIFICATION ---
+      // This function is complex and cannot be a direct event listener.
+      // We wrap it in an arrow function to provide the correct context.
+      addIdeaButton.addEventListener('click', (event) => {
+        if (!modal) return;
+        // @ts-ignore
+        const currentSourceId = modal.dataset.sourceId || null;
+        handleShowIdeaForm(event, currentSourceId, null, false, false);
+      });
+      // --- END: MODIFICATION ---
     }
 
     if (editButton) {
@@ -208,9 +213,13 @@ export async function openSourceDetailModal(sourceId) {
  */
 function handleEditSource(event) {
   if (!(event.target instanceof HTMLElement)) return;
+  // @ts-ignore
   const sourceId = event.target.dataset.sourceId;
   if (sourceId) {
-    openEditSourceModal(sourceId);
+    // --- START: MODIFICATION ---
+    // Call the new, refactored function
+    openSourceFormModal(sourceId);
+    // --- END: MODIFICATION ---
   } else {
     console.error('Edit button clicked without a source ID.');
   }
@@ -363,7 +372,10 @@ export async function loadOpenTradesForSource(sourceId) {
 export async function loadPaperTradesForSource(sourceId) {
   const containerId = 'paper-trades-table-placeholder';
   try {
+    // --- START: MODIFICATION ---
+    /** @type {PaperTradeSummary[]} */
     const trades = await getPaperTradesForSource(sourceId);
+    // --- END: MODIFICATION ---
     renderPaperTradesForSource(trades, containerId);
   } catch (err) {
     console.error(`Failed to load paper trades for source ${sourceId}:`, err);

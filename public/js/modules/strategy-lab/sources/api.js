@@ -3,13 +3,13 @@ import { api } from '../../../utils/apiFetch.js';
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
+// --- START: NEW IMPORT ---
+/** @typedef {import('../../../types.js').PaperTradeSummary} PaperTradeSummary */
+// --- END: NEW IMPORT ---
 
 // Re-export functions from the settings module.
 // The types are already defined in the original file.
-export {
-  getSources,
-  getSource,
-} from '../../settings/sources.api.js';
+export { getSource, getSources } from '../../settings/sources.api.js';
 
 /**
  * Adds a new strategy to the database.
@@ -52,7 +52,7 @@ export async function getOpenTradesForSource(sourceId) {
 /**
  * Fetches all "Paper Trades" for a specific source ID.
  * @param {string|number} sourceId - The ID of the source.
- * @returns {Promise<Transaction[]>} A promise that resolves to an array of Transactions.
+ * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of Transactions.
  */
 export async function getPaperTradesForSource(sourceId) {
   return api.get(`/api/sources/${sourceId}/paper-trades`);
