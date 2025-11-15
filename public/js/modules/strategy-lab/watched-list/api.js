@@ -27,9 +27,9 @@ export async function deleteIdea(id) {
  * @param {number | string} id - The ID of the idea to move.
  * @returns {Promise<any>}
  */
-export async function moveIdeaToPaper(id) {
+export async function moveIdeaToPaper(id, ideaData) {
   // This calls the new endpoint that creates a transaction and updates the idea
-  return api.post(`/api/watched-items/${id}/to-paper`);
+  return api.post(`/api/watched-items/${id}/to-paper`, ideaData);
 }
 
 /**
@@ -51,4 +51,24 @@ export async function getIdeaForPrefill(id) {
  */
 export async function addIdea(ideaData) {
   return api.post('/api/watched-items/ideas', ideaData);
+}
+
+/**
+ * Updates a watched idea.
+ * @param {string} ideaId - The ID of the idea to update.
+ * @param {object} ideaData - The data to update.
+ * @returns {Promise<WatchedItem>} A promise that resolves to the updated idea object.
+ */
+export async function updateIdea(ideaId, ideaData) {
+  return api.put(`/api/watched-items/${ideaId}`, ideaData);
+}
+
+/**
+ * Moves a watched idea to a real trade.
+ * @param {string} id - The ID of the idea to move.
+ * @param {object} ideaData - The data to update.
+ * @returns {Promise<any>}
+ */
+export async function moveIdeaToRealTrade(id, ideaData) {
+  return api.post(`/api/watched-items/${id}/to-real`, ideaData);
 }

@@ -222,9 +222,20 @@ router.get('/:sourceId/paper-trades', async (req, res) => {
     const db = await getDb();
     const { sourceId } = req.params;
     const trades = await db.all(
-      `SELECT * FROM transactions 
-       WHERE source_id = ? AND is_paper_trade = 1 
-       ORDER BY transaction_date DESC`,
+      `SELECT
+        buy.id,
+        buy.ticker,
+        buy.transaction_date AS entry_date,
+        buy.price AS entry_price,
+        buy.quantity,
+        sell.transaction_date AS exit_date,
+        sell.price AS exit_price,
+        (sell.price - buy.price) * buy.quantity AS pnl,
+        ((sell.price - buy.price) / buy.price) * 100 AS return_pct
+      FROM transactions buy
+      LEFT JOIN transactions sell ON buy.watched_item_id = sell.watched_item_id AND sell.transaction_type = 'SELL'
+      WHERE buy.source_id = ? AND buy.is_paper_trade = 1 AND buy.transaction_type = 'BUY'
+      ORDER BY buy.transaction_date DESC`,
       [sourceId]
     );
     res.json(trades);

@@ -1,0 +1,23 @@
+<div id="edit-trade-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Trade</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="edit-trade-form">
+        <input type="hidden" id="edit-trade-id" name="id" />
+        <label for="edit-trade-ticker">Ticker:</label>
+        <input type="text" id="edit-trade-ticker" name="ticker" required />
+        <label for="edit-trade-quantity">Quantity:</label>
+        <input type="number" id="edit-trade-quantity" name="quantity" required />
+        <label for="edit-trade-price">Price:</label>
+        <input type="number" id="edit-trade-price" name="price" step="0.01" required />
+        <div class="form-actions">
+          <button type="submit" class="btn">Save Changes</button>
+          <button type="button" id="cancel-edit-trade-btn" class="btn secondary-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

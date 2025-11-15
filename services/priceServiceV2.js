@@ -14,7 +14,7 @@ export async function getPriceV2(ticker) {
   }
 
   try {
-    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker.toUpperCase()}&token=${apiKey}`;
     console.log(`Fetching price for ${ticker} from Finnhub...`);
     const response = await fetch(url);
 

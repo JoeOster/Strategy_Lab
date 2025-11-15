@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadHtmlPartial('/_edit-source-modal.html', 'app-container');
   await loadHtmlPartial('/_source-detail-modal.html', 'app-container');
   await loadHtmlPartial('/_add-strategy-modal.html', 'app-container');
+  await loadHtmlPartial('/_sell-trade-modal.html', 'app-container');
+  await loadHtmlPartial('/_edit-trade-modal.html', 'app-container');
+  await loadHtmlPartial('/_paper-trade-details-modal.html', 'app-container');
 
   // --- THIS LINE IS THE LIKELY FIX ---
   await loadHtmlPartial('/_add-idea-modal.html', 'app-container');

@@ -135,19 +135,44 @@ router.post('/:id/to-paper', async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params;
+    const idea = req.body;
+
+    // First, update the idea with the new data from the modal
+    await db.run(
+      `UPDATE watched_items SET
+        ticker = ?,
+        buy_price_low = ?,
+        buy_price_high = ?,
+        take_profit_low = ?,
+        take_profit_high = ?,
+        escape_price = ?,
+        notes = ?
+      WHERE id = ?`,
+      [
+        idea.ticker,
+        idea.buy_price_low,
+        idea.buy_price_high,
+        idea.take_profit_low,
+        idea.take_profit_high,
+        idea.escape_price,
+        idea.notes,
+        id,
+      ]
+    );
+
     /** @type {WatchedItem | undefined} */
-    const idea = await db.get(
-      'SELECT * FROM watched_items WHERE id = ? AND is_paper_trade = 1',
+    const updatedIdea = await db.get(
+      'SELECT * FROM watched_items WHERE id = ? AND is_paper_trade = 0',
       id
     );
-    if (!idea) {
+    if (!updatedIdea) {
       return res.status(404).json({ error: 'Trade Idea not found' });
     }
-    const entryPrice = await getPriceV2(idea.ticker);
+    const entryPrice = await getPriceV2(updatedIdea.ticker);
     if (!entryPrice) {
       return res
-        .status(500)
-        .json({ error: 'Could not fetch current price to create paper trade' });
+        .status(400)
+        .json({ error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.` });
     }
     const now = new Date().toISOString();
     const result = await db.run(
@@ -156,11 +181,11 @@ router.post('/:id/to-paper', async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         1,
-        idea.user_id,
-        idea.source_id,
+        updatedIdea.user_id,
+        updatedIdea.source_id,
         id,
         now,
-        idea.ticker,
+        updatedIdea.ticker,
         'BUY',
         1,
         entryPrice,
@@ -170,8 +195,8 @@ router.post('/:id/to-paper', async (req, res) => {
       ]
     );
     await db.run(
-      'UPDATE watched_items SET status = ?, updated_date = ? WHERE id = ?',
-      ['EXECUTED', now, id]
+      'UPDATE watched_items SET status = ? WHERE id = ?',
+      ['EXECUTED', id]
     );
     res.status(201).json({
       message: 'Paper trade created',
@@ -184,6 +209,130 @@ router.post('/:id/to-paper', async (req, res) => {
     res
       .status(500)
       .json({ error: 'Failed to move idea to paper', details: message });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const idea = req.body;
+    const result = await db.run(
+      `UPDATE watched_items SET
+        ticker = ?,
+        buy_price_low = ?,
+        buy_price_high = ?,
+        take_profit_low = ?,
+        take_profit_high = ?,
+        escape_price = ?,
+        notes = ?
+      WHERE id = ?`,
+      [
+        idea.ticker,
+        idea.buy_price_low,
+        idea.buy_price_high,
+        idea.take_profit_low,
+        idea.take_profit_high,
+        idea.escape_price,
+        idea.notes,
+        id,
+      ]
+    );
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Watched item not found' });
+    }
+    const updatedIdea = await db.get(
+      'SELECT * FROM watched_items WHERE id = ?',
+      id
+    );
+    res.json(updatedIdea);
+  } catch (err) {
+    console.error(`Failed to update watched item ${req.params.id}:`, err);
+    const message = err instanceof Error ? err.message : String(err);
+    res
+      .status(500)
+      .json({ error: 'Failed to update watched item', details: message });
+  }
+});
+
+router.post('/:id/to-real', async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const idea = req.body;
+
+    // First, update the idea with the new data from the modal
+    await db.run(
+      `UPDATE watched_items SET
+        ticker = ?,
+        buy_price_low = ?,
+        buy_price_high = ?,
+        take_profit_low = ?,
+        take_profit_high = ?,
+        escape_price = ?,
+        notes = ?
+      WHERE id = ?`,
+      [
+        idea.ticker,
+        idea.buy_price_low,
+        idea.buy_price_high,
+        idea.take_profit_low,
+        idea.take_profit_high,
+        idea.escape_price,
+        idea.notes,
+        id,
+      ]
+    );
+
+    /** @type {WatchedItem | undefined} */
+    const updatedIdea = await db.get(
+      'SELECT * FROM watched_items WHERE id = ? AND is_paper_trade = 0',
+      id
+    );
+    if (!updatedIdea) {
+      return res.status(404).json({ error: 'Trade Idea not found' });
+    }
+    const entryPrice = await getPriceV2(updatedIdea.ticker);
+    if (!entryPrice) {
+      return res
+        .status(400)
+        .json({ error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.` });
+    }
+    const now = new Date().toISOString();
+    const result = await db.run(
+      `INSERT INTO transactions 
+         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        0,
+        updatedIdea.user_id,
+        updatedIdea.source_id,
+        id,
+        now,
+        updatedIdea.ticker,
+        'BUY',
+        1,
+        entryPrice,
+        1,
+        now,
+        now,
+      ]
+    );
+    await db.run(
+      'UPDATE watched_items SET status = ? WHERE id = ?',
+      ['EXECUTED', id]
+    );
+    res.status(201).json({
+      message: 'Real trade created',
+      newTransactionId: result.lastID,
+      originalIdeaId: id,
+    });
+  } catch (err) {
+    console.error(`Failed to move idea ${req.params.id} to real trade:`, err);
+    const message = err instanceof Error ? err.message : String(err);
+    res
+      .status(500)
+      .json({ error: 'Failed to move idea to real trade', details: message });
   }
 });
 

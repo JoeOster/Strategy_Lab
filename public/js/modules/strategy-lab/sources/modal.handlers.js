@@ -6,6 +6,10 @@
 
 import { getSource } from '../../settings/sources.api.js';
 import { openEditSourceModal } from '../../settings/sources.handlers.js';
+import {
+  renderOpenTradesForSource,
+  renderPaperTradesForSource,
+} from '../../transactions/render.js';
 import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
 import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
@@ -18,12 +22,7 @@ import {
   handleShowIdeaForm,
   handleShowStrategyForm,
 } from './forms.handlers.js';
-import {
-  renderOpenIdeasForSource,
-  renderOpenTradesForSource,
-  renderPaperTradesForSource,
-  renderStrategiesTable,
-} from './render.js';
+import { renderOpenIdeasForSource, renderStrategiesTable } from './render.js';
 
 /**
  * Opens the source detail modal and populates it with data.
@@ -309,7 +308,6 @@ export async function loadOpenIdeasForSource(sourceId) {
  */
 // --- START: FIX ---
 export async function loadOpenTradesForSource(sourceId) {
-  // --- END: FIX ---
   const containerId = 'open-trades-table-placeholder';
   try {
     const trades = await getOpenTradesForSource(sourceId);
@@ -325,9 +323,7 @@ export async function loadOpenTradesForSource(sourceId) {
  * Fetches and renders the "Paper Trades" table for the source.
  * @param {string|number} sourceId - The ID of the source.
  */
-// --- START: FIX ---
 export async function loadPaperTradesForSource(sourceId) {
-  // --- END: FIX ---
   const containerId = 'paper-trades-table-placeholder';
   try {
     const trades = await getPaperTradesForSource(sourceId);
@@ -340,6 +336,10 @@ export async function loadPaperTradesForSource(sourceId) {
 }
 
 // --- END: NEW LOADER FUNCTIONS ---
+
+import { openEditTradeModal } from '../../transactions/edit-trade.handlers.js';
+import { openPaperTradeDetailsModal } from '../../transactions/paper-trade-details.handlers.js';
+import { openSellTradeModal } from '../../transactions/sell-trade.handlers.js';
 
 /**
  * Handles all clicks within the modal's bottom panel.
@@ -378,17 +378,14 @@ async function handleModalBottomPanelClicks(event) {
   if (button.classList.contains('paper-delete-btn')) {
     shouldRefreshPaperTrades = await handleDeletePaperTradeClick(id);
   } else if (button.classList.contains('paper-details-btn')) {
-    // TODO: Implement "Details" functionality
-    alert('Details functionality not yet implemented.');
+    openPaperTradeDetailsModal(id);
   }
 
   // Check for "Open Trades" buttons
   if (button.classList.contains('real-sell-btn')) {
-    // TODO: Implement "Sell" functionality (pre-fill Orders tab)
-    alert('Sell functionality not yet implemented.');
+    openSellTradeModal(id);
   } else if (button.classList.contains('real-edit-btn')) {
-    // TODO: Implement "Edit" functionality (open edit transaction modal)
-    alert('Edit functionality not yet implemented.');
+    openEditTradeModal(id);
   }
 
   // @ts-ignore
