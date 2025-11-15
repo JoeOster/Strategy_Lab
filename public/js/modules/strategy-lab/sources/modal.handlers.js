@@ -102,7 +102,10 @@ export async function openSourceDetailModal(sourceId) {
     }
     const imageFile = source.image_path ? source.image_path : 'default.png';
     const finalImagePath = folderPath + imageFile;
-    const genericPlaceholder = 'images/default-placeholder.svg';
+    // --- START: FIX ---
+    // Changed placeholder to a file that exists
+    const genericPlaceholder = 'images/contacts/default.png';
+    // --- END: FIX ---
 
     // Populate profile container
     profileContainer.innerHTML = `

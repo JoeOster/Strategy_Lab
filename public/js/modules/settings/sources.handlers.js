@@ -45,7 +45,10 @@ export function updateImagePreview(type, filename) {
   previewImg.style.display = 'block'; // Show the image
 
   // Set fallback image for broken links or typos
-  const genericPlaceholder = 'images/default-placeholder.svg';
+  // --- START: FIX ---
+  // Changed placeholder to a file that exists
+  const genericPlaceholder = 'images/contacts/default.png';
+  // --- END: FIX ---
   // @ts-ignore
   previewImg.onerror = () => {
     previewImg.onerror = null; // prevent infinite loops

@@ -37,3 +37,4 @@ Thumbs.db
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.gemini/tmp/request_log.txt
