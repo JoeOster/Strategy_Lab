@@ -1,7 +1,7 @@
 // eslint.config.js
 import js from '@eslint/js';
+import markdown from '@eslint/markdown';
 import prettierConfig from 'eslint-config-prettier';
-import markdown from 'eslint-plugin-markdown';
 import prettierPlugin from 'eslint-plugin-prettier';
 import globals from 'globals';
 
@@ -11,8 +11,21 @@ export default [
     ignores: ['node_modules/', 'log/'],
   },
 
-  // 2. Recommended ESLint rules
-  js.configs.recommended,
+  // --- START: FIX ---
+  // 2. JavaScript Files Configuration
+  // We apply the core JS rules ONLY to .js files.
+  {
+    files: ['**/*.js'],
+    ...js.configs.recommended, // This was the line causing the problem
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: 'module',
+      globals: {
+        ...globals.es2021,
+      },
+    },
+  },
+  // --- END: FIX ---
 
   // 3. Markdown configuration
   ...markdown.configs.recommended,
@@ -30,16 +43,6 @@ export default [
 
   // 5. Language and Environment Globals
   {
-    files: ['**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2021,
-      sourceType: 'module',
-      globals: {
-        ...globals.es2021,
-      },
-    },
-  },
-  {
     files: ['public/js/**/*.js'],
     languageOptions: {
       globals: {
@@ -50,6 +53,7 @@ export default [
   {
     files: [
       'server.js',
+      'api/**/*.js',
       'services/**/*.js',
       'playwright.config.js',
       'tests/**/*.js',
@@ -65,6 +69,7 @@ export default [
   // 6. Rules for code blocks inside Markdown
   {
     files: ['**/*.md/*.js'],
+    ...js.configs.recommended, // Apply JS rules to code blocks
     rules: {
       'no-unused-vars': 'warn',
       'no-undef': 'warn',

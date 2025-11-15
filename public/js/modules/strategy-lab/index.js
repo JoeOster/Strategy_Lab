@@ -1,12 +1,12 @@
 // public/js/modules/strategy-lab/index.js
 
 import * as handlers from './handlers.js';
-import { initializeStrategyLabSubTabs } from './handlers.js';
+// Import the card click handler from the new sources sub-module
+import { handleSourceCardClick } from './sources/handlers.js';
 
 export function initializeModule() {
   console.log('Strategy Lab Module Initialized');
 
-  // **FIX:** Scope all queries to the newly loaded page container
   const strategyLabContainer = document.getElementById(
     'strategy-lab-page-container'
   );
@@ -17,22 +17,27 @@ export function initializeModule() {
     return;
   }
 
-  // Attach event listener for main sub-tab clicks *within this container*
+  // Attach event listener for main sub-tab clicks
   for (const tabElement of strategyLabContainer.querySelectorAll(
     '.sub-nav-btn'
   )) {
     tabElement.addEventListener('click', handlers.handleSubTabClick);
   }
 
-  // **NEW:** Add delegated listener for source card clicks
+  // Add delegated listener for source card clicks
   strategyLabContainer.addEventListener('click', (event) => {
-    if (event.target.closest('.source-card')) {
-      handlers.handleSourceCardClick(event);
+    // --- START: FIX ---
+    // Add type guard to ensure event.target is an Element
+    if (!(event.target instanceof Element)) {
+      return;
     }
-    // Note: The 'close-source-detail-btn' click is handled in handlers.js
-    // because the button doesn't exist until loadSourceDetail is called.
+    // --- END: FIX ---
+
+    if (event.target.closest('.source-card')) {
+      handleSourceCardClick(event);
+    }
   });
 
   // Initialize the Strategy Lab sub-tabs
-  initializeStrategyLabSubTabs();
+  handlers.initializeStrategyLabSubTabs();
 }

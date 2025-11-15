@@ -1,0 +1,65 @@
+<div id="add-idea-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Add New Trade Idea</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="log-idea-form">
+        <input type="hidden" id="idea-source-id" name="source_id" />
+        <input type="hidden" id="idea-strategy-id" name="strategy_id" />
+        <label for="idea-ticker">Ticker:</label>
+        <input type="text" id="idea-ticker" name="ticker" required />
+
+        <label for="idea-buy-low">Buy Zone (Low):</label>
+        <input
+          type="number"
+          id="idea-buy-low"
+          name="buy_price_low"
+          step="0.01"
+        />
+
+        <label for="idea-buy-high">Buy Zone (High):</label>
+        <input
+          type="number"
+          id="idea-buy-high"
+          name="buy_price_high"
+          step="0.01"
+        />
+
+        <label for="idea-tp-low">Take Profit (Low):</label>
+        <input
+          type="number"
+          id="idea-tp-low"
+          name="take_profit_low"
+          step="0.01"
+        />
+
+        <label for="idea-tp-high">Take Profit (High):</label>
+        <input
+          type="number"
+          id="idea-tp-high"
+          name="take_profit_high"
+          step="0.01"
+        />
+
+        <label for="idea-escape">Stop Loss (Escape):</label>
+        <input type="number" id="idea-escape" name="escape_price" step="0.01" />
+
+        <label for="idea-notes">Notes:</label>
+        <textarea id="idea-notes" name="notes"></textarea>
+
+        <div class="form-actions">
+          <button type="submit" class="btn">Save Idea</button>
+          <button
+            type="button"
+            id="cancel-idea-form-btn"
+            class="btn secondary-btn"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

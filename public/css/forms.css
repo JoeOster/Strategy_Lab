@@ -21,6 +21,7 @@
 #add-holder-form,
 #add-webapp-form,
 #log-strategy-form,
+#log-idea-form,
 #edit-source-form {
   display: flex;
   flex-direction: column;

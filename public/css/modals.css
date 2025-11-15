@@ -18,7 +18,7 @@
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
+  z-index: 1000; /* Sit on top - THIS IS OUR BASE L1 MODAL LEVEL */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -138,3 +138,13 @@
   border: none;
   background-color: transparent;
 }
+
+/* --- START: z-index FIX --- */
+/* L2 Modals (Modals on top of other modals) */
+/* Give them a higher z-index to appear above the L1 modals (z-index: 1000) */
+#edit-source-modal,
+#add-strategy-modal,
+#add-idea-modal {
+  z-index: 1010;
+}
+/* --- END: z-index FIX --- */

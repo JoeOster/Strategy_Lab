@@ -40,13 +40,43 @@
  */
 
 /**
- * Represents a Watched Item from the mock API.
+ * Represents a Watched Item ("Trade Idea") from the 'watched_items' table.
  * @typedef {object} WatchedItem
  * @property {number} id
- * @property {string} symbol
- * @property {number} entryPrice
- * @property {number} targetPrice
- * @property {string} notes
+ * @property {number} is_paper_trade
+ * @property {number | null} [user_id]
+ * @property {number | null} [source_id]
+ * @property {number | null} [strategy_id]
+ * @property {string} ticker
+ * @property {string | null} [order_type]
+ * @property {number | null} [buy_price_high]
+ * @property {number | null} [buy_price_low]
+ * @property {number | null} [take_profit_high]
+ * @property {number | null} [take_profit_low]
+ * @property {number | null} [escape_price]
+ * @property {string} status
+ * @property {string | null} [notes]
+ * @property {string} created_date
+ * @property {string} updated_date
+ * @property {number | null} [current_price] - (Added by the API)
+ */
+
+/**
+ * Represents a Transaction ("Paper Trade" or "Real Trade") from the 'transactions' table.
+ * @typedef {object} Transaction
+ * @property {number} id
+ * @property {number} is_paper_trade
+ * @property {number | null} [user_id]
+ * @property {number | null} [source_id]
+ * @property {number | null} [watched_item_id]
+ * @property {string} transaction_date
+ * @property {string} ticker
+ * @property {string} transaction_type
+ * @property {number} quantity
+ * @property {number} price
+ * @property {number | null} [quantity_remaining]
+ * @property {string} created_date
+ * @property {string} updated_date
  */
 
 /**

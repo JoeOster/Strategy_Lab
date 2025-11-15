@@ -1,8 +1,13 @@
 // public/js/modules/strategy-lab/sources/render.js
 
+/** @typedef {import('../../../types.js').Source} Source */
+/** @typedef {import('../../../types.js').Strategy} Strategy */
+/** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
+/** @typedef {import('../../../types.js').Transaction} Transaction */
+
 /**
  * Renders the list of advice sources as cards in the grid.
- * @param {import('../../../types.js').Source[] | null} sources - An array of source objects from the API.
+ * @param {Source[] | null} sources - An array of source objects from the API.
  * @param {Error | null} [error] - An optional error object.
  */
 export function renderSourceCards(sources, error = null) {
@@ -47,7 +52,7 @@ export function renderSourceCards(sources, error = null) {
 
 /**
  * Renders the table of logged strategies for a source.
- * @param {import('../../../types.js').Strategy[]} strategies - An array of strategy objects.
+ * @param {Strategy[]} strategies - An array of strategy objects.
  */
 export function renderStrategiesTable(strategies) {
   const container = document.getElementById('strategy-table');
@@ -100,3 +105,212 @@ export function renderStrategiesTable(strategies) {
     }
   }
 }
+
+// --- START: NEW RENDER FUNCTIONS FOR MODAL BOTTOM PANEL ---
+
+/**
+ * Renders the table of "Open Ideas" for a source.
+ * @param {WatchedItem[] | null} ideas - An array of WatchedItem objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function renderOpenIdeasForSource(ideas, containerId, error = null) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container not found: ${containerId}`);
+    return;
+  }
+
+  // Clear placeholder and add title
+  container.innerHTML = '<h3>Open Ideas</h3>';
+
+  if (error) {
+    container.innerHTML += '<p class="error">Failed to load open ideas.</p>';
+    return;
+  }
+
+  if (!ideas || ideas.length === 0) {
+    container.innerHTML += '<p>No open ideas from this source.</p>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'strategy-table'; // Re-use the existing table style
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Entry Zone</th>
+        <th>Targets</th>
+        <th>Stop Loss</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${ideas
+        .map(
+          (item) => `
+        <tr data-id="${item.id}">
+          <td>${item.ticker || ''}</td>
+          <td>${item.buy_price_low || ''} - ${item.buy_price_high || ''}</td>
+          <td>${item.take_profit_low || ''} / ${
+            item.take_profit_high || ''
+          }</td>
+          <td>${item.escape_price || ''}</td>
+          <td>${item.status || 'WATCHING'}</td>
+          <td>${item.notes || ''}</td>
+          <td>
+            <button class="btn table-action-btn idea-buy-btn" data-id="${
+              item.id
+            }">Buy</button>
+            <button class="btn table-action-btn idea-paper-btn" data-id="${
+              item.id
+            }">Paper</button>
+            <button class="btn table-action-btn idea-edit-btn" data-id="${
+              item.id
+            }">Edit</button>
+            <button class="btn table-action-btn idea-delete-btn" data-id="${
+              item.id
+            }">Delete</button>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  `;
+  container.appendChild(table);
+}
+
+/**
+ * Renders the table of "Open Trades" (real money) for a source.
+ * @param {Transaction[] | null} trades - An array of Transaction objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function renderOpenTradesForSource(trades, containerId, error = null) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container not found: ${containerId}`);
+    return;
+  }
+
+  container.innerHTML = '<h3>Open Trades</h3>';
+
+  if (error) {
+    container.innerHTML += '<p class="error">Failed to load open trades.</p>';
+    return;
+  }
+
+  if (!trades || trades.length === 0) {
+    container.innerHTML += '<p>No open trades from this source.</p>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'strategy-table';
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Ticker</th>
+        <th>Type</th>
+        <th>Qty</th>
+        <th>Entry Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${trades
+        .map(
+          (trade) => `
+        <tr data-id="${trade.id}">
+          <td>${trade.transaction_date.split('T')[0] || ''}</td>
+          <td>${trade.ticker || ''}</td>
+          <td>${trade.transaction_type || ''}</td>
+          <td>${trade.quantity || ''}</td>
+          <td>${trade.price || ''}</td>
+          <td>
+            <button class="btn table-action-btn real-sell-btn" data-id="${
+              trade.id
+            }">Sell</button>
+            <button class="btn table-action-btn real-edit-btn" data-id="${
+              trade.id
+            }">Edit</button>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  `;
+  container.appendChild(table);
+}
+
+/**
+ * Renders the table of "Paper Trades" for a source.
+ * @param {Transaction[] | null} trades - An array of Transaction objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function renderPaperTradesForSource(trades, containerId, error = null) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container not found: ${containerId}`);
+    return;
+  }
+
+  container.innerHTML = '<h3>Paper Trades</h3>';
+
+  if (error) {
+    container.innerHTML += '<p class="error">Failed to load paper trades.</p>';
+    return;
+  }
+
+  if (!trades || trades.length === 0) {
+    container.innerHTML += '<p>No paper trades from this source.</p>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'strategy-table';
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Symbol</th>
+        <th>Type</th>
+        <th>Qty</th>
+        <th>Entry Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${trades
+        .map(
+          (trade) => `
+        <tr data-id="${trade.id}">
+          <td>${trade.transaction_date.split('T')[0] || ''}</td>
+          <td>${trade.ticker || ''}</td>
+          <td>${trade.transaction_type || ''}</td>
+          <td>${trade.quantity || ''}</td>
+          <td>${trade.price || ''}</td>
+          <td>
+            <button class="btn table-action-btn paper-details-btn" data-id="${
+              trade.id
+            }">Details</button>
+            <button class="btn table-action-btn paper-delete-btn" data-id="${
+              trade.id
+            }">Delete</button>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  `;
+  container.appendChild(table);
+}
+// --- END: NEW RENDER FUNCTIONS ---

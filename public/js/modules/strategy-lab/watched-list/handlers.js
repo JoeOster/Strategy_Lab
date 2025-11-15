@@ -2,6 +2,67 @@
 
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 import * as api from './api.js';
+import { getWatchedList } from './api.js';
+import { renderWatchedList } from './render.js';
+
+// --- START: MOVED FROM strategy-lab/handlers.js ---
+
+/**
+ * Fetches and renders the content for the "Watched List" sub-tab.
+ */
+export async function loadWatchedListContent() {
+  console.log('Loading Watched List content...');
+  try {
+    const watchedList = await getWatchedList();
+    renderWatchedList(watchedList);
+
+    // After rendering, attach a single listener to the table for all button clicks
+    const table = document.getElementById('watched-list-table');
+    if (table) {
+      // Remove old listener to prevent duplicates, if any
+      table.removeEventListener('click', handleWatchedListClicks);
+      // Add the new listener
+      table.addEventListener('click', handleWatchedListClicks);
+    }
+  } catch (err) {
+    console.error('Failed to load watched list:', err);
+    // Cast unknown 'err' to 'Error'
+    const error = err instanceof Error ? err : new Error(String(err));
+    renderWatchedList(null, error);
+  }
+}
+
+/**
+ * Handles all clicks within the #watched-list-table.
+ * @param {Event} event
+ */
+export async function handleWatchedListClicks(event) {
+  if (!(event.target instanceof HTMLElement)) return;
+  const target = event.target;
+
+  const button = target.closest('button');
+  if (!button) return;
+
+  const id = button.dataset.id;
+  if (!id) return;
+
+  let shouldRefresh = false;
+
+  if (button.classList.contains('idea-delete-btn')) {
+    shouldRefresh = await handleDeleteIdeaClick(id);
+  } else if (button.classList.contains('idea-paper-btn')) {
+    shouldRefresh = await handleMoveIdeaToPaperClick(id);
+  } else if (button.classList.contains('idea-buy-btn')) {
+    await handleBuyIdeaClick(id);
+  } else if (button.classList.contains('idea-edit-btn')) {
+    await handleEditIdeaClick(id);
+  }
+
+  if (shouldRefresh) {
+    loadWatchedListContent(); // Re-load the table data
+  }
+}
+// --- END: MOVED FROM strategy-lab/handlers.js ---
 
 /**
  * Handles the click to delete a "Trade Idea".

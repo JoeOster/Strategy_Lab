@@ -2,7 +2,7 @@
 
 /**
  * Renders the paper trades table.
- * @param {import('../../../types.js').PaperTrade[] | null} paperTrades - An array of paper trade items.
+ * @param {import('../../../types.js').Transaction[] | null} paperTrades - An array of paper trade items.
  * @param {Error | null} [error] - An optional error object.
  */
 export function renderPaperTrades(paperTrades, error = null) {
@@ -12,12 +12,10 @@ export function renderPaperTrades(paperTrades, error = null) {
     return;
   }
 
-  // --- FIX: Added error handling ---
   if (error) {
     container.innerHTML = '<p class="error">Failed to load paper trades.</p>';
     return;
   }
-  // --- END FIX ---
 
   if (!paperTrades || paperTrades.length === 0) {
     container.innerHTML = '<p>No paper trades recorded.</p>';
@@ -27,15 +25,16 @@ export function renderPaperTrades(paperTrades, error = null) {
   const table = document.createElement('table');
   table.className = 'strategy-table'; // Re-use the existing table style
 
+  // --- START: FIX ---
+  // Updated columns to match the Transaction type
   table.innerHTML = `
     <thead>
       <tr>
-        <th>Symbol</th>
-        <th>Entry Price</th>
-        <th>Exit Price</th>
-        <th>Quantity</th>
-        <th>Profit/Loss</th>
         <th>Date</th>
+        <th>Symbol</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Entry Price</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -44,16 +43,18 @@ export function renderPaperTrades(paperTrades, error = null) {
         .map(
           (trade) => `
         <tr>
-          <td>${trade.symbol}</td>
-          <td>${trade.entryPrice}</td>
-          <td>${trade.exitPrice}</td>
+          <td>${trade.transaction_date.split('T')[0] || ''}</td>
+          <td>${trade.ticker}</td>
+          <td>${trade.transaction_type}</td>
           <td>${trade.quantity}</td>
-          <td style="color: ${
-            trade.profit >= 0 ? 'var(--success-color)' : 'var(--danger-color)'
-          };">${trade.profit}</td>
-          <td>${trade.date}</td>
+          <td>${trade.price}</td>
           <td>
-            <button class="small-btn" data-id="${trade.id}">Details</button>
+            <button class="small-btn btn paper-details-btn" data-id="${
+              trade.id
+            }">Details</button>
+            <button class="small-btn btn paper-delete-btn" data-id="${
+              trade.id
+            }">Delete</button>
           </td>
         </tr>
       `
@@ -61,6 +62,7 @@ export function renderPaperTrades(paperTrades, error = null) {
         .join('')}
     </tbody>
   `;
+  // --- END: FIX ---
 
   container.innerHTML = ''; // Clear previous content
   container.appendChild(table);
