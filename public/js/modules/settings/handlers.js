@@ -32,7 +32,9 @@ export function handleMainTabClick(event) {
   if (panel) {
     panel.classList.add('active');
     // Always load data for the clicked main tab
-    if (targetPanelId === 'appearance-settings-panel') {
+    if (targetPanelId === 'general-settings-panel') {
+      loadGeneralSettings();
+    } else if (targetPanelId === 'appearance-settings-panel') {
       appearanceHandlers.loadAppearanceSettings();
     } else if (targetPanelId === 'data-management-settings-panel') {
       initializeSubTabs(
@@ -140,64 +142,71 @@ export function handleSubTabClick(event) {
   }
 }
 
-/**
- * Handles closing the settings modal.
- */
-export function handleCloseModal() {
-  console.log('Close modal button clicked.');
-  // In a real scenario, this would hide the modal
-  document.getElementById('settings-modal').style.display = 'none';
-}
 
-/**
- * Handles saving all settings.
- */
-export async function handleSaveAllSettings() {
-  console.log('Save All Settings button clicked.');
-  const settings = {
-    'family-name': document.getElementById('family-name').value,
-    'take-profit-percent': document.getElementById('take-profit-percent').value,
-    'stop-loss-percent': document.getElementById('stop-loss-percent').value,
-    'notification-cooldown': document.getElementById('notification-cooldown')
-      .value,
-    theme: document.getElementById('theme-selector').value,
-    font: document.getElementById('font-selector').value,
-  };
 
-  try {
-    await updateSettings(settings);
-    console.log('Settings saved to database.');
-    // Optionally, show a success message to the user
-  } catch (error) {
-    console.error('Failed to save settings:', error);
-    // Optionally, show an error message to the user
-  }
-}
+
 
 /**
  * Loads general settings from the database and populates the form.
  */
 export async function loadGeneralSettings() {
   try {
+    console.log('loadGeneralSettings called');
     const settings = await getSettings();
+    console.log('Settings fetched:', settings);
     if (settings) {
-      document.getElementById('family-name').value =
-        settings['family-name'] || '';
-      document.getElementById('take-profit-percent').value =
-        settings['take-profit-percent'] || '';
-      document.getElementById('stop-loss-percent').value =
-        settings['stop-loss-percent'] || '';
-      document.getElementById('notification-cooldown').value =
-        settings['notification-cooldown'] || '';
+      const familyNameElement = document.getElementById('family-name');
+      if (familyNameElement) {
+        familyNameElement.value = settings['family-name'] || '';
+        console.log('family-name set to:', familyNameElement.value);
+      } else {
+        console.error('Element with ID "family-name" not found.');
+      }
+
+      const takeProfitElement = document.getElementById('take-profit-percent');
+      if (takeProfitElement) {
+        takeProfitElement.value = settings['take-profit-percent'] || '';
+        console.log('take-profit-percent set to:', takeProfitElement.value);
+      } else {
+        console.error('Element with ID "take-profit-percent" not found.');
+      }
+
+      const stopLossElement = document.getElementById('stop-loss-percent');
+      if (stopLossElement) {
+        stopLossElement.value = settings['stop-loss-percent'] || '';
+        console.log('stop-loss-percent set to:', stopLossElement.value);
+      } else {
+        console.error('Element with ID "stop-loss-percent" not found.');
+      }
+
+      const notificationCooldownElement = document.getElementById(
+        'notification-cooldown'
+      );
+      if (notificationCooldownElement) {
+        notificationCooldownElement.value =
+          settings['notification-cooldown'] || '';
+        console.log(
+          'notification-cooldown set to:',
+          notificationCooldownElement.value
+        );
+      } else {
+        console.error('Element with ID "notification-cooldown" not found.');
+      }
 
       const themeSelector = document.getElementById('theme-selector');
       if (themeSelector) {
         themeSelector.value = settings.theme || 'light';
+        console.log('theme-selector set to:', themeSelector.value);
+      } else {
+        console.error('Element with ID "theme-selector" not found.');
       }
 
       const fontSelector = document.getElementById('font-selector');
       if (fontSelector) {
         fontSelector.value = settings.font || 'system';
+        console.log('font-selector set to:', fontSelector.value);
+      } else {
+        console.error('Element with ID "font-selector" not found.');
       }
 
       // Apply the loaded appearance settings

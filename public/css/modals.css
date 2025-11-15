@@ -1,5 +1,46 @@
 /* ... (existing modal styles) ... */
 
+/* General Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+.modal-content {
+  background-color: var(--bg-color);
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid var(--container-border);
+  width: 80%; /* Could be more or less, depending on screen size */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 8px;
+  position: relative; /* For absolute positioning of close button */
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 /* --- START: z-index FIX --- */
 /* L2 Modals (Modals on top of other modals) */
 /* Give them a higher z-index to appear above the L1 modals (z-index: 1000) */

@@ -36,17 +36,27 @@
 .settings-panel,
 .sub-panel,
 .sub-tab-content {
-  /* Added .sub-tab-content */
   display: none; /* Hidden by default */
   padding: 15px 0;
   border-top: 1px solid var(--container-border);
+  position: absolute; /* Position inactive panels absolutely */
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 .settings-panel.active,
 .sub-panel.active,
 .sub-tab-content.active {
-  /* Added .sub-tab-content.active */
   display: block; /* Show active panel */
+  position: relative; /* Bring active panel back into document flow */
+  min-height: 100px; /* Ensure active panel has some height */
+}
+
+/* Add position relative to modal-content to serve as positioning context */
+.modal-content {
+  position: relative;
+  overflow: hidden; /* Hide overflowing content from absolutely positioned children */
 }
 
 /* --- START: NEW PREVIEW STYLE --- */

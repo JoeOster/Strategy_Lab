@@ -14,7 +14,7 @@ export async function loadHtmlPartial(url, targetElementId) {
     const html = await response.text();
     const targetElement = document.getElementById(targetElementId);
     if (targetElement) {
-      targetElement.insertAdjacentHTML('afterend', html);
+      targetElement.insertAdjacentHTML('beforeend', html);
     } else {
       console.error(`Target element with ID "${targetElementId}" not found.`);
     }

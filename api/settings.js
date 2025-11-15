@@ -20,6 +20,18 @@ router.get('/', async (req, res) => {
       },
       {}
     );
+
+    // Provide default values for settings if they are not present
+    settingsObj['family-name'] = settingsObj['family-name'] || '';
+    settingsObj['take-profit-percent'] =
+      settingsObj['take-profit-percent'] || '0.00'; // Default to 0.00
+    settingsObj['stop-loss-percent'] =
+      settingsObj['stop-loss-percent'] || '0.00'; // Default to 0.00
+    settingsObj['notification-cooldown'] =
+      settingsObj['notification-cooldown'] || '5'; // Default to 5 minutes
+    settingsObj.theme = settingsObj.theme || 'light'; // Default theme
+    settingsObj.font = settingsObj.font || 'system'; // Default font
+
     res.json(settingsObj);
   } catch (err) {
     console.error('Failed to get settings:', err);

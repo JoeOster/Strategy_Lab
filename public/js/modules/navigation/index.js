@@ -47,11 +47,9 @@ export const loadPageContent = async (tab) => {
 export const initializeNavigation = () => {
   const navButtons = document.querySelectorAll('.main-nav .nav-btn');
   const mainContent = document.getElementById('app-content');
-  const settingsModal = document.getElementById('settings-modal');
-
-  if (!mainContent || !settingsModal) {
+  if (!mainContent) {
     console.error(
-      'Navigation initialization failed: Missing #app-content or #settings-modal'
+      'Navigation initialization failed: Missing #app-content'
     );
     return;
   }
@@ -80,14 +78,9 @@ export const initializeNavigation = () => {
       target.classList.add('active');
 
       if (tab === 'settings') {
-        // --- THIS IS THE FIX ---
-        // Clear main content and show the modal
-        mainContent.innerHTML = '';
-        settingsModal.style.display = 'block';
+        loadPageContent('settings-page');
       } else {
-        // Hide the modal and load the tab content
-        settingsModal.style.display = 'none';
-        loadPageContent(tab); // This is now type-safe
+        loadPageContent(tab);
       }
     });
   }

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('Strategy Lab App Main script loaded.');
 
   // Dynamically load modal HTML partials first
-  await loadHtmlPartial('/_settings-modal.html', 'app-container');
+  await loadHtmlPartial('/_settings-page.html', 'app-container');
   // --- START: MODIFICATION ---
   // Renamed _edit-source-modal.html to _source-form-modal.html
   await loadHtmlPartial('/_source-form-modal.html', 'app-container');

@@ -24,12 +24,21 @@ export { loadAppearanceSettings };
 
 export function initializeSettingsModule() {
   console.log('Settings module initialized.');
-  handlers.loadGeneralSettings();
+  // handlers.loadGeneralSettings(); // This will now be called by handleMainTabClick
   loadAccountHoldersList();
 
   // Main tab navigation
   for (const button of document.querySelectorAll('.settings-tab')) {
     button.addEventListener('click', handlers.handleMainTabClick);
+  }
+
+  // Explicitly activate the default tab (General) and load its content
+  const defaultTab = document.querySelector(
+    '.settings-tab[data-tab="general-settings-panel"]'
+  );
+  if (defaultTab) {
+    // Simulate a click on the default tab to trigger its activation and content loading
+    handlers.handleMainTabClick({ target: defaultTab });
   }
 
   // Sub-tab navigation (using event delegation)
@@ -38,18 +47,10 @@ export function initializeSettingsModule() {
     container.addEventListener('click', handlers.handleSubTabClick);
   }
 
-  // Close button
-  const settingsModal = document.getElementById('settings-modal');
-  if (settingsModal) {
-    const closeButton = settingsModal.querySelector('.close-button');
-    if (closeButton) {
-      closeButton.addEventListener('click', handlers.handleCloseModal);
-    } else {
-      console.error('Close button not found within settings modal.');
-    }
-
-    // Delegated event listener for all change events within the modal
-    settingsModal.addEventListener('change', (event) => {
+  // Delegated event listener for all change events within the settings page
+  const appContainer = document.getElementById('app-container');
+  if (appContainer) {
+    appContainer.addEventListener('change', (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
 
@@ -60,24 +61,13 @@ export function initializeSettingsModule() {
         case 'font-selector':
           handleFontChange(event);
           break;
-        // --- START: MODIFICATION ---
         case 'source-form-type':
-          // Pass the value directly, not the event
           handleSourceTypeChange(
             /** @type {HTMLSelectElement} */ (target).value
           );
           break;
-        // --- END: MODIFICATION ---
       }
     });
-
-    // Add listener for the new "Add New Source" button
-    const addSourceBtn = document.getElementById('open-add-source-btn');
-    if (addSourceBtn) {
-      addSourceBtn.addEventListener('click', () => openSourceFormModal(null));
-    }
-  } else {
-    console.error('Settings modal not found.');
   }
 
   // Listeners for the new single modal

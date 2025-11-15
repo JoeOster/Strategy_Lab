@@ -1,0 +1,175 @@
+<div id="settings-page">
+  <h2>Settings</h2>
+
+  <div class="settings-tabs">
+    <button class="settings-tab active" data-tab="general-settings-panel">
+      General
+    </button>
+    <button class="settings-tab" data-tab="appearance-settings-panel">
+      Appearance
+    </button>
+    <button class="settings-tab" data-tab="data-management-settings-panel">
+      Data Management
+    </button>
+    <button class="settings-tab" data-tab="user-management-settings-panel">
+      User Management
+    </button>
+  </div>
+
+  <div id="general-settings-panel" class="settings-panel active">
+    <h3>General Settings</h3>
+    <form id="general-settings-form">
+      <div class="form-group">
+        <label for="family-name">Family Name:</label>
+        <input type="text" id="family-name" name="family-name" />
+      </div>
+      <div class="form-group">
+        <label for="take-profit-percent">Take Profit %:</label>
+        <input
+          type="number"
+          id="take-profit-percent"
+          name="take-profit-percent"
+          step="0.01"
+        />
+      </div>
+      <div class="form-group">
+        <label for="stop-loss-percent">Stop Loss %:</label>
+        <input
+          type="number"
+          id="stop-loss-percent"
+          name="stop-loss-percent"
+          step="0.01"
+        />
+      </div>
+      <div class="form-group">
+        <label for="notification-cooldown">Notification Cooldown (min):</label>
+        <input
+          type="number"
+          id="notification-cooldown"
+          name="notification-cooldown"
+        />
+      </div>
+      <div class="form-actions">
+        <button
+          type="button"
+          id="clear-general-settings-btn"
+          class="btn secondary"
+        >
+          Clear
+        </button>
+        <button type="submit" id="save-general-settings-btn" class="btn">
+          Save General Settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="appearance-settings-panel" class="settings-panel">
+    <h3>Appearance Settings</h3>
+    <form id="appearance-settings-form">
+      <div class="form-group">
+        <label for="theme-selector">Theme:</label>
+        <select id="theme-selector" name="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="font-selector">Font:</label>
+        <select id="font-selector" name="font">
+          <option value="system">System Default</option>
+          <option value="sans-serif">Sans-serif</option>
+          <option value="monospace">Monospace</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button
+          type="button"
+          id="clear-appearance-settings-btn"
+          class="btn secondary"
+        >
+          Clear
+        </button>
+        <button type="submit" id="save-appearance-settings-btn" class="btn">
+          Save Appearance Settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="data-management-settings-panel" class="settings-panel">
+    <h3>Data Management</h3>
+    <div class="settings-sub-tabs">
+      <button class="settings-sub-tab active" data-sub-tab="sources-panel">
+        Advice Sources
+      </button>
+      <button class="settings-sub-tab" data-sub-tab="exchanges-panel">
+        Exchanges
+      </button>
+      <button class="settings-sub-tab" data-sub-tab="webapps-panel">
+        Web Apps
+      </button>
+    </div>
+
+    <div id="sources-panel" class="sub-panel active">
+      <h4>Manage Advice Sources</h4>
+      <button type="button" id="open-add-source-btn" class="btn">
+        Add New Source
+      </button>
+      <hr />
+      <h4>Advice Sources</h4>
+      <div id="advice-source-list"></div>
+    </div>
+
+    <div id="exchanges-panel" class="sub-panel">
+      <h4>Manage Exchanges</h4>
+      <button type="button" id="open-add-exchange-btn" class="btn">
+        Add New Exchange
+      </button>
+      <hr />
+      <h4>Exchanges</h4>
+      <div id="exchange-list"></div>
+    </div>
+
+    <div id="webapps-panel" class="sub-panel">
+      <h4>Manage Web Apps</h4>
+      <button type="button" id="open-add-webapp-btn" class="btn">
+        Add New Web App
+      </button>
+      <hr />
+      <h4>Web Apps</h4>
+      <div id="webapp-list"></div>
+    </div>
+  </div>
+
+  <div id="user-management-settings-panel" class="settings-panel">
+    <h3>User Management</h3>
+    <div class="settings-sub-tabs">
+      <button class="settings-sub-tab active" data-sub-tab="users-panel">
+        Users
+      </button>
+      <button
+        class="settings-sub-tab"
+        data-sub-tab="subscriptions-panel"
+        style="display: none"
+      >
+        Subscriptions
+      </button>
+    </div>
+
+    <div id="users-panel" class="sub-panel active">
+      <h4>Manage Users</h4>
+      <button type="button" id="open-add-user-btn" class="btn">
+        Add New User
+      </button>
+      <hr />
+      <h4>Users</h4>
+      <div id="user-list"></div>
+    </div>
+
+    <div id="subscriptions-panel" class="sub-panel">
+      <h4>Manage Subscriptions</h4>
+      <div id="subscriptions-list"></div>
+    </div>
+  </div>
+</div>
