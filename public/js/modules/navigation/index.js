@@ -21,6 +21,9 @@ export const loadPageContent = async (tab) => {
     // Use dynamic import to load the module and call its initializeModule function
     try {
       // All modules now follow the same '/index.js' pattern.
+      // --- START: FIX ---
+      // This path will now correctly become '../settings/index.js' when 'settings' is clicked
+      // --- END: FIX ---
       const modulePath = `../${tab}/index.js`;
 
       const module = await import(modulePath);
@@ -77,11 +80,11 @@ export const initializeNavigation = () => {
       // Activate the clicked button
       target.classList.add('active');
 
-      if (tab === 'settings') {
-        loadPageContent('settings-page');
-      } else {
-        loadPageContent(tab);
-      }
+      // --- START: FIX ---
+      // Removed the broken "if (tab === 'settings')" logic.
+      // All tabs are now handled by the same function.
+      loadPageContent(tab);
+      // --- END: FIX ---
     });
   }
 
