@@ -13,6 +13,11 @@ router.post('/ideas', async (req, res) => {
     const db = await getDb();
     /** @type {Partial<WatchedItem>} */
     const idea = req.body;
+    const now = new Date().toISOString();
+
+    const isPaperTrade = idea.is_paper_trade ? 1 : 0;
+    const status = isPaperTrade ? 'EXECUTED' : 'WATCHING'; // If it's a paper trade, its status is EXECUTED
+
     const columns = [
       'is_paper_trade',
       'user_id',
@@ -28,29 +33,62 @@ router.post('/ideas', async (req, res) => {
       'status',
       'notes',
       'created_date',
+      'updated_date',
     ];
-    const now = new Date().toISOString();
     const values = [
-      0, // is_paper_trade
-      idea.user_id || 1, // user_id (default to 1 for now)
+      isPaperTrade,
+      idea.user_id || 1,
       idea.source_id || null,
       idea.strategy_id || null,
       idea.ticker.toUpperCase(),
+      idea.order_type || null,
       idea.buy_price_high || null,
       idea.buy_price_low || null,
       idea.take_profit_high || null,
       idea.take_profit_low || null,
       idea.escape_price || null,
-      'WATCHING', // status
+      status, // Use the determined status
       idea.notes || null,
-      now, // created_date
+      now,
+      now,
     ].map((v) => (v === '' ? null : v));
     const placeholders = columns.map(() => '?').join(',');
     const sql = `INSERT INTO watched_items (${columns.join(',')}) VALUES (${placeholders})`;
     const result = await db.run(sql, values);
+    const newIdeaId = result.lastID;
+
+    // If it's a paper trade, also create a transaction
+    if (isPaperTrade) {
+      // Assuming ideaData will contain quantity and price for a paper trade
+      const { quantity, price, limit_low, limit_high, exchange, time } = idea;
+      await db.run(
+        `INSERT INTO transactions
+           (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date, limit_low, limit_high, exchange, time)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          1, // is_paper_trade
+          idea.user_id,
+          idea.source_id,
+          newIdeaId, // Use the newly created watched_item_id
+          now,
+          idea.ticker,
+          'BUY', // Assuming 'BUY' for initial paper trade creation
+          quantity,
+          price,
+          quantity, // quantity_remaining
+          now,
+          now,
+          limit_low || null,
+          limit_high || null,
+          exchange || null,
+          time || null,
+        ]
+      );
+    }
+
     const newIdea = await db.get(
       'SELECT * FROM watched_items WHERE id = ?',
-      result.lastID
+      newIdeaId
     );
     res.status(201).json(newIdea);
   } catch (err) {
@@ -133,70 +171,46 @@ router.delete('/:id', async (req, res) => {
 router.post('/:id/to-paper', async (req, res) => {
   try {
     const db = await getDb();
-    const { id } = req.params;
-    const idea = req.body;
-
-    // First, update the idea with the new data from the modal
-    await db.run(
-      `UPDATE watched_items SET
-        ticker = ?,
-        buy_price_low = ?,
-        buy_price_high = ?,
-        take_profit_low = ?,
-        take_profit_high = ?,
-        escape_price = ?,
-        notes = ?
-      WHERE id = ?`,
-      [
-        idea.ticker.toUpperCase(),
-        idea.buy_price_low,
-        idea.buy_price_high,
-        idea.take_profit_low,
-        idea.take_profit_high,
-        idea.escape_price,
-        idea.notes,
-        id,
-      ]
-    );
+    const { id } = req.params; // This is the ideaId
+    const { quantity, price, limit_low, limit_high, exchange, time } =
+      req.body;
 
     /** @type {WatchedItem | undefined} */
-    const updatedIdea = await db.get(
-      'SELECT * FROM watched_items WHERE id = ? AND is_paper_trade = 0',
-      id
-    );
-    if (!updatedIdea) {
+    const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
+    if (!idea) {
       return res.status(404).json({ error: 'Trade Idea not found' });
     }
-    const entryPrice = await getPriceV2(updatedIdea.ticker);
-    if (!entryPrice) {
-      return res.status(400).json({
-        error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.`,
-      });
-    }
+
     const now = new Date().toISOString();
     const result = await db.run(
       `INSERT INTO transactions 
-         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date, limit_low, limit_high, exchange, time) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        1,
-        updatedIdea.user_id,
-        updatedIdea.source_id,
+        1, // is_paper_trade
+        idea.user_id,
+        idea.source_id,
         id,
         now,
-        updatedIdea.ticker,
+        idea.ticker,
         'BUY',
-        1,
-        entryPrice,
-        1,
+        quantity,
+        price,
+        quantity, // quantity_remaining
         now,
         now,
+        limit_low || null,
+        limit_high || null,
+        exchange || null,
+        time || null,
       ]
     );
+
     await db.run('UPDATE watched_items SET status = ? WHERE id = ?', [
       'EXECUTED',
       id,
     ]);
+
     res.status(201).json({
       message: 'Paper trade created',
       newTransactionId: result.lastID,
@@ -257,70 +271,46 @@ router.put('/:id', async (req, res) => {
 router.post('/:id/to-real', async (req, res) => {
   try {
     const db = await getDb();
-    const { id } = req.params;
-    const idea = req.body;
-
-    // First, update the idea with the new data from the modal
-    await db.run(
-      `UPDATE watched_items SET
-        ticker = ?,
-        buy_price_low = ?,
-        buy_price_high = ?,
-        take_profit_low = ?,
-        take_profit_high = ?,
-        escape_price = ?,
-        notes = ?
-      WHERE id = ?`,
-      [
-        idea.ticker.toUpperCase(),
-        idea.buy_price_low,
-        idea.buy_price_high,
-        idea.take_profit_low,
-        idea.take_profit_high,
-        idea.escape_price,
-        idea.notes,
-        id,
-      ]
-    );
+    const { id } = req.params; // This is the ideaId
+    const { quantity, price, limit_low, limit_high, exchange, time } =
+      req.body;
 
     /** @type {WatchedItem | undefined} */
-    const updatedIdea = await db.get(
-      'SELECT * FROM watched_items WHERE id = ? AND is_paper_trade = 0',
-      id
-    );
-    if (!updatedIdea) {
+    const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
+    if (!idea) {
       return res.status(404).json({ error: 'Trade Idea not found' });
     }
-    const entryPrice = await getPriceV2(updatedIdea.ticker);
-    if (!entryPrice) {
-      return res.status(400).json({
-        error: `Could not fetch current price for ${updatedIdea.ticker}. Please check the ticker symbol.`,
-      });
-    }
+
     const now = new Date().toISOString();
     const result = await db.run(
       `INSERT INTO transactions 
-         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date, limit_low, limit_high, exchange, time) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        0,
-        updatedIdea.user_id,
-        updatedIdea.source_id,
+        0, // is_paper_trade
+        idea.user_id,
+        idea.source_id,
         id,
         now,
-        updatedIdea.ticker,
+        idea.ticker,
         'BUY',
-        1,
-        entryPrice,
-        1,
+        quantity,
+        price,
+        quantity, // quantity_remaining
         now,
         now,
+        limit_low || null,
+        limit_high || null,
+        exchange || null,
+        time || null,
       ]
     );
+
     await db.run('UPDATE watched_items SET status = ? WHERE id = ?', [
       'EXECUTED',
       id,
     ]);
+
     res.status(201).json({
       message: 'Real trade created',
       newTransactionId: result.lastID,
