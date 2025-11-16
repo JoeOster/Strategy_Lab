@@ -1,6 +1,6 @@
 // public/js/modules/settings/exchanges.api.js
 
-import { api } from '../../utils/apiFetch.js';
+import { api } from '../../services/apiFetch.js';
 
 /**
  * Fetches the list of exchanges from the backend.

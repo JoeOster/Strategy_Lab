@@ -130,8 +130,7 @@ Write-Log "Checking for and closing any existing listeners on port $port..."
 Write-Log "Starting server with 'npm run dev' on port $port..."
 # We use npx to run cross-env, which sets the PORT env variable
 # Then we run the 'dev' script from package.json
-$serverProcess = Start-Process -FilePath "npx.cmd" -ArgumentList "cross-env", "PORT=$port", "npm", "run", "dev" -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru -RedirectStandardOutput $serverStdoutFile -RedirectStandardError $serverStderrFile
-$serverPid = $serverProcess.Id
+$serverProcess = Start-Process -FilePath "npx.cmd" -ArgumentList "cross-env", "PORT=$port", "npm", "run", "dev" -WorkingDirectory $PSScriptRoot -PassThru
 # --- END IMPROVEMENT ---
 
 Write-Log "Server job 'DevServer' started."
@@ -156,13 +155,37 @@ while (-not $serverReady -and $attempt -lt $maxAttempts) {
 
 if (-not $serverReady) {
     Write-Log "Server failed to start after $maxAttempts attempts. Stopping script."
-    Stop-Process -Id $serverPid -Force
+    # Attempt to find and stop any process listening on the port if server didn't start correctly
+    try {
+        $failedProcess = (Get-NetTCPConnection -LocalPort ${port} | Select-Object -First 1).OwningProcess
+        if ($failedProcess) {
+            Stop-Process -Id $failedProcess -Force -ErrorAction SilentlyContinue
+            Write-Log "Stopped process $failedProcess that was listening on port ${port}."
+        }
+    } catch {
+        Write-Log "Error during cleanup of failed server start: $_"
+    }
     return # Exit the script
 }
 
+# --- NEW: Find the actual PID listening on the port ---
+$actualServerPid = $null
+try {
+    $connection = Get-NetTCPConnection -LocalPort ${port} | Select-Object -First 1
+    if ($connection) {
+        $actualServerPid = $connection.OwningProcess
+        Write-Log "Actual process listening on port ${port}: PID $actualServerPid"
+    } else {
+        Write-Log "Could not find a process listening on port ${port} after server started."
+    }
+} catch {
+    Write-Log "Error finding actual server PID: $_"
+}
+# --- END NEW ---
+
 # --- IMPROVEMENT: Launch in default browser ---
 Write-Log "Launching default browser. The script will wait for you to close the browser."
-Start-Process "http://localhost:$port"
+Start-Process "http://localhost:${port}"
 Write-Host "Press any key to close the browser and continue..."
 $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
 # --- END IMPROVEMENT ---
@@ -174,9 +197,18 @@ Write-Log "Browser closed. Starting automated cleanup..."
 
 # --- IMPROVEMENT: Removed obsolete browser log filtering section ---
 
-# --- FIX: Explicitly stop the server process ---
-Write-Log "Stopping 'npm run dev' background process (PID: $serverPid)..."
-Stop-Process -Id $serverPid -Force -ErrorAction SilentlyContinue
+# --- FIX: Explicitly stop the server process using taskkill ---
+if ($actualServerPid) {
+    Write-Log "Attempting to terminate server process (PID: $actualServerPid) using taskkill /F..."
+    try {
+        taskkill /PID $actualServerPid /F | Out-Null
+        Write-Log "Server process terminated."
+    } catch {
+        Write-Log "Error terminating server process: $_"
+    }
+} else {
+    Write-Log "No server process PID found to stop."
+}
 # --- END FIX ---
 
 Write-Log "Server job stopped."

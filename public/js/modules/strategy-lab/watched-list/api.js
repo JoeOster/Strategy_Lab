@@ -2,7 +2,7 @@
 
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 
-import { api } from '../../../utils/apiFetch.js';
+import { api } from '../../../services/apiFetch.js';
 
 /**
  * Fetches the list of watched items (Trade Ideas) from the real API.

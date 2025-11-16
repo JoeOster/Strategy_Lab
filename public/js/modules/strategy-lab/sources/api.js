@@ -1,5 +1,5 @@
 // public/js/modules/strategy-lab/sources/api.js
-import { api } from '../../../utils/apiFetch.js';
+import { api } from '../../../services/apiFetch.js';
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
@@ -29,6 +29,15 @@ export async function getStrategiesForSource(sourceId) {
   return api.get(`/api/sources/${sourceId}/strategies`);
 }
 
+/**
+ * Fetches a single strategy by its ID.
+ * @param {string | number} strategyId - The ID of the strategy to fetch.
+ * @returns {Promise<Strategy>}
+ */
+export async function getStrategy(strategyId) {
+  return api.get(`/api/strategies/${strategyId}`);
+}
+
 // --- START: NEW SOURCE-SPECIFIC API FUNCTIONS ---
 
 /**
@@ -37,7 +46,7 @@ export async function getStrategiesForSource(sourceId) {
  * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of WatchedItems.
  */
 export async function getOpenIdeasForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/ideas`);
+  return api.get(`/api/sources/${sourceId}/open-ideas`);
 }
 
 /**
@@ -56,5 +65,24 @@ export async function getOpenTradesForSource(sourceId) {
  */
 export async function getPaperTradesForSource(sourceId) {
   return api.get(`/api/sources/${sourceId}/paper-trades`);
+}
+
+/**
+ * Deletes a strategy by marking it as inactive.
+ * @param {string | number} strategyId - The ID of the strategy to delete.
+ * @returns {Promise<any>}
+ */
+export async function deleteStrategy(strategyId) {
+  return api.delete(`/api/strategies/${strategyId}`);
+}
+
+/**
+ * Updates an existing strategy.
+ * @param {string | number} strategyId - The ID of the strategy to update.
+ * @param {object} strategyData - The data to update.
+ * @returns {Promise<Strategy>}
+ */
+export async function updateStrategy(strategyId, strategyData) {
+  return api.put(`/api/strategies/${strategyId}`, strategyData);
 }
 // --- END: NEW SOURCE-SPECIFIC API FUNCTIONS ---

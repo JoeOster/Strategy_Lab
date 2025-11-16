@@ -1,6 +1,6 @@
 // public/js/modules/strategy-lab/watched-list/handlers.js
 
-import { loadPageContent } from '../../navigation/index.js';
+import { openEditTradeModal } from '../../transactions/edit-trade.handlers.js';
 import { handleShowIdeaForm } from '../sources/forms.handlers.js';
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 import * as api from './api.js';
@@ -53,7 +53,7 @@ export async function handleWatchedListClicks(event) {
   if (button.classList.contains('idea-delete-btn')) {
     shouldRefresh = await handleDeleteIdeaClick(id);
   } else if (button.classList.contains('idea-paper-btn')) {
-    shouldRefresh = await handleMoveIdeaToPaperClick(id);
+    await handleMoveIdeaToPaperClick(id);
   } else if (button.classList.contains('idea-buy-btn')) {
     await handleBuyIdeaClick(id);
   } else if (button.classList.contains('idea-edit-btn')) {
@@ -87,68 +87,18 @@ export async function handleDeleteIdeaClick(id) {
 
 /**
  * Handles the click to move an "Idea" to "Paper Trades".
- * @param {string} id - The ID of the watched item.
- * @returns {Promise<boolean>} True if the list should be refreshed.
+ * @param {string} ideaId - The ID of the watched item.
  */
 export async function handleMoveIdeaToPaperClick(ideaId) {
-  console.log('Handle Move Idea to Paper Click:', ideaId);
-  try {
-    const idea = await api.getIdeaForPrefill(ideaId);
-    if (idea) {
-      handleShowIdeaForm(null, idea.source_id, idea.strategy_id, true);
-      const ideaForm = document.getElementById('log-idea-form');
-      if (ideaForm) {
-        ideaForm.elements['idea-ticker'].value = idea.ticker;
-        ideaForm.elements['idea-buy-low'].value = idea.buy_price_low;
-        ideaForm.elements['idea-buy-high'].value = idea.buy_price_high;
-        ideaForm.elements['idea-tp-low'].value = idea.take_profit_low;
-        ideaForm.elements['idea-tp-high'].value = idea.take_profit_high;
-        ideaForm.elements['idea-escape'].value = idea.escape_price;
-        ideaForm.elements['idea-notes'].value = idea.notes;
-        const ideaIdInput = document.createElement('input');
-        ideaIdInput.type = 'hidden';
-        ideaIdInput.name = 'id';
-        ideaIdInput.value = idea.id;
-        ideaForm.appendChild(ideaIdInput);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to get idea for prefill:', error);
-    alert('Error: Could not get idea details. Please check the console.');
-  }
+  openEditTradeModal({ ideaId: ideaId, isPaper: true });
 }
 
 /**
  * Handles the "Buy" button click for an idea.
- * This will pre-fill the Orders tab with the idea's data.
  * @param {string} ideaId - The ID of the idea to buy.
  */
 export async function handleBuyIdeaClick(ideaId) {
-  console.log('Handle Buy Idea Click:', ideaId);
-  try {
-    const idea = await api.getIdeaForPrefill(ideaId);
-    if (idea) {
-      handleShowIdeaForm(null, idea.source_id, idea.strategy_id, false, true);
-      const ideaForm = document.getElementById('log-idea-form');
-      if (ideaForm) {
-        ideaForm.elements['idea-ticker'].value = idea.ticker;
-        ideaForm.elements['idea-buy-low'].value = idea.buy_price_low;
-        ideaForm.elements['idea-buy-high'].value = idea.buy_price_high;
-        ideaForm.elements['idea-tp-low'].value = idea.take_profit_low;
-        ideaForm.elements['idea-tp-high'].value = idea.take_profit_high;
-        ideaForm.elements['idea-escape'].value = idea.escape_price;
-        ideaForm.elements['idea-notes'].value = idea.notes;
-        const ideaIdInput = document.createElement('input');
-        ideaIdInput.type = 'hidden';
-        ideaIdInput.name = 'id';
-        ideaIdInput.value = idea.id;
-        ideaForm.appendChild(ideaIdInput);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to get idea for prefill:', error);
-    alert('Error: Could not get idea details. Please check the console.');
-  }
+  openEditTradeModal({ ideaId: ideaId, isPaper: false });
 }
 
 export async function handleEditIdeaClick(ideaId) {
@@ -178,3 +128,4 @@ export async function handleEditIdeaClick(ideaId) {
     alert('Error: Could not get idea details. Please check the console.');
   }
 }
+

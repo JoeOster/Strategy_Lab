@@ -1,10 +1,10 @@
-// server.js
 import fs from 'node:fs';
-import dotenv from 'dotenv';
-dotenv.config();
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// server.js
+import dotenv from 'dotenv';
 import express from 'express';
+dotenv.config();
 // --- START: NEW API ROUTER IMPORT ---
 import apiRouter from './api/index.js';
 import { getDb } from './services/database.js';

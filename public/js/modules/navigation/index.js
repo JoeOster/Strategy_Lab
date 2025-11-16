@@ -51,9 +51,7 @@ export const initializeNavigation = () => {
   const navButtons = document.querySelectorAll('.main-nav .nav-btn');
   const mainContent = document.getElementById('app-content');
   if (!mainContent) {
-    console.error(
-      'Navigation initialization failed: Missing #app-content'
-    );
+    console.error('Navigation initialization failed: Missing #app-content');
     return;
   }
 

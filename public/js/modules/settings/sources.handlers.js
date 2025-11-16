@@ -1,4 +1,5 @@
 // public/js/modules/settings/sources.handlers.js
+import { handleFetchIsbnInfo } from './sources_books.handlers.js';
 import {
   addSource,
   deleteSource,
@@ -7,6 +8,43 @@ import {
   updateSource,
 } from './sources.api.js';
 import { getWebApps } from './webapps.api.js';
+
+// --- START: ADD CACHE ---
+let cachedSources = null;
+// --- END: ADD CACHE ---
+
+/**
+ * Renders the list of sources into the container.
+ * @param {Array<object>} sources - The array of source objects.
+ * @param {HTMLElement} container - The container element to render into.
+ */
+function renderSourcesList(sources, container) {
+  if (sources.length === 0) {
+    container.innerHTML = '<p>No advice sources found.</p>';
+    return;
+  }
+
+  container.innerHTML = ''; // Clear existing list
+  for (const source of sources) {
+    const sourceElement = document.createElement('div');
+    sourceElement.className = 'advice-source-item';
+    sourceElement.dataset.id = String(source.id); // Ensure ID is string
+
+    const infoSpan = document.createElement('span');
+    infoSpan.classList.add('source-info');
+    infoSpan.textContent = `${source.name} (${source.type})`;
+    sourceElement.appendChild(infoSpan);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('source-actions');
+    actionsDiv.innerHTML = `
+      <button class="edit-source-btn table-action-btn btn-secondary" data-id="${source.id}">Edit</button>
+      <button class="delete-source-btn table-action-btn btn-danger" data-id="${source.id}">Delete</button>
+    `;
+    sourceElement.appendChild(actionsDiv);
+    container.appendChild(sourceElement);
+  }
+}
 
 /**
  * Updates the image preview in the add/edit source forms.
@@ -44,11 +82,7 @@ export function updateImagePreview(type, filename) {
   previewImg.src = folderPath + file;
   previewImg.style.display = 'block'; // Show the image
 
-  // Set fallback image for broken links or typos
-  // --- START: FIX ---
-  // Changed placeholder to a file that exists
   const genericPlaceholder = 'images/contacts/default.png';
-  // --- END: FIX ---
   // @ts-ignore
   previewImg.onerror = () => {
     previewImg.onerror = null; // prevent infinite loops
@@ -168,35 +202,27 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 
 export async function loadSourcesList() {
   console.log('Handler: loadSourcesList called');
-  const sources = await getSources();
   const sourcesContainer = document.getElementById('advice-source-list');
-  if (sourcesContainer) {
-    sourcesContainer.innerHTML = ''; // Clear existing list
-    if (sources.length === 0) {
-      sourcesContainer.innerHTML = '<p>No advice sources found.</p>';
-      return;
-    }
-    for (const source of sources) {
-      const sourceElement = document.createElement('div');
-      sourceElement.className = 'advice-source-item';
-      sourceElement.dataset.id = String(source.id); // Ensure ID is string
+  if (!sourcesContainer) return;
 
-      const infoSpan = document.createElement('span');
-      infoSpan.classList.add('source-info');
-      infoSpan.textContent = `${source.name} (${source.type})`;
-      sourceElement.appendChild(infoSpan);
+  // --- START: CACHE ---
+  if (cachedSources) {
+    console.log('Loading sources from cache...');
+    renderSourcesList(cachedSources, sourcesContainer);
+    return;
+  }
+  // --- END: CACHE ---
 
-      const actionsDiv = document.createElement('div');
-      actionsDiv.classList.add('source-actions');
-      actionsDiv.innerHTML = `
-        <button class="edit-source-btn table-action-btn btn-secondary" data-id="${source.id}">Edit</button>
-        <button class="delete-source-btn table-action-btn btn-danger" data-id="${source.id}">Delete</button>
-      `;
-      sourceElement.appendChild(actionsDiv);
-      sourcesContainer.appendChild(sourceElement);
-
-      // Event listener is now handled by delegation in settings/index.js
-    }
+  sourcesContainer.innerHTML = '<p>Loading sources...</p>'; // Placeholder
+  try {
+    const sources = await getSources();
+    // --- START: CACHE ---
+    cachedSources = sources; // Store in cache
+    // --- END: CACHE ---
+    renderSourcesList(sources, sourcesContainer);
+  } catch (error) {
+    console.error('Error loading sources list:', error);
+    sourcesContainer.innerHTML = '<p class="error">Failed to load sources.</p>';
   }
 }
 
@@ -325,6 +351,17 @@ export async function openSourceFormModal(sourceId = null) {
     handleSourceTypeChange(elements.type.value);
   }
 
+  // This logic is unchanged, but it now calls the imported function
+  const fetchBtn = document.getElementById('fetch-isbn-btn');
+  if (fetchBtn) {
+    // Remove old listener if it exists, to prevent memory leaks
+    fetchBtn.replaceWith(fetchBtn.cloneNode(true));
+    // Add the new one
+    document
+      .getElementById('fetch-isbn-btn')
+      .addEventListener('click', handleFetchIsbnInfo);
+  }
+
   // @ts-ignore
   modal.style.display = 'block'; // Show the modal
 }
@@ -352,6 +389,9 @@ export async function handleSourceFormSubmit(event) {
       await addSource(sourceData);
       console.log('Source added');
     }
+    // --- START: CACHE ---
+    cachedSources = null; // Invalidate cache
+    // --- END: CACHE ---
     loadSourcesList(); // Refresh the list
     closeSourceFormModal(); // Hide the modal
   } catch (error) {
@@ -369,6 +409,9 @@ export function handleDeleteSourceClick(sourceId) {
     deleteSource(sourceId)
       .then(() => {
         console.log('Source deleted:', sourceId);
+        // --- START: CACHE ---
+        cachedSources = null; // Invalidate cache
+        // --- END: CACHE ---
         loadSourcesList(); // Refresh the list
       })
       .catch((error) => {
@@ -383,7 +426,7 @@ export function handleDeleteSourceClick(sourceId) {
  */
 export function closeSourceFormModal() {
   const modal = document.getElementById('source-form-modal');
-  const form = /** @type {HTMLFormElement | null} */ (
+  const form = /** @type {HTMLFormElement} */ (
     document.getElementById('source-form-form')
   );
   if (modal && form) {

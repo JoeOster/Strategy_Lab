@@ -1,6 +1,6 @@
 // public/js/modules/settings/sources.api.js
 
-import { api } from '../../utils/apiFetch.js';
+import { api } from '../../services/apiFetch.js';
 /** @unused @typedef {import('../../types.js').Source} Source */
 
 /**

@@ -3,6 +3,7 @@
 import * as handlers from './handlers.js';
 // Import the card click handler from the new sources sub-module
 import { handleSourceCardClick } from './sources/handlers.js';
+import { loadWatchedListContent } from './watched-list/handlers.js';
 
 export function initializeModule() {
   console.log('Strategy Lab Module Initialized');
@@ -35,6 +36,17 @@ export function initializeModule() {
 
     if (event.target.closest('.source-card')) {
       handleSourceCardClick(event);
+    }
+  });
+
+  // Add listener for idea creation events
+  document.addEventListener('ideaAdded', () => {
+    // Check if the watched list is the active sub-tab and refresh it
+    const watchedListTab = document.querySelector(
+      '[data-sub-tab="watched-list"]'
+    );
+    if (watchedListTab && watchedListTab.classList.contains('active')) {
+      loadWatchedListContent();
     }
   });
 

@@ -1,0 +1,42 @@
+<div id="edit-strategy-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Edit Strategy</h3>
+          <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="edit-strategy-form">
+            <input type="hidden" id="edit-strategy-id" name="strategy_id" />
+            <input type="hidden" id="edit-strategy-source-id" name="source_id" />
+            <label for="edit-strategy-title">Title:</label>
+            <input type="text" id="edit-strategy-title" name="title" required />
+
+            <label for="edit-strategy-ticker">Ticker:</label>
+            <input type="text" id="edit-strategy-ticker" name="ticker" />
+
+            <label for="edit-strategy-chapter">Chapter:</label>
+            <input type="text" id="edit-strategy-chapter" name="chapter" />
+
+            <label for="edit-strategy-page-number">Page Number:</label>
+            <input type="text" id="edit-strategy-page-number" name="page_number" />
+
+            <label for="edit-strategy-description">Description:</label>
+            <textarea id="edit-strategy-description" name="description"></textarea>
+
+            <label for="edit-strategy-pdf-path">PDF Path:</label>
+            <input type="text" id="edit-strategy-pdf-path" name="pdf_path" />
+
+            <div class="form-actions">
+              <button type="submit" class="btn">Save Changes</button>
+              <button
+                type="button"
+                id="cancel-edit-strategy-form-btn"
+                class="btn secondary-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>

@@ -2,7 +2,7 @@
 
 /** @typedef {import('../../../types.js').Transaction} Transaction */
 
-import { api } from '../../../utils/apiFetch.js';
+import { api } from '../../../services/apiFetch.js';
 
 /**
  * Fetches the list of all paper trades.

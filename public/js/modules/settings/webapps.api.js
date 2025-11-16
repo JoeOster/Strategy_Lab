@@ -1,6 +1,6 @@
 // public/js/modules/settings/webapps.api.js
 
-import { api } from '../../utils/apiFetch.js';
+import { api } from '../../services/apiFetch.js';
 
 export async function getWebApps() {
   return api.get('/api/webapps');

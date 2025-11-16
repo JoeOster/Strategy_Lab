@@ -1,24 +1,31 @@
 // api/index.js
-import { Router } from 'express';
-import exchangesRouter from './exchanges.js';
-import settingsRouter from './settings.js';
-import sourcesRouter from './sources.js';
-import strategiesRouter from './strategies.js';
-import transactionsRouter from './transactions.js';
-import utilsRouter from './utils.js';
-import watchedItemsRouter from './watched-items.js';
-import webappsRouter from './webapps.js';
+import express from 'express';
+const router = express.Router();
 
-const router = Router();
+// Import API route modules
+import settingsApi from './settings.js';
+import sourcesApi from './sources.js';
+import exchangesApi from './exchanges.js';
+import webappsApi from './webapps.js';
+import strategiesApi from './strategies.js';
+import watchedItemsApi from './watched-items.js';
+import transactionsApi from './transactions.js';
+import usersApi from './users.js';
+// --- START: ADD THIS ---
+import bookLookupApi from './book-lookup.js';
+// --- END: ADD THIS ---
 
-// Mount all the individual routers
-router.use('/sources', sourcesRouter);
-router.use('/strategies', strategiesRouter);
-router.use('/watched-items', watchedItemsRouter);
-router.use('/transactions', transactionsRouter);
-router.use('/settings', settingsRouter);
-router.use('/exchanges', exchangesRouter);
-router.use('/webapps', webappsRouter);
-router.use(utilsRouter); // Mount utility routes (like /priceV2, /clear-db)
+// Mount API routes
+router.use('/settings', settingsApi);
+router.use('/sources', sourcesApi);
+router.use('/exchanges', exchangesApi);
+router.use('/webapps', webappsApi);
+router.use('/strategies', strategiesApi);
+router.use('/watched-items', watchedItemsApi);
+router.use('/transactions', transactionsApi);
+router.use('/holders', usersApi);
+// --- START: ADD THIS ---
+router.use('/book-lookup', bookLookupApi);
+// --- END: ADD THIS ---
 
 export default router;

@@ -1,101 +1,115 @@
 // public/js/modules/settings/exchanges.handlers.js
+import * as api from './exchanges.api.js';
 
-import { addExchange, deleteExchange, getExchanges } from './exchanges.api.js';
+// --- START: ADD CACHE ---
+let cachedExchanges = null;
+// --- END: ADD CACHE ---
 
 /**
- * Loads the list of exchanges and renders them in the UI.
+ * Renders the list of exchanges into the container.
+ * @param {Array<object>} exchanges - The array of exchange objects.
+ * @param {HTMLElement} container - The container element to render into.
  */
-export async function loadExchangesList() {
-  console.log('loadExchangesList called');
-  const exchangeListDiv = document.getElementById('exchange-list');
-  if (!exchangeListDiv) {
-    console.error('Exchange list div not found.');
+function renderExchangesList(exchanges, container) {
+  if (!exchanges || exchanges.length === 0) {
+    container.innerHTML = '<p>No exchanges found.</p>';
     return;
   }
 
-  try {
-    const exchanges = await getExchanges();
-    exchangeListDiv.innerHTML = ''; // Clear existing list
-
-    if (exchanges.length === 0) {
-      exchangeListDiv.innerHTML = '<p>No exchanges added yet.</p>';
-      return;
-    }
-
-    const ul = document.createElement('ul');
-    for (const exchange of exchanges) {
-      const li = document.createElement('li');
-      li.classList.add('exchange-item'); // Add a class for consistent styling of list items
-
-      const nameSpan = document.createElement('span');
-      nameSpan.classList.add('exchange-name');
-      nameSpan.textContent = exchange.name;
-      li.appendChild(nameSpan);
-
-      const actionsDiv = document.createElement('div');
-      actionsDiv.classList.add('exchange-actions');
-      actionsDiv.innerHTML = `
-        <button class="delete-exchange-btn table-action-btn" data-id="${exchange.id}">Delete</button>
-      `;
-      li.appendChild(actionsDiv);
-      ul.appendChild(li);
-    }
-    exchangeListDiv.appendChild(ul);
-  } catch (error) {
-    console.error('Failed to load exchanges:', error);
-    exchangeListDiv.innerHTML = '<p>Failed to load exchanges.</p>';
+  // Create list
+  const list = document.createElement('ul');
+  list.className = 'settings-list'; // A generic class
+  for (const exchange of exchanges) {
+    const item = document.createElement('li');
+    item.className = 'exchange-item'; // From components.css
+    item.innerHTML = `
+      <span class="exchange-name">${exchange.name}</span>
+      <div class="exchange-actions">
+        <button class="btn btn-danger table-action-btn delete-exchange-btn" data-id="${exchange.id}">Delete</button>
+      </div>
+    `;
+    list.appendChild(item);
   }
+  container.innerHTML = ''; // Clear "Loading..."
+  container.appendChild(list);
 }
 
 /**
- * Handles the submission of the add new exchange form.
+ * Handles the submission of the "Add New Exchange" form.
  * @param {Event} event - The form submission event.
  */
 export async function handleAddExchangeSubmit(event) {
   event.preventDefault();
+  console.log('handleAddExchangeSubmit called');
 
-  const newExchangeNameInput = document.getElementById('new-exchange-name');
-  const name = newExchangeNameInput.value.trim();
+  const form = /** @type {HTMLFormElement} */ (event.target);
+  const formData = new FormData(form);
+  const exchangeName = formData.get('name');
 
-  if (!name) {
-    alert('Exchange name cannot be empty.');
+  if (!exchangeName) {
+    alert('Please enter an exchange name.');
     return;
   }
 
   try {
-    await addExchange({ name });
-    newExchangeNameInput.value = ''; // Clear the form
-    await loadExchangesList(); // Refresh the list
+    await api.addExchange(exchangeName);
+    // --- START: CACHE ---
+    cachedExchanges = null; // Invalidate cache
+    // --- END: CACHE ---
+    form.reset();
+    loadExchangesList(); // Refresh the list
   } catch (error) {
-    console.error('Failed to add exchange:', error);
-    alert('Failed to add exchange. Please try again.');
+    console.error('Error adding exchange:', error);
+    alert('Failed to add exchange. See console for details.');
   }
 }
 
 /**
- * Handles the deletion of an exchange.
- * @param {string} id - The ID of the exchange to delete.
+ * Loads and renders the list of exchanges.
  */
-export async function handleDeleteExchangeClick(id) {
+export async function loadExchangesList() {
+  const container = document.getElementById('exchange-list');
+  if (!container) return;
+
+  // --- START: CACHE ---
+  if (cachedExchanges) {
+    console.log('Loading exchanges from cache...');
+    renderExchangesList(cachedExchanges, container);
+    return;
+  }
+  // --- END: CACHE ---
+
+  container.innerHTML = '<p>Loading exchanges...</p>'; // Placeholder
+
+  try {
+    const exchanges = await api.getExchanges();
+    // --- START: CACHE ---
+    cachedExchanges = exchanges; // Store in cache
+    // --- END: CACHE ---
+    renderExchangesList(exchanges, container);
+  } catch (error) {
+    console.error('Error loading exchanges list:', error);
+    container.innerHTML = '<p class="error">Failed to load exchanges.</p>';
+  }
+}
+
+/**
+ * Handles delete button clicks for exchanges.
+ * @param {string} exchangeId - The ID of the exchange to delete.
+ */
+export async function handleDeleteExchangeClick(exchangeId) {
   if (!confirm('Are you sure you want to delete this exchange?')) {
     return;
   }
-  try {
-    await deleteExchange(id);
-    await loadExchangesList(); // Refresh the list
-  } catch (error) {
-    console.error('Failed to delete exchange:', error);
-    alert('Failed to delete exchange. Please try again.');
-  }
-}
 
-/**
- * Handles clearing the exchange form.
- */
-export function handleClearExchangeForm() {
-  console.log('handleClearExchangeForm called');
-  const addExchangeForm = document.getElementById('add-exchange-form');
-  if (addExchangeForm) {
-    addExchangeForm.reset();
+  try {
+    await api.deleteExchange(exchangeId);
+    // --- START: CACHE ---
+    cachedExchanges = null; // Invalidate cache
+    // --- END: CACHE ---
+    loadExchangesList(); // Refresh the list
+  } catch (error) {
+    console.error('Error deleting exchange:', error);
+    alert('Failed to delete exchange. See console for details.');
   }
 }

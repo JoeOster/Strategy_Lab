@@ -7,33 +7,37 @@ import {
 } from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
 import * as handlers from './handlers.js';
-// Import all needed functions from sources.handlers.js
+// --- START: FIX ---
+// Import the new save function
+import { handleSaveGeneralSettings } from './handlers.js';
+// --- END: FIX ---
 import {
   closeSourceFormModal,
-  handleClearSourceForm, // Import the new clear function
-  handleDeleteSourceClick, // Added missing import
+  handleClearSourceForm,
+  handleDeleteSourceClick,
   handleSourceFormSubmit,
   handleSourceTypeChange,
   openSourceFormModal,
   updateImagePreview,
 } from './sources.handlers.js';
-import * as usersHandlers from './users.handlers.js'; // This import is now USED
+import * as usersHandlers from './users.handlers.js';
 import { loadAccountHoldersList } from './users.handlers.js';
+import * as webappsHandlers from './webapps.handlers.js'; // Import new handlers
 
 export function initializeModule() {
   console.log('Settings module initialized.');
 
   initializeAppearanceTab();
-  loadAccountHoldersList();
 
   // Stop the General Settings form from reloading the page
   const generalForm = document.getElementById('general-settings-form');
   if (generalForm) {
     generalForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      console.log('General settings save clicked');
-      // TODO: Add logic to save general settings
-      alert('General settings saved (demo)');
+      // --- START: FIX ---
+      // Call the real save function instead of an alert
+      handleSaveGeneralSettings();
+      // --- END: FIX ---
     });
   }
 
@@ -43,7 +47,6 @@ export function initializeModule() {
     appearanceForm.addEventListener('submit', (event) => {
       event.preventDefault();
       console.log('Appearance settings save clicked');
-      // Note: Themes/fonts are already saved *on change*
       alert('Appearance settings saved!');
     });
   }
@@ -58,7 +61,6 @@ export function initializeModule() {
     '.settings-tab[data-tab="general-settings-panel"]'
   );
   if (defaultTab) {
-    // Simulate a click on the default tab to trigger its activation and content loading
     handlers.handleMainTabClick({ target: defaultTab });
   }
 
@@ -91,7 +93,7 @@ export function initializeModule() {
     });
   }
 
-  // Listeners for the new single modal
+  // Listeners for the new single modal (FOR SOURCES)
   const sourceFormModal = document.getElementById('source-form-modal');
   if (sourceFormModal) {
     // Form submission
@@ -109,7 +111,7 @@ export function initializeModule() {
     // Clear button
     const clearButton = document.getElementById('source-form-clear-btn');
     if (clearButton) {
-      clearButton.addEventListener('click', handleClearSourceForm); // Use the new function
+      clearButton.addEventListener('click', handleClearSourceForm);
     }
 
     // Live image preview listener
@@ -128,33 +130,12 @@ export function initializeModule() {
     });
   }
 
-  // --- START: FIX ---
-  // Listener for the "Add New Source" button
+  // Listener for the "Add New Source" button (MODAL)
   const addSourceBtn = document.getElementById('open-add-source-btn');
   if (addSourceBtn) {
     addSourceBtn.addEventListener('click', () => {
       openSourceFormModal(null); // Open in "Add" mode
     });
-  }
-  // --- END: FIX ---
-
-  // Save settings button
-  const saveSettingsButton = document.getElementById('save-settings-button');
-  if (saveSettingsButton) {
-    saveSettingsButton.addEventListener(
-      'click',
-      handlers.handleSaveAllSettings
-    );
-  }
-
-  // Clear general settings button
-  const clearGeneralSettingsBtn = document.getElementById(
-    'clear-general-settings-btn'
-  );
-  if (clearGeneralSettingsBtn) {
-    clearGeneralSettingsBtn.addEventListener('click', () =>
-      handlers.handleClearGeneralAndAppearanceForms()
-    );
   }
 
   // Add new exchange form submission
@@ -191,6 +172,24 @@ export function initializeModule() {
     );
   }
 
+  // Add new holder form submission
+  const addHolderForm = document.getElementById('add-holder-form');
+  if (addHolderForm) {
+    addHolderForm.addEventListener(
+      'submit',
+      usersHandlers.handleAddHolderSubmit
+    );
+  }
+
+  // Add new webapp form submission
+  const addWebAppForm = document.getElementById('add-webapp-form');
+  if (addWebAppForm) {
+    addWebAppForm.addEventListener(
+      'submit',
+      webappsHandlers.handleAddWebAppSubmit
+    );
+  }
+
   // Close button for source-detail-modal
   const sourceDetailModal = document.getElementById('source-detail-modal');
   if (sourceDetailModal) {
@@ -221,15 +220,6 @@ export function initializeModule() {
         openSourceFormModal(sourceId);
       }
     });
-  }
-
-  // Add new holder form submission
-  const addHolderForm = document.getElementById('add-holder-form');
-  if (addHolderForm) {
-    addHolderForm.addEventListener(
-      'submit',
-      usersHandlers.handleAddHolderSubmit
-    );
   }
 
   // Event delegation for user-list actions
@@ -267,6 +257,22 @@ export function initializeModule() {
         const exchangeId = target.dataset.id;
         if (exchangeId) {
           exchangesHandlers.handleDeleteExchangeClick(exchangeId);
+        }
+      }
+    });
+  }
+
+  // Event delegation for deleting webapps
+  const webappsContainer = document.getElementById('webapp-list');
+  if (webappsContainer) {
+    webappsContainer.addEventListener('click', (event) => {
+      if (!(event.target instanceof HTMLElement)) return;
+      const target = event.target;
+      if (target.classList.contains('delete-webapp-btn')) {
+        // @ts-ignore
+        const webAppId = target.dataset.id;
+        if (webAppId) {
+          webappsHandlers.handleDeleteWebAppClick(webAppId);
         }
       }
     });

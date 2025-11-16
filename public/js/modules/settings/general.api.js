@@ -1,4 +1,4 @@
-import { api } from '../../utils/apiFetch.js';
+import { api } from '../../services/apiFetch.js';
 
 export async function getSettings() {
   return api.get('/api/settings');

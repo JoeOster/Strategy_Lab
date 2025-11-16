@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadHtmlPartial('/_edit-trade-modal.html', 'app-container');
   await loadHtmlPartial('/_paper-trade-details-modal.html', 'app-container');
   await loadHtmlPartial('/_add-idea-modal.html', 'app-container');
+  await loadHtmlPartial('/_edit-strategy-modal.html', 'app-container');
 
   // Then initialize modules that depend on these elements being present
   // --- START: FIX ---

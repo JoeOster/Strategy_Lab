@@ -26,9 +26,7 @@
   margin: 5% auto; /* 5% from top, not 15% */
   padding: 20px;
   width: 80%; /* Could be more or less, depending on screen size */
-  box-shadow:
-    0 4px 8px 0 var(--shadow-color),
-    0 6px 20px 0 var(--shadow-color);
+  box-shadow: 0 4px 8px 0 var(--shadow-color), 0 6px 20px 0 var(--shadow-color);
   border-radius: 8px;
   position: relative; /* For absolute positioning of close button */
 }
@@ -65,3 +63,51 @@
   z-index: 1010;
 }
 /* --- END: z-index FIX --- */
+
+/* --- START: Source Detail Modal Styles --- */
+.source-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grid-item {
+  background-color: var(--info-panel-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--container-border);
+}
+
+#source-profile-container {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+#logged-strategies-container {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+#open-ideas-table-placeholder,
+#open-trades-table-placeholder,
+#paper-trades-table-placeholder {
+  grid-column: 1 / -1; /* Span full width */
+}
+
+.source-profile-image {
+  max-width: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+  .source-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #source-profile-container,
+  #logged-strategies-container {
+    grid-column: 1 / -1;
+  }
+}
+/* --- END: Source Detail Modal Styles --- */

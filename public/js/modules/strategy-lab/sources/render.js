@@ -72,6 +72,7 @@ export function renderStrategiesTable(strategies) {
       <thead>
         <tr>
           <th>Title</th>
+          <th>Ticker</th>
           <th>Chapter</th>
           <th>Page</th>
           <th>Description</th>
@@ -91,6 +92,7 @@ export function renderStrategiesTable(strategies) {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${strategy.title || ''}</td>
+        <td>${strategy.ticker || ''}</td>
         <td>${strategy.chapter || ''}</td>
         <td>${strategy.page_number || ''}</td>
         <td>${strategy.description || ''}</td>
@@ -98,7 +100,74 @@ export function renderStrategiesTable(strategies) {
         <td>
           <button class="table-action-btn btn btn-secondary" data-strategy-id="${
             strategy.id
-          }">Add Idea</button>
+          }" data-ticker="${strategy.ticker || ''}">Add Idea</button>
+          <button class="table-action-btn btn btn-secondary strategy-edit-btn" data-strategy-id="${
+            strategy.id
+          }">Edit</button>
+          <button class="table-action-btn btn btn-danger strategy-delete-btn" data-strategy-id="${
+            strategy.id
+          }">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    }
+  }
+}
+
+/**
+ * Renders the table of logged trade ideas for a source.
+ * @param {WatchedItem[]} ideas - An array of watched item objects.
+ */
+export function renderTradeIdeasTable(ideas) {
+  const container = document.getElementById('trade-ideas-table');
+  if (!container) {
+    console.error('Trade ideas table container not found.');
+    return;
+  }
+
+  if (!ideas || ideas.length === 0) {
+    container.innerHTML = '<p>No trade ideas logged for this source yet.</p>';
+    return;
+  }
+
+  // Create the table structure
+  container.innerHTML = `
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Entry Zone</th>
+          <th>Targets</th>
+          <th>Stop Loss</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        </tbody>
+    </table>
+  `;
+
+  const tbody = container.querySelector('tbody');
+
+  if (tbody) {
+    for (const item of ideas) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.ticker || ''}</td>
+        <td>${item.buy_price_low || ''} - ${item.buy_price_high || ''}</td>
+        <td>${item.take_profit_low || ''} / ${
+        item.take_profit_high || ''
+      }</td>
+        <td>${item.escape_price || ''}</td>
+        <td>${item.status || 'WATCHING'}</td>
+        <td>
+          <button class="btn table-action-btn idea-edit-btn" data-id="${
+            item.id
+          }">Edit</button>
+          <button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${
+            item.id
+          }">Delete</button>
         </td>
       `;
       tbody.appendChild(row);

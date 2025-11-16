@@ -1,6 +1,6 @@
 // public/js/modules/transactions/api.js
 
-import { api } from '../../utils/apiFetch.js';
+import { api } from '../../services/apiFetch.js';
 
 /** @typedef {import('../../types.js').Transaction} Transaction */
 

@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS advice_sources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  url TEXT,
+  description TEXT,
+  image_path TEXT,
+  person_email TEXT,
+  person_phone TEXT,
+  person_app_type TEXT,
+  person_app_handle TEXT,
+  group_primary_contact TEXT,
+  group_email TEXT,
+  group_phone TEXT,
+  group_app_type TEXT,
+  group_app_handle TEXT,
+  book_author TEXT,
+  book_isbn TEXT,
+  website_websites TEXT
+);
