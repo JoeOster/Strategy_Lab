@@ -128,4 +128,3 @@ export async function handleEditIdeaClick(ideaId) {
     alert('Error: Could not get idea details. Please check the console.');
   }
 }
-

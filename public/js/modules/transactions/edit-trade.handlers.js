@@ -1,6 +1,10 @@
 // public/js/modules/transactions/edit-trade.handlers.js
 
-import { getIdeaForPrefill, moveIdeaToPaper, moveIdeaToRealTrade } from '../strategy-lab/watched-list/api.js';
+import {
+  getIdeaForPrefill,
+  moveIdeaToPaper,
+  moveIdeaToRealTrade,
+} from '../strategy-lab/watched-list/api.js';
 import { getTransaction, updateTransaction } from './api.js';
 
 /**
@@ -43,9 +47,9 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper }) {
 
       const idea = await getIdeaForPrefill(ideaId);
       form.elements.id.value = ''; // No trade ID yet
-      form.elements['idea_id'].value = idea.id; // Store idea ID
-      form.elements['source_id'].value = idea.source_id; // Store source ID
-      form.elements['is_paper'].value = isPaper;
+      form.elements.idea_id.value = idea.id; // Store idea ID
+      form.elements.source_id.value = idea.source_id; // Store source ID
+      form.elements.is_paper.value = isPaper;
       tickerInput.value = idea.ticker;
       tickerInput.readOnly = true; // Lock ticker when creating from idea
     }

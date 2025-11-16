@@ -45,7 +45,7 @@ export function initializeModule() {
     const watchedListTab = document.querySelector(
       '[data-sub-tab="watched-list"]'
     );
-    if (watchedListTab && watchedListTab.classList.contains('active')) {
+    if (watchedListTab?.classList.contains('active')) {
       loadWatchedListContent();
     }
   });

@@ -65,7 +65,6 @@ export async function handleFetchIsbnInfo() {
       urlInput.value = bookInfo.previewLink;
     }
     // --- END: POPULATE NEW FIELDS ---
-
   } catch (error) {
     console.error('Failed to fetch book info:', error);
     alert('Failed to fetch book info. Check the ISBN or try again.');

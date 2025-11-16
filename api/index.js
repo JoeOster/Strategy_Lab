@@ -2,17 +2,17 @@
 import express from 'express';
 const router = express.Router();
 
+// --- START: ADD THIS ---
+import bookLookupApi from './book-lookup.js';
+import exchangesApi from './exchanges.js';
 // Import API route modules
 import settingsApi from './settings.js';
 import sourcesApi from './sources.js';
-import exchangesApi from './exchanges.js';
-import webappsApi from './webapps.js';
 import strategiesApi from './strategies.js';
-import watchedItemsApi from './watched-items.js';
 import transactionsApi from './transactions.js';
 import usersApi from './users.js';
-// --- START: ADD THIS ---
-import bookLookupApi from './book-lookup.js';
+import watchedItemsApi from './watched-items.js';
+import webappsApi from './webapps.js';
 // --- END: ADD THIS ---
 
 // Mount API routes

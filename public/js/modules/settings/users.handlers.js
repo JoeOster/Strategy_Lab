@@ -1,9 +1,9 @@
 // public/js/modules/settings/users.handlers.js
 import {
   addAccountHolder,
+  deleteAccountHolder,
   getAccountHolders,
   setDefaultAccountHolder,
-  deleteAccountHolder,
 } from './users.api.js';
 
 // --- START: ADD CACHE ---
@@ -212,9 +212,7 @@ export async function loadSubscriptionsForUser(holderId) {
     if (backBtn) {
       backBtn.addEventListener('click', () => {
         // Find and click the "Users" sub-tab to return
-        const usersTab = document.querySelector(
-          '[data-sub-tab="users-panel"]'
-        );
+        const usersTab = document.querySelector('[data-sub-tab="users-panel"]');
         if (usersTab instanceof HTMLElement) {
           usersTab.click();
         }

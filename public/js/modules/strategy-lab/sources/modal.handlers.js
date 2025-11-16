@@ -176,8 +176,10 @@ export async function openSourceDetailModal(sourceId) {
 
     // Attach listener for the feature button
     const editButton = profileContainer.querySelector('#edit-source-btn');
-    const addStrategyButton = loggedStrategiesContainer.querySelector('#add-strategy-btn');
-    const addIdeaButton = loggedStrategiesContainer.querySelector('#add-idea-btn');
+    const addStrategyButton =
+      loggedStrategiesContainer.querySelector('#add-strategy-btn');
+    const addIdeaButton =
+      loggedStrategiesContainer.querySelector('#add-idea-btn');
 
     if (addStrategyButton) {
       addStrategyButton.addEventListener('click', handleShowStrategyForm);
@@ -205,7 +207,8 @@ export async function openSourceDetailModal(sourceId) {
     }
 
     // Attach listener for the strategy table
-    const strategyTable = loggedStrategiesContainer.querySelector('#strategy-table');
+    const strategyTable =
+      loggedStrategiesContainer.querySelector('#strategy-table');
     if (strategyTable) {
       strategyTable.addEventListener('click', handleStrategyTableClicks);
     }
@@ -272,9 +275,7 @@ export function closeSourceDetailModal() {
       openIdeas.innerHTML = '';
       openIdeas.style.display = 'block'; // Reset display style
     }
-    const openTrades = document.getElementById(
-      'open-trades-table-placeholder'
-    );
+    const openTrades = document.getElementById('open-trades-table-placeholder');
     if (openTrades) openTrades.innerHTML = '';
     const paperTrades = document.getElementById(
       'paper-trades-table-placeholder'

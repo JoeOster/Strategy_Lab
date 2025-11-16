@@ -172,8 +172,7 @@ router.post('/:id/to-paper', async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params; // This is the ideaId
-    const { quantity, price, limit_low, limit_high, exchange, time } =
-      req.body;
+    const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
@@ -272,8 +271,7 @@ router.post('/:id/to-real', async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params; // This is the ideaId
-    const { quantity, price, limit_low, limit_high, exchange, time } =
-      req.body;
+    const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);

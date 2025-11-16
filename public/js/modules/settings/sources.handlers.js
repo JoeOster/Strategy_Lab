@@ -1,5 +1,3 @@
-// public/js/modules/settings/sources.handlers.js
-import { handleFetchIsbnInfo } from './sources_books.handlers.js';
 import {
   addSource,
   deleteSource,
@@ -7,6 +5,8 @@ import {
   getSources,
   updateSource,
 } from './sources.api.js';
+// public/js/modules/settings/sources.handlers.js
+import { handleFetchIsbnInfo } from './sources_books.handlers.js';
 import { getWebApps } from './webapps.api.js';
 
 // --- START: ADD CACHE ---

@@ -84,9 +84,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     console.error(`Failed to get strategy ${req.params.id}:`, err);
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get strategy', details: message });
+    res.status(500).json({ error: 'Failed to get strategy', details: message });
   }
 });
 

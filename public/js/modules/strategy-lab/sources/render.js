@@ -156,9 +156,7 @@ export function renderTradeIdeasTable(ideas) {
       row.innerHTML = `
         <td>${item.ticker || ''}</td>
         <td>${item.buy_price_low || ''} - ${item.buy_price_high || ''}</td>
-        <td>${item.take_profit_low || ''} / ${
-        item.take_profit_high || ''
-      }</td>
+        <td>${item.take_profit_low || ''} / ${item.take_profit_high || ''}</td>
         <td>${item.escape_price || ''}</td>
         <td>${item.status || 'WATCHING'}</td>
         <td>

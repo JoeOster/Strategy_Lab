@@ -143,7 +143,8 @@ export async function handleShowEditStrategyForm(strategyId) {
     // @ts-ignore
     document.getElementById('edit-strategy-id').value = strategy.id;
     // @ts-ignore
-    document.getElementById('edit-strategy-source-id').value = strategy.source_id;
+    document.getElementById('edit-strategy-source-id').value =
+      strategy.source_id;
     // @ts-ignore
     document.getElementById('edit-strategy-title').value = strategy.title;
     // @ts-ignore
@@ -151,9 +152,11 @@ export async function handleShowEditStrategyForm(strategyId) {
     // @ts-ignore
     document.getElementById('edit-strategy-chapter').value = strategy.chapter;
     // @ts-ignore
-    document.getElementById('edit-strategy-page-number').value = strategy.page_number;
+    document.getElementById('edit-strategy-page-number').value =
+      strategy.page_number;
     // @ts-ignore
-    document.getElementById('edit-strategy-description').value = strategy.description;
+    document.getElementById('edit-strategy-description').value =
+      strategy.description;
     // @ts-ignore
     document.getElementById('edit-strategy-pdf-path').value = strategy.pdf_path;
 
@@ -161,9 +164,15 @@ export async function handleShowEditStrategyForm(strategyId) {
     editStrategyModal.style.display = 'block';
 
     // Attach listeners
-    document.getElementById('cancel-edit-strategy-form-btn')?.addEventListener('click', handleCancelEditStrategyForm);
-    editStrategyModal.querySelector('.close-button')?.addEventListener('click', handleCancelEditStrategyForm);
-    document.getElementById('edit-strategy-form')?.addEventListener('submit', handleEditStrategySubmit);
+    document
+      .getElementById('cancel-edit-strategy-form-btn')
+      ?.addEventListener('click', handleCancelEditStrategyForm);
+    editStrategyModal
+      .querySelector('.close-button')
+      ?.addEventListener('click', handleCancelEditStrategyForm);
+    document
+      .getElementById('edit-strategy-form')
+      ?.addEventListener('submit', handleEditStrategySubmit);
     /** @param {MouseEvent} event */
     window.onclick = (event) => {
       if (event.target === editStrategyModal) {
@@ -189,9 +198,15 @@ function handleCancelEditStrategyForm() {
     if (form) form.reset();
 
     // Clean up listeners
-    document.getElementById('cancel-edit-strategy-form-btn')?.removeEventListener('click', handleCancelEditStrategyForm);
-    editStrategyModal.querySelector('.close-button')?.removeEventListener('click', handleCancelEditStrategyForm);
-    document.getElementById('edit-strategy-form')?.removeEventListener('submit', handleEditStrategySubmit);
+    document
+      .getElementById('cancel-edit-strategy-form-btn')
+      ?.removeEventListener('click', handleCancelEditStrategyForm);
+    editStrategyModal
+      .querySelector('.close-button')
+      ?.removeEventListener('click', handleCancelEditStrategyForm);
+    document
+      .getElementById('edit-strategy-form')
+      ?.removeEventListener('submit', handleEditStrategySubmit);
     // @ts-ignore
     window.onclick = null;
   }

@@ -11,12 +11,12 @@ function initializeSubTabs() {
     return;
   }
 
-  subTabButtons.forEach(button => {
+  subTabButtons.forEach((button) => {
     button.addEventListener('click', async (event) => {
       const subtab = event.target.dataset.subtab;
-      
+
       // Deactivate other buttons
-      subTabButtons.forEach(btn => btn.classList.remove('active'));
+      subTabButtons.forEach((btn) => btn.classList.remove('active'));
       // Activate clicked button
       event.target.classList.add('active');
 
