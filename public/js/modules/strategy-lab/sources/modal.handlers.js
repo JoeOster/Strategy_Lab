@@ -19,16 +19,24 @@ import {
 import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
 import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
+  deleteStrategy,
   getOpenIdeasForSource,
   getOpenTradesForSource,
   getPaperTradesForSource,
   getStrategiesForSource,
 } from './api.js';
 import {
+  handleShowEditStrategyForm,
   handleShowIdeaForm,
   handleShowStrategyForm,
 } from './forms.handlers.js';
-import { renderOpenIdeasForSource, renderStrategiesTable } from './render.js';
+import {
+  renderOpenIdeasForSource,
+  renderStrategiesTable,
+  renderTradeIdeasTable,
+} from './render.js';
+
+let tradeCreatedHandler;
 
 /**
  * Opens the source detail modal and populates it with data.
@@ -37,10 +45,9 @@ import { renderOpenIdeasForSource, renderStrategiesTable } from './render.js';
 export async function openSourceDetailModal(sourceId) {
   const modal = document.getElementById('source-detail-modal');
   const profileContainer = document.getElementById('source-profile-container');
-  const featureBtnContainer = document.getElementById(
-    'source-feature-btn-container'
+  const loggedStrategiesContainer = document.getElementById(
+    'logged-strategies-container'
   );
-  const rightPanel = document.querySelector('.source-detail-right-panel');
   const closeButton = modal?.querySelector('.close-button');
 
   // Reset bottom panel placeholders
@@ -55,6 +62,7 @@ export async function openSourceDetailModal(sourceId) {
   );
 
   if (ideasPlaceholder) {
+    ideasPlaceholder.style.display = 'block'; // Ensure it's visible by default
     ideasPlaceholder.innerHTML = '<h3>Open Ideas</h3><p>Loading...</p>';
   }
   if (openTradesPlaceholder) {
@@ -67,8 +75,7 @@ export async function openSourceDetailModal(sourceId) {
   if (
     !modal ||
     !profileContainer ||
-    !featureBtnContainer ||
-    !rightPanel ||
+    !loggedStrategiesContainer ||
     !closeButton
   ) {
     console.error(
@@ -132,23 +139,25 @@ export async function openSourceDetailModal(sourceId) {
           ? `<p>Primary Contact: ${source.group_primary_contact}</p>`
           : ''
       }
-    `;
-    // --- END: IMAGE PATH LOGIC ---
-
-    // Render ONLY the Edit button in the left panel's footer
-    featureBtnContainer.innerHTML = `
       <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
     `;
+    // --- END: IMAGE PATH LOGIC ---
 
     // Load content for the right panel (Strategies or Ideas)
     await loadSourceDetailContent(
       sourceId,
       source.type,
-      /** @type {HTMLElement} */ (rightPanel)
+      /** @type {HTMLElement} */ (loggedStrategiesContainer)
     );
 
-    // Load all three bottom panel tables in parallel
-    loadOpenIdeasForSource(sourceId);
+    // Load bottom panel tables, conditionally hiding Open Ideas for groups
+    if (source.type === 'group' || source.type === 'person') {
+      if (ideasPlaceholder) {
+        ideasPlaceholder.style.display = 'none'; // Hide for groups
+      }
+    } else {
+      loadOpenIdeasForSource(sourceId);
+    }
     loadOpenTradesForSource(sourceId);
     loadPaperTradesForSource(sourceId);
 
@@ -166,9 +175,9 @@ export async function openSourceDetailModal(sourceId) {
     };
 
     // Attach listener for the feature button
-    const editButton = featureBtnContainer.querySelector('#edit-source-btn');
-    const addStrategyButton = rightPanel.querySelector('#add-strategy-btn');
-    const addIdeaButton = rightPanel.querySelector('#add-idea-btn');
+    const editButton = profileContainer.querySelector('#edit-source-btn');
+    const addStrategyButton = loggedStrategiesContainer.querySelector('#add-strategy-btn');
+    const addIdeaButton = loggedStrategiesContainer.querySelector('#add-idea-btn');
 
     if (addStrategyButton) {
       addStrategyButton.addEventListener('click', handleShowStrategyForm);
@@ -180,7 +189,7 @@ export async function openSourceDetailModal(sourceId) {
         if (!modal) return;
         // @ts-ignore
         const currentSourceId = modal.dataset.sourceId || null;
-        handleShowIdeaForm(event, currentSourceId, null, false, false);
+        handleShowIdeaForm(event, currentSourceId, null, true, false);
       });
       // --- END: MODIFICATION ---
     }
@@ -189,17 +198,32 @@ export async function openSourceDetailModal(sourceId) {
       editButton.addEventListener('click', handleEditSource);
     }
 
-    // Add event listener for the bottom panel
-    const bottomPanel = modal.querySelector('.source-detail-bottom-panel');
-    if (bottomPanel) {
-      bottomPanel.addEventListener('click', handleModalBottomPanelClicks);
+    // Add event listener for the modal body
+    const modalBody = modal.querySelector('.modal-body');
+    if (modalBody) {
+      modalBody.addEventListener('click', handleModalBottomPanelClicks);
     }
 
     // Attach listener for the strategy table
-    const strategyTable = rightPanel.querySelector('#strategy-table');
+    const strategyTable = loggedStrategiesContainer.querySelector('#strategy-table');
     if (strategyTable) {
       strategyTable.addEventListener('click', handleStrategyTableClicks);
     }
+
+    // Add listener for trade creation events
+    tradeCreatedHandler = (e) => {
+      // @ts-ignore
+      const { sourceId: eventSourceId } = e.detail;
+      // @ts-ignore
+      const currentSourceId = modal.dataset.sourceId;
+      if (eventSourceId === currentSourceId) {
+        loadOpenTradesForSource(currentSourceId);
+        loadPaperTradesForSource(currentSourceId);
+        // Also refresh open ideas, as one was just executed
+        loadOpenIdeasForSource(currentSourceId);
+      }
+    };
+    document.addEventListener('tradeCreated', tradeCreatedHandler);
   } catch (error) {
     console.error(
       `Failed to load source details for modal ${sourceId}:`,
@@ -239,19 +263,28 @@ export function closeSourceDetailModal() {
     // Clear content
     const profile = document.getElementById('source-profile-container');
     if (profile) profile.innerHTML = '';
-    const feature = document.getElementById('source-feature-btn-container');
-    if (feature) feature.innerHTML = '';
-    const dynamicContentDiv = document.getElementById(
-      'source-detail-dynamic-content'
+    const loggedStrategies = document.getElementById(
+      'logged-strategies-container'
     );
-    if (dynamicContentDiv) {
-      dynamicContentDiv.remove();
+    if (loggedStrategies) loggedStrategies.innerHTML = '';
+    const openIdeas = document.getElementById('open-ideas-table-placeholder');
+    if (openIdeas) {
+      openIdeas.innerHTML = '';
+      openIdeas.style.display = 'block'; // Reset display style
     }
+    const openTrades = document.getElementById(
+      'open-trades-table-placeholder'
+    );
+    if (openTrades) openTrades.innerHTML = '';
+    const paperTrades = document.getElementById(
+      'paper-trades-table-placeholder'
+    );
+    if (paperTrades) paperTrades.innerHTML = '';
 
-    // Remove event listener for the bottom panel
-    const bottomPanel = modal.querySelector('.source-detail-bottom-panel');
-    if (bottomPanel) {
-      bottomPanel.removeEventListener('click', handleModalBottomPanelClicks);
+    // Remove event listener for the modal body
+    const modalBody = modal.querySelector('.modal-body');
+    if (modalBody) {
+      modalBody.removeEventListener('click', handleModalBottomPanelClicks);
     }
     const strategyTable = modal.querySelector('#strategy-table');
     if (strategyTable) {
@@ -259,6 +292,11 @@ export function closeSourceDetailModal() {
     }
     // @ts-ignore
     modal.dataset.sourceId = ''; // Clear the stored ID
+
+    // Remove the trade creation event listener
+    if (tradeCreatedHandler) {
+      document.removeEventListener('tradeCreated', tradeCreatedHandler);
+    }
   }
 }
 
@@ -272,13 +310,10 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
   console.log(
     `Loading content for source detail right panel for source ${sourceId}...`
   );
-  const contentDiv = document.createElement('div');
-  contentDiv.id = 'source-detail-dynamic-content';
-  targetElement.prepend(contentDiv); // Prepend to keep placeholders at the bottom
 
   try {
     if (sourceType === 'book' || sourceType === 'website') {
-      contentDiv.innerHTML = `
+      targetElement.innerHTML = `
         <div class="source-detail-right-header">
           <h3>Logged Strategies</h3>
           <button class="btn" id="add-strategy-btn" data-source-id="${sourceId}">Add Strategy</button>
@@ -289,7 +324,7 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
       `;
       await loadStrategiesForSource(sourceId);
     } else if (sourceType === 'person' || sourceType === 'group') {
-      contentDiv.innerHTML = `
+      targetElement.innerHTML = `
         <div class="source-detail-right-header">
           <h3>Logged Trade Ideas</h3>
           <button class="btn" id="add-idea-btn" data-source-id="${sourceId}">Add Idea</button>
@@ -300,14 +335,14 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
           </div>
         </div>
       `;
-      // TODO: Implement loadTradeIdeasForSource
+      await loadTradeIdeasForSource(sourceId);
     }
   } catch (error) {
     console.error(
       `Failed to load source detail content for ${sourceId}:`,
       error
     );
-    contentDiv.innerHTML = '<p class="error">Failed to load content.</p>';
+    targetElement.innerHTML = '<p class="error">Failed to load content.</p>';
   }
 }
 
@@ -327,6 +362,24 @@ export async function loadStrategiesForSource(sourceId) {
     const container = document.getElementById('strategy-table');
     if (container) {
       container.innerHTML = '<p class="error">Failed to load strategies.</p>';
+    }
+  }
+}
+
+/**
+ * Fetches and renders the trade ideas table for a given source.
+ * @param {string|number} sourceId - The ID of the source.
+ */
+export async function loadTradeIdeasForSource(sourceId) {
+  console.log(`Loading trade ideas for source ${sourceId}...`);
+  try {
+    const ideas = await getOpenIdeasForSource(sourceId);
+    renderTradeIdeasTable(ideas);
+  } catch (error) {
+    console.error(`Failed to load trade ideas for source ${sourceId}:`, error);
+    const container = document.getElementById('trade-ideas-table');
+    if (container) {
+      container.innerHTML = '<p class="error">Failed to load trade ideas.</p>';
     }
   }
 }
@@ -470,12 +523,39 @@ async function handleStrategyTableClicks(event) {
   const strategyId = button.dataset.strategyId;
   if (!strategyId) return;
 
-  if (button.classList.contains('table-action-btn')) {
-    const modal = event.target.closest('#source-detail-modal');
-    if (modal) {
-      // @ts-ignore
-      const sourceId = modal.dataset.sourceId;
-      handleShowIdeaForm(event, sourceId, strategyId);
-    }
+  const modal = event.target.closest('#source-detail-modal');
+  if (!modal) return;
+
+  // @ts-ignore
+  const sourceId = modal.dataset.sourceId;
+  const ticker = button.dataset.ticker;
+
+  if (button.classList.contains('strategy-delete-btn')) {
+    await handleDeleteStrategyClick(strategyId, sourceId);
+  } else if (button.classList.contains('strategy-edit-btn')) {
+    handleShowEditStrategyForm(strategyId);
+  } else if (button.classList.contains('table-action-btn')) {
+    // This is the "Add Idea" button
+    handleShowIdeaForm(event, sourceId, strategyId, false, false, ticker);
+  }
+}
+
+/**
+ * Handles the click of the delete button on a strategy row.
+ * @param {string} strategyId - The ID of the strategy to delete.
+ * @param {string} sourceId - The ID of the source to refresh.
+ */
+async function handleDeleteStrategyClick(strategyId, sourceId) {
+  if (!confirm('Are you sure you want to delete this strategy?')) {
+    return;
+  }
+
+  try {
+    await deleteStrategy(strategyId);
+    alert('Strategy deleted successfully.');
+    await loadStrategiesForSource(sourceId); // Refresh the table
+  } catch (error) {
+    console.error('Failed to delete strategy:', error);
+    alert('Failed to delete strategy. Please check the console.');
   }
 }
