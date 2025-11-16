@@ -11,12 +11,14 @@ function initializeSubTabs() {
     return;
   }
 
-  subTabButtons.forEach((button) => {
+  for (const button of subTabButtons) {
     button.addEventListener('click', async (event) => {
       const subtab = event.target.dataset.subtab;
 
       // Deactivate other buttons
-      subTabButtons.forEach((btn) => btn.classList.remove('active'));
+      for (const btn of subTabButtons) {
+        btn.classList.remove('active');
+      }
       // Activate clicked button
       event.target.classList.add('active');
 
@@ -24,7 +26,7 @@ function initializeSubTabs() {
         await loadHtmlPartial(`/_alerts-${subtab}.html`, 'alerts-content');
       }
     });
-  });
+  }
 
   // Load default sub-tab
   const defaultSubTab = document.querySelector('.sub-nav-btn');

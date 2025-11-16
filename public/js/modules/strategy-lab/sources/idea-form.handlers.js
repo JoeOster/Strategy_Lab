@@ -1,260 +1,146 @@
 // public/js/modules/strategy-lab/sources/idea-form.handlers.js
 
-/** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
+import { createWatchedItem, getWatchedItem, updateWatchedItem } from './api.js';
+import { loadOpenIdeasForSource } from './modal.handlers.js'; // To refresh the table
 
-import {
-  addIdea,
-  moveIdeaToPaper,
-  moveIdeaToRealTrade,
-  updateIdea,
-} from '../watched-list/api.js';
-import {
-  loadOpenIdeasForSource,
-  loadPaperTradesForSource,
-  loadStrategiesForSource, // This might not be needed here, check usage
-  loadTradeIdeasForSource,
-} from './modal.handlers.js';
-
-// --- START: "Log New Idea" Modal Functions ---
+const addIdeaModal = document.getElementById('add-idea-modal');
+const logIdeaForm = document.getElementById('log-idea-form');
+const quantityContainer = document.getElementById('quantity-container');
 
 /**
- * Shows the "Log New Idea" form modal.
- * @param {Event | null} event - The click event (can be null).
- * @param {string | null} sourceId - The source ID.
- * @param {string | null} strategyId - The strategy ID (optional).
- * @param {boolean} [isPaperTrade=false] - Is this to create a paper trade?
- * @param {boolean} [isRealTrade=false] - Is this to create a real trade?
- * @param {string | null} [ticker=null] - The ticker symbol (optional).
+ * Opens the add/edit idea modal and populates it if editing.
+ * @param {Event} event
+ * @param {string | null} sourceId
+ * @param {string | null} strategyId
+ * @param {boolean} isEdit
+ * @param {boolean} isPaperTrade
+ * @param {string | null} ticker
+ * @param {string | null} ideaId
  */
-export function handleShowIdeaForm(
+export async function handleShowIdeaForm(
   event,
-  sourceId,
-  strategyId,
+  sourceId = null,
+  strategyId = null,
+  isEdit = false,
   isPaperTrade = false,
-  isRealTrade = false,
-  ticker = null
+  ticker = null,
+  ideaId = null
 ) {
-  const addIdeaModal = document.getElementById('add-idea-modal');
-  const ideaSourceIdInput = document.getElementById('idea-source-id');
-  const ideaStrategyIdInput = document.getElementById('idea-strategy-id');
-  const modalTitle = addIdeaModal?.querySelector('.modal-title');
-  const quantityContainer = document.getElementById('quantity-container');
-  const saveButton = addIdeaModal?.querySelector('button[type="submit"]');
-  const tickerInput = /** @type {HTMLInputElement | null} */ (
-    document.getElementById('idea-ticker')
-  );
+  // Reset form fields
+  // @ts-ignore
+  logIdeaForm.reset();
 
-  if (
-    addIdeaModal &&
-    ideaSourceIdInput &&
-    ideaStrategyIdInput &&
-    modalTitle &&
-    quantityContainer &&
-    saveButton &&
-    tickerInput
-  ) {
-    if (isPaperTrade) {
-      modalTitle.textContent = 'Add Paper Trade';
-      saveButton.textContent = 'Save Paper Trade';
-      quantityContainer.style.display = 'none';
-    } else if (isRealTrade) {
-      modalTitle.textContent = 'Add Real Trade';
-      saveButton.textContent = 'Save Trade';
-      quantityContainer.style.display = 'block';
-    } else {
-      modalTitle.textContent = 'Add New Trade Idea';
-      saveButton.textContent = 'Save Idea';
-      quantityContainer.style.display = 'none';
-    }
+  // Set source and strategy IDs
+  // @ts-ignore
+  document.getElementById('idea-source-id').value = sourceId || '';
+  // @ts-ignore
+  document.getElementById('idea-strategy-id').value = strategyId || '';
 
-    if (sourceId) {
-      // @ts-ignore
-      ideaSourceIdInput.value = sourceId;
-    }
-    // --- START: LINT FIX ---
-    if (event?.target) {
-      // @ts-ignore
-      const buttonSourceId = event.target.dataset.sourceId;
-      if (buttonSourceId) {
-        // @ts-ignore
-        ideaSourceIdInput.value = buttonSourceId;
-      }
-    }
-    // --- END: LINT FIX ---
-    if (strategyId) {
-      // @ts-ignore
-      ideaStrategyIdInput.value = strategyId;
-    }
+  // Set ticker if provided
+  // @ts-ignore
+  document.getElementById('idea-ticker').value = ticker || '';
 
-    // Handle pre-filled ticker
-    if (ticker) {
-      tickerInput.value = ticker;
-      tickerInput.readOnly = true;
-    } else {
-      tickerInput.value = '';
-      tickerInput.readOnly = false;
-    }
-
-    const form = document.getElementById('log-idea-form');
-    if (form) {
-      // Clear any previous hidden inputs
-      const oldPaperInput = form.querySelector('input[name="is_paper_trade"]');
-      if (oldPaperInput) oldPaperInput.remove();
-      const oldRealInput = form.querySelector('input[name="is_real_trade"]');
-      if (oldRealInput) oldRealInput.remove();
-
-      if (isPaperTrade) {
-        const paperTradeInput = document.createElement('input');
-        paperTradeInput.type = 'hidden';
-        paperTradeInput.name = 'is_paper_trade';
-        paperTradeInput.value = 'true';
-        form.appendChild(paperTradeInput);
-      }
-      if (isRealTrade) {
-        const realTradeInput = document.createElement('input');
-        realTradeInput.type = 'hidden';
-        realTradeInput.name = 'is_real_trade';
-        realTradeInput.value = 'true';
-        form.appendChild(realTradeInput);
-      }
-    }
-
+  // Show/hide quantity for paper trades
+  if (isPaperTrade) {
     // @ts-ignore
-    addIdeaModal.style.display = 'block';
-
-    // Attach listeners
-    document
-      .getElementById('cancel-idea-form-btn')
-      ?.addEventListener('click', handleCancelIdeaForm);
-    addIdeaModal
-      .querySelector('.close-button')
-      ?.addEventListener('click', handleCancelIdeaForm);
-    document
-      .getElementById('log-idea-form')
-      ?.addEventListener('submit', handleLogIdeaSubmit);
-    /** @param {MouseEvent} event */
-    window.onclick = (event) => {
-      if (event.target === addIdeaModal) {
-        handleCancelIdeaForm();
-      }
-    };
+    quantityContainer.style.display = 'block';
+  } else {
+    // @ts-ignore
+    quantityContainer.style.display = 'none';
   }
+
+  if (isEdit && ideaId) {
+    try {
+      const idea = await getWatchedItem(ideaId);
+      if (idea) {
+        // Populate form fields for editing
+        // @ts-ignore
+        document.getElementById('idea-ticker').value = idea.ticker || '';
+        // @ts-ignore
+        document.getElementById('idea-buy-low').value =
+          idea.buy_price_low || '';
+        // @ts-ignore
+        document.getElementById('idea-buy-high').value =
+          idea.buy_price_high || '';
+        // @ts-ignore
+        document.getElementById('idea-tp-low').value =
+          idea.take_profit_low || '';
+        // @ts-ignore
+        document.getElementById('idea-tp-high').value =
+          idea.take_profit_high || '';
+        // @ts-ignore
+        document.getElementById('idea-escape').value = idea.escape_price || '';
+        // @ts-ignore
+        document.getElementById('idea-notes').value = idea.notes || '';
+        // @ts-ignore
+        document.getElementById('idea-source-id').value = idea.source_id || '';
+        // @ts-ignore
+        document.getElementById('idea-strategy-id').value =
+          idea.strategy_id || '';
+      }
+    } catch (error) {
+      console.error(`Failed to load idea ${ideaId} for editing:`, error);
+      alert('Failed to load idea for editing.');
+    }
+  }
+
+  // @ts-ignore
+  addIdeaModal.style.display = 'block';
 }
 
-/**
- * Hides the "Log New Idea" form modal.
- */
-export function handleCancelIdeaForm() {
-  const addIdeaModal = document.getElementById('add-idea-modal');
-  if (addIdeaModal) {
+// Event listener for adding/editing an idea
+if (logIdeaForm) {
+  logIdeaForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    // @ts-ignore
+    const formData = new FormData(logIdeaForm);
+    const ideaData = Object.fromEntries(formData.entries());
+
+    // Determine if it's an edit or add operation
+    // @ts-ignore
+    const ideaId = document.getElementById('idea-id')?.value; // Assuming an idea-id field for edits
+
+    try {
+      if (ideaId) {
+        await updateWatchedItem(ideaId, ideaData);
+        alert('Idea updated successfully!');
+      } else {
+        await createWatchedItem(ideaData);
+        alert('Idea added successfully!');
+      }
+      // @ts-ignore
+      addIdeaModal.style.display = 'none';
+      // Refresh open ideas table in the source detail modal
+      // @ts-ignore
+      const sourceId = document.getElementById('idea-source-id').value;
+      if (sourceId) {
+        loadOpenIdeasForSource(sourceId);
+      }
+    } catch (error) {
+      console.error('Failed to save idea:', error);
+      alert('Failed to save idea.');
+    }
+  });
+}
+
+// Close buttons for modal
+if (addIdeaModal) {
+  addIdeaModal.querySelector('.close-button')?.addEventListener('click', () => {
     // @ts-ignore
     addIdeaModal.style.display = 'none';
-    const form = /** @type {HTMLFormElement | null} */ (
-      document.getElementById('log-idea-form')
-    );
-    if (form) form.reset();
-
-    const saveButton = addIdeaModal.querySelector('button[type="submit"]');
-    if (saveButton) {
-      saveButton.textContent = 'Save Idea';
-    }
-
-    // Reset ticker input to be editable
-    const tickerInput = /** @type {HTMLInputElement | null} */ (
-      document.getElementById('idea-ticker')
-    );
-    if (tickerInput) {
-      tickerInput.readOnly = false;
-    }
-
-    // Clean up listeners
-    document
-      .getElementById('cancel-idea-form-btn')
-      ?.removeEventListener('click', handleCancelIdeaForm);
-    addIdeaModal
-      .querySelector('.close-button')
-      ?.removeEventListener('click', handleCancelIdeaForm);
-    document
-      .getElementById('log-idea-form')
-      ?.removeEventListener('submit', handleLogIdeaSubmit);
-    // @ts-ignore
-    window.onclick = null; // Be careful if other modals use this
-  }
+  });
+  addIdeaModal
+    .querySelector('#cancel-idea-form-btn')
+    ?.addEventListener('click', () => {
+      // @ts-ignore
+      addIdeaModal.style.display = 'none';
+    });
 }
 
-/**
- * Handles the submission of the "Log New Idea" form.
- * @param {Event} event - The form submission event.
- */
-async function handleLogIdeaSubmit(event) {
-  event.preventDefault();
-  console.log('Idea form submitted.');
-
-  if (!(event.target instanceof HTMLFormElement)) {
-    return;
-  }
-  const form = event.target;
-  const formData = new FormData(form);
-  const ideaData = Object.fromEntries(formData.entries());
-
-  if (!ideaData.ticker) {
-    alert('Ticker is a required field.');
-    return;
-  }
-
-  try {
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+  if (event.target === addIdeaModal) {
     // @ts-ignore
-    if (ideaData.is_paper_trade) {
-      // If it's a new idea being created as a paper trade
-      if (!ideaData.id) {
-        await addIdea({ ...ideaData, is_paper_trade: true }); // Pass the flag to addIdea
-        alert('New idea saved as Paper Trade!');
-      } else {
-        // Existing idea being moved to paper trade
-        await moveIdeaToPaper(ideaData.id, ideaData);
-        alert('Idea moved to Paper Trades.');
-      }
-      if (ideaData.source_id) {
-        loadPaperTradesForSource(ideaData.source_id);
-      }
-    } else if (ideaData.is_real_trade) {
-      // If it's a new idea being created as a real trade
-      if (!ideaData.id) {
-        await addIdea({ ...ideaData, is_real_trade: true }); // Pass the flag to addIdea
-        alert('New idea saved as Real Trade!');
-      } else {
-        // Existing idea being moved to real trade
-        await moveIdeaToRealTrade(ideaData.id, ideaData);
-        alert('Idea moved to Real Trades.');
-      }
-      if (ideaData.source_id) {
-        loadOpenIdeasForSource(ideaData.source_id);
-        loadPaperTradesForSource(ideaData.source_id);
-        loadStrategiesForSource(ideaData.source_id);
-      }
-    } else if (ideaData.id) {
-      // Existing idea being updated
-      await updateIdea(ideaData.id, ideaData);
-      alert('Idea updated successfully!');
-    } else {
-      // Brand new idea (not a trade yet)
-      await addIdea(ideaData);
-      alert('Idea saved successfully!');
-      document.dispatchEvent(new CustomEvent('ideaAdded')); // Dispatch event
-    }
-    handleCancelIdeaForm(); // Hide and clear the form
-
-    // Also refresh the "Open Ideas" table in the modal if it's open
-    if (ideaData.source_id) {
-      // @ts-ignore
-      loadOpenIdeasForSource(ideaData.source_id);
-      // @ts-ignore
-      loadTradeIdeasForSource(ideaData.source_id);
-    }
-  } catch (error) {
-    console.error('Failed to save idea:', error);
-    // @ts-ignore
-    alert(`Error: ${error.message}`);
+    addIdeaModal.style.display = 'none';
   }
-}
-// --- END: "Log New Idea" Modal Functions ---
+});

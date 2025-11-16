@@ -168,10 +168,15 @@ router.delete('/:id', async (req, res) => {
 });
 
 // POST /api/watched-items/:id/to-paper
+router.post('/:id/to-paper', async (req, res) => {
+  console.log('Received request to move idea to paper:', req.body);
+  try {
+    const db = await getDb();
+    const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
     const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
-    const parsedPrice = Number(price) || 0;     // Ensure it's a number, default to 0
+    const parsedPrice = Number(price) || 0; // Ensure it's a number, default to 0
 
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
@@ -219,7 +224,11 @@ router.delete('/:id', async (req, res) => {
     const message = err instanceof Error ? err.message : String(err);
     res
       .status(500)
-      .json({ error: 'Failed to move idea to paper', details: message });
+      .json({
+        error: 'Failed to move idea to paper',
+        details: message,
+        debug: err.message,
+      });
   }
 });
 
@@ -267,13 +276,14 @@ router.put('/:id', async (req, res) => {
 });
 
 router.post('/:id/to-real', async (req, res) => {
+  console.log('Received request to move idea to real trade:', req.body);
   try {
     const db = await getDb();
     const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
     const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
-    const parsedPrice = Number(price) || 0;     // Ensure it's a number, default to 0
+    const parsedPrice = Number(price) || 0; // Ensure it's a number, default to 0
 
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
@@ -321,7 +331,11 @@ router.post('/:id/to-real', async (req, res) => {
     const message = err instanceof Error ? err.message : String(err);
     res
       .status(500)
-      .json({ error: 'Failed to move idea to real trade', details: message });
+      .json({
+        error: 'Failed to move idea to real trade',
+        details: message,
+        debug: err.message,
+      });
   }
 });
 
