@@ -25,11 +25,8 @@ import {
   getPaperTradesForSource,
   getStrategiesForSource,
 } from './api.js';
-import {
-  handleShowEditStrategyForm,
-  handleShowIdeaForm,
-  handleShowStrategyForm,
-} from './forms.handlers.js';
+import { handleShowIdeaForm } from './idea-form.handlers.js';
+import { handleShowEditStrategyForm, handleShowStrategyForm } from './strategy-form.handlers.js';
 import {
   renderOpenIdeasForSource,
   renderStrategiesTable,
