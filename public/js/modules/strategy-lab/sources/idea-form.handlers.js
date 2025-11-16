@@ -123,7 +123,8 @@ if (logIdeaForm) {
           await moveIdeaToRealTrade(ideaId, ideaData);
           alert('Real trade executed successfully!');
         }
-      } else if (ideaId) { // This is an edit of an existing idea
+      } else if (ideaId) {
+        // This is an edit of an existing idea
         await updateWatchedItem(ideaId, ideaData);
         alert('Idea updated successfully!');
       } else {

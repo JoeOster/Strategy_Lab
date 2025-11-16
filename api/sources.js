@@ -214,18 +214,25 @@ router.get('/:id/open-trades', async (req, res) => {
 
     // --- START: MODIFICATION ---
     // Fetch current prices for all unique tickers
-    const tickers = [...new Set(trades.map((trade) => trade.ticker))];
+    const tickers = [
+      ...new Set(
+        trades.map((/** @type {{ ticker: any; }} */ trade) => trade.ticker)
+      ),
+    ];
     const pricePromises = tickers.map((ticker) => getPriceV2(ticker));
     const prices = await Promise.all(pricePromises);
+    /** @type {Object<string, any>} */
     const priceMap = tickers.reduce((acc, ticker, index) => {
       acc[ticker] = prices[index];
       return acc;
     }, {});
 
-    const tradesWithPrices = trades.map((trade) => ({
-      ...trade,
-      current_price: priceMap[trade.ticker] || null,
-    }));
+    const tradesWithPrices = trades.map(
+      (/** @type {{ ticker: string | number; }} */ trade) => ({
+        ...trade,
+        current_price: priceMap[trade.ticker] || null,
+      })
+    );
     // --- END: FIX ---
     res.json(tradesWithPrices);
   } catch (error) {
@@ -248,20 +255,25 @@ router.get('/:id/paper-trades', async (req, res) => {
     // Fetch current prices for any trades that are not fully closed
     const openPaperTickers = [
       ...new Set(
-        trades.filter((t) => !t.exit_date).map((trade) => trade.ticker)
+        trades
+          .filter((/** @type {{ exit_date: any; }} */ t) => !t.exit_date)
+          .map((/** @type {{ ticker: any; }} */ trade) => trade.ticker)
       ),
     ];
     const pricePromises = openPaperTickers.map((ticker) => getPriceV2(ticker));
     const prices = await Promise.all(pricePromises);
+    /** @type {Object<string, any>} */
     const priceMap = openPaperTickers.reduce((acc, ticker, index) => {
       acc[ticker] = prices[index];
       return acc;
     }, {});
 
-    const tradesWithPrices = trades.map((trade) => ({
-      ...trade,
-      current_price: priceMap[trade.ticker] || null,
-    }));
+    const tradesWithPrices = trades.map(
+      (/** @type {{ ticker: string | number; }} */ trade) => ({
+        ...trade,
+        current_price: priceMap[trade.ticker] || null,
+      })
+    );
     res.json(tradesWithPrices);
   } catch (error) {
     console.error(`Failed to get paper trades for source ${id}:`, error);
@@ -276,7 +288,18 @@ router.get('/:id/closed-trades', async (req, res) => {
     const db = await getDb();
     // This query fetches all trades (paper and real) that have been closed.
     const trades = await db.all(
-      "SELECT * FROM transactions WHERE source_id = ? AND transaction_type = 'SELL'",
+      `SELECT
+        t_sell.id,
+        t_sell.ticker,
+        t_sell.quantity,
+        t_buy.transaction_date as entry_date,
+        t_buy.price as entry_price,
+        t_sell.transaction_date as exit_date,
+        t_sell.price as exit_price,
+        (t_sell.price - t_buy.price) * t_sell.quantity as pnl
+       FROM transactions t_sell
+       LEFT JOIN transactions t_buy ON t_sell.original_transaction_id = t_buy.id
+       WHERE t_sell.source_id = ? AND t_sell.transaction_type = 'SELL'`,
       id
     );
     res.json(trades);

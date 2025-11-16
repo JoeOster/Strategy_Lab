@@ -7,7 +7,7 @@ import express from 'express';
 dotenv.config();
 // --- START: NEW API ROUTER IMPORT ---
 import apiRouter from './api/index.js';
-import { getDb } from './services/database.js';
+import { getDb, initializeDatabase } from './services/database.js';
 // --- END: NEW API ROUTER IMPORT ---
 
 const app = express();
@@ -60,23 +60,32 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, async () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  // Ensure the database connection is closed when the server shuts down
-  process.on('SIGINT', async () => {
-    const db = await getDb();
-    if (db) {
-      await db.close();
-      console.log('Database connection closed.');
-    }
-    process.exit(0);
-  });
-  process.on('SIGTERM', async () => {
-    const db = await getDb();
-    if (db) {
-      await db.close();
-      console.log('Database connection closed.');
-    }
-    process.exit(0);
-  });
-});
+const startServer = async () => {
+  try {
+    // Wait for the database to be fully initialized and migrated before starting the server
+    await initializeDatabase();
+    console.log('Database connection and migrations successful.');
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
+  }
+};
+
+const gracefulShutdown = async () => {
+  console.log('\nReceived shutdown signal.');
+  const db = await getDb();
+  if (db) {
+    await db.close();
+    console.log('Database connection closed.');
+  }
+  process.exit(0);
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
+startServer();

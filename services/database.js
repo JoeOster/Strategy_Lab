@@ -7,11 +7,6 @@ import sqlite3 from 'sqlite3';
 // --- END: FIX ---
 
 // --- START: FIX ---
-// Recreate __dirname for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-// --- END: FIX ---
-
 let db;
 
 // --- START: FIX ---
@@ -20,16 +15,36 @@ export async function initializeDatabase() {
   if (db) return db;
   try {
     db = await open({
-      // --- START: FIX ---
-      // Use in-memory DB only if TEST_ENV is explicitly 'true' for tests.
-      filename: path.resolve(__dirname, '../db/strategy_lab.db'),
+      // --- FIX: Defer DB path resolution to avoid race conditions with environment variables ---
+      // The path is now resolved inside this function, ensuring process.env.DB_FILE is set.
+      filename:
+        process.env.DB_FILE ||
+        path.resolve(
+          path.dirname(fileURLToPath(import.meta.url)),
+          '../db/strategy_lab.db'
+        ),
       // --- END: FIX ---
       driver: sqlite3.Database,
     });
-    await db.migrate({
-      migrationsPath: path.resolve(__dirname, './migrations'),
+
+    // --- IMPROVEMENT: Add verbose logging for migrations ---
+    // Listen for the 'migrating' event to log which script is being applied.
+    db.on('migrating', (data) => {
+      console.log(`Applying migration: ${data.name}`);
     });
-    console.log('Database connection and migrations successful.');
+    // --- END IMPROVEMENT ---
+
+    await db.migrate({
+      migrationsPath: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './migrations'
+      ),
+      // --- IMPROVEMENT: Use 'force' for a master schema approach ---
+      // This tells the migrator to apply only the LATEST migration file.
+      // Perfect for a single, consolidated schema file.
+      force: 'last',
+    });
+
     return db;
   } catch (error) {
     console.error('Failed to initialize database:', error);

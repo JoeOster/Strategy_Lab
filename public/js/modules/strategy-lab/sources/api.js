@@ -66,7 +66,9 @@ export async function getOpenTradesForSource(sourceId) {
  * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of Transactions.
  */
 export async function getPaperTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/paper-trades`, { cache: 'no-cache' });
+  return api.get(`/api/sources/${sourceId}/paper-trades`, {
+    cache: 'no-cache',
+  });
 }
 
 /**
@@ -75,7 +77,9 @@ export async function getPaperTradesForSource(sourceId) {
  * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of closed trades.
  */
 export async function getClosedTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/closed-trades`, { cache: 'no-cache' });
+  return api.get(`/api/sources/${sourceId}/closed-trades`, {
+    cache: 'no-cache',
+  });
 }
 
 /**

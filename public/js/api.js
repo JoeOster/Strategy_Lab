@@ -44,7 +44,7 @@ export async function getWatchedItem(id) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      `Failed to fetch watched item: ${errorData.details || 'Not Found'}`,
+      `Failed to fetch watched item: ${errorData.details || 'Not Found'}`
     );
   }
 
@@ -67,7 +67,7 @@ export async function updateWatchedItem(id, ideaData) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      `Failed to update watched item: ${errorData.details || response.statusText}`,
+      `Failed to update watched item: ${errorData.details || response.statusText}`
     );
   }
 
@@ -86,7 +86,9 @@ export async function deleteWatchedItem(id) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(`Failed to delete watched item: ${errorData.details || 'Not Found'}`);
+    throw new Error(
+      `Failed to delete watched item: ${errorData.details || 'Not Found'}`
+    );
   }
 }
 
@@ -123,7 +125,7 @@ export async function moveIdeaToRealTrade(ideaId, tradeData) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      `Failed to move idea to real trade: ${errorData.details || response.statusText}`,
+      `Failed to move idea to real trade: ${errorData.details || response.statusText}`
     );
   }
 
@@ -146,7 +148,7 @@ export async function moveIdeaToPaperTrade(ideaId, tradeData) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      `Failed to move idea to paper trade: ${errorData.details || response.statusText}`,
+      `Failed to move idea to paper trade: ${errorData.details || response.statusText}`
     );
   }
 

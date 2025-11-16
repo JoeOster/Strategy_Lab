@@ -13,16 +13,16 @@ import { getSource } from '../../settings/sources.api.js';
 import { openSourceFormModal } from '../../settings/sources.handlers.js';
 // --- END: MODIFICATION ---
 import {
-  renderOpenTradesForSource,
   renderClosedTradesForSource,
+  renderOpenTradesForSource,
   renderPaperTradesForSource,
 } from '../../transactions/render.js';
 import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
 import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
   deleteStrategy,
-  getOpenIdeasForSource,
   getClosedTradesForSource,
+  getOpenIdeasForSource,
   getOpenTradesForSource,
   getPaperTradesForSource,
   getStrategiesForSource,
@@ -77,7 +77,8 @@ export async function openSourceDetailModal(sourceId) {
     paperTradesPlaceholder.innerHTML = '<h3>Paper Trades</h3><p>Loading...</p>';
   }
   if (closedTradesPlaceholder) {
-    closedTradesPlaceholder.innerHTML = '<h3>Closed Trades</h3><p>Loading...</p>';
+    closedTradesPlaceholder.innerHTML =
+      '<h3>Closed Trades</h3><p>Loading...</p>';
   }
 
   if (
@@ -291,7 +292,9 @@ export function closeSourceDetailModal() {
       'paper-trades-table-placeholder'
     );
     if (paperTrades) paperTrades.innerHTML = '';
-    const closedTrades = document.getElementById('closed-trades-table-placeholder');
+    const closedTrades = document.getElementById(
+      'closed-trades-table-placeholder'
+    );
     if (closedTrades) closedTrades.innerHTML = '';
 
     // Remove event listener for the modal body
@@ -501,8 +504,7 @@ async function handleModalBottomPanelClicks(event) {
     shouldRefreshIdeas = await watchedListHandlers.handleDeleteIdeaClick(id);
   } else if (button.classList.contains('idea-paper-btn')) {
     if (tradeTypeInput) tradeTypeInput.value = 'paper';
-    movedToPaper =
-      await watchedListHandlers.handleMoveIdeaToPaperClick(id);
+    movedToPaper = await watchedListHandlers.handleMoveIdeaToPaperClick(id);
     if (shouldRefreshIdeas) {
       movedToPaper = true;
     }

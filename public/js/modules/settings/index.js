@@ -6,11 +6,12 @@ import {
   initializeAppearanceTab,
 } from './appearance.handlers.js';
 import * as exchangesHandlers from './exchanges.handlers.js';
-import * as handlers from './handlers.js';
+import { initializeIdeasHandlers } from './handlers.js';
 // --- START: FIX ---
 // Import the new save function
 import { handleSaveGeneralSettings } from './handlers.js';
 // --- END: FIX ---
+import * as handlers from './handlers.js';
 import {
   closeSourceFormModal,
   handleClearSourceForm,
@@ -21,13 +22,15 @@ import {
   updateImagePreview,
 } from './sources.handlers.js';
 import * as usersHandlers from './users.handlers.js';
-import { loadAccountHoldersList } from './users.handlers.js';
 import * as webappsHandlers from './webapps.handlers.js'; // Import new handlers
 
 export function initializeModule() {
   console.log('Settings module initialized.');
 
   initializeAppearanceTab();
+
+  // Initialize the handlers for the "ideas" or "watched items" functionality
+  initializeIdeasHandlers();
 
   // Stop the General Settings form from reloading the page
   const generalForm = document.getElementById('general-settings-form');
@@ -56,12 +59,12 @@ export function initializeModule() {
     button.addEventListener('click', handlers.handleMainTabClick);
   }
 
-  // Explicitly activate the default tab (General) and load its content
+  // Explicitly activate the default tab (Dashboard) and load its content
   const defaultTab = document.querySelector(
-    '.settings-tab[data-tab="general-settings-panel"]'
+    '.settings-tab[data-tab="dashboard-panel"]'
   );
   if (defaultTab) {
-    handlers.handleMainTabClick({ target: defaultTab });
+    defaultTab.click();
   }
 
   // Sub-tab navigation (using event delegation)
