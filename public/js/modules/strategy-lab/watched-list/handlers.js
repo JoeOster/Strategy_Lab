@@ -1,7 +1,7 @@
 // public/js/modules/strategy-lab/watched-list/handlers.js
 
 import { openEditTradeModal } from '../../transactions/edit-trade.handlers.js';
-import { handleShowIdeaForm } from '../sources/forms.handlers.js';
+import { handleShowIdeaForm } from '../sources/idea-form.handlers.js';
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 import * as api from './api.js';
 import { getWatchedList } from './api.js';
