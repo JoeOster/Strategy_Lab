@@ -26,12 +26,15 @@ import {
   getStrategiesForSource,
 } from './api.js';
 import { handleShowIdeaForm } from './idea-form.handlers.js';
-import { handleShowEditStrategyForm, handleShowStrategyForm } from './strategy-form.handlers.js';
 import {
   renderOpenIdeasForSource,
   renderStrategiesTable,
   renderTradeIdeasTable,
 } from './render.js';
+import {
+  handleShowEditStrategyForm,
+  handleShowStrategyForm,
+} from './strategy-form.handlers.js';
 
 let tradeCreatedHandler;
 

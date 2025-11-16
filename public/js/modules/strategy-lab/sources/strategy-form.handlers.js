@@ -3,9 +3,7 @@
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 
 import { addStrategy, getStrategy, updateStrategy } from './api.js';
-import {
-  loadStrategiesForSource,
-} from './modal.handlers.js';
+import { loadStrategiesForSource } from './modal.handlers.js';
 
 // --- START: "Log New Strategy" Modal Functions ---
 
