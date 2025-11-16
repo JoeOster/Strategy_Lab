@@ -1,7 +1,12 @@
 // public/js/modules/strategy-lab/sources/idea-form.handlers.js
 
-import { createWatchedItem, getWatchedItem, updateWatchedItem } from './api.js';
-import { loadOpenIdeasForSource } from './modal.handlers.js'; // To refresh the table
+import {
+  createWatchedItem,
+  getWatchedItem,
+  moveIdeaToPaperTrade,
+  moveIdeaToRealTrade,
+  updateWatchedItem,
+} from '../../../api.js';
 
 const addIdeaModal = document.getElementById('add-idea-modal');
 const logIdeaForm = document.getElementById('log-idea-form');
@@ -49,6 +54,11 @@ export async function handleShowIdeaForm(
     quantityContainer.style.display = 'none';
   }
 
+  // --- START: FIX ---
+  // Set the idea ID for conversions (Buy/Paper) or edits.
+  // @ts-ignore
+  document.getElementById('idea-id').value = ideaId || '';
+  // --- END: FIX ---
   if (isEdit && ideaId) {
     try {
       const idea = await getWatchedItem(ideaId);
@@ -97,11 +107,23 @@ if (logIdeaForm) {
     const ideaData = Object.fromEntries(formData.entries());
 
     // Determine if it's an edit or add operation
-    // @ts-ignore
-    const ideaId = document.getElementById('idea-id')?.value; // Assuming an idea-id field for edits
+    const ideaId = ideaData.id;
+
+    // Check if this is a conversion to a trade (real or paper)
+    const isTradeConversion = ideaData.quantity && ideaId;
+    // Check which button was clicked to determine trade type
+    const isPaperTrade = ideaData.trade_type === 'paper';
 
     try {
-      if (ideaId) {
+      if (isTradeConversion) {
+        if (isPaperTrade) {
+          await moveIdeaToPaperTrade(ideaId, ideaData);
+          alert('Paper trade executed successfully!');
+        } else {
+          await moveIdeaToRealTrade(ideaId, ideaData);
+          alert('Real trade executed successfully!');
+        }
+      } else if (ideaId) { // This is an edit of an existing idea
         await updateWatchedItem(ideaId, ideaData);
         alert('Idea updated successfully!');
       } else {
@@ -110,12 +132,16 @@ if (logIdeaForm) {
       }
       // @ts-ignore
       addIdeaModal.style.display = 'none';
-      // Refresh open ideas table in the source detail modal
+
+      // --- START: FIX ---
+      // Dispatch a custom event to notify that a trade was created or an idea was updated.
+      // The modal handler will listen for this and refresh the correct tables.
       // @ts-ignore
       const sourceId = document.getElementById('idea-source-id').value;
-      if (sourceId) {
-        loadOpenIdeasForSource(sourceId);
-      }
+      document.dispatchEvent(
+        new CustomEvent('tradeCreated', { detail: { sourceId } })
+      );
+      // --- END: FIX ---
     } catch (error) {
       console.error('Failed to save idea:', error);
       alert('Failed to save idea.');

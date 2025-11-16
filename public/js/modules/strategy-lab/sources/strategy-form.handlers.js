@@ -1,6 +1,6 @@
 // public/js/modules/strategy-lab/sources/strategy-form.handlers.js
 
-import { createStrategy, getStrategy, updateStrategy } from './api.js';
+import { addStrategy, getStrategy, updateStrategy } from './api.js';
 import { loadStrategiesForSource } from './modal.handlers.js'; // To refresh the table
 
 const addStrategyModal = document.getElementById('add-strategy-modal');
@@ -82,7 +82,7 @@ if (logStrategyForm) {
     const strategyData = Object.fromEntries(formData.entries());
 
     try {
-      await createStrategy(strategyData);
+      await addStrategy(strategyData);
       alert('Strategy added successfully!');
       // @ts-ignore
       addStrategyModal.style.display = 'none';

@@ -4,7 +4,6 @@ import { initializeNavigation } from './modules/navigation/index.js';
 // --- START: FIX ---
 // Import directly from the handler file to avoid breaking the app
 import { applyInitialAppearance } from './modules/settings/appearance.handlers.js';
-import { initializeModule as initializeStrategyLab } from './modules/strategy-lab/index.js';
 // --- END: FIX ---
 import { initializeUserSelector } from './modules/user-selector/index.js';
 import { loadHtmlPartial } from './utils/loadHtmlPartial.js';
@@ -30,5 +29,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeNavigation();
   // --- END: FIX ---
   initializeUserSelector();
-  initializeStrategyLab();
+  // initializeStrategyLab(); // This is called by the navigation module when the tab is loaded.
 });

@@ -2,6 +2,7 @@
 // --- START: FIX ---
 import express from 'express';
 import { getDb } from '../services/database.js'; // Added the missing import
+import { getPriceV2 } from '../services/priceServiceV2.js';
 const router = express.Router(); // Kept the correct router declaration
 // --- END: FIX ---
 
@@ -188,7 +189,7 @@ router.get('/:id/open-ideas', async (req, res) => {
     // --- START: FIX ---
     const db = await getDb(); // Use getDb()
     const items = await db.all(
-      `SELECT * FROM watched_items WHERE source_id = ? AND status = 'WATCHING'`,
+      'SELECT * FROM watched_items WHERE source_id = ?',
       [id]
     );
     // --- END: FIX ---
@@ -205,13 +206,28 @@ router.get('/:id/open-trades', async (req, res) => {
   try {
     // --- START: FIX ---
     const db = await getDb(); // Use getDb()
+    // This query ensures ONLY real trades are returned.
     const trades = await db.all(
-      `SELECT * FROM transactions 
-       WHERE source_id = ? AND quantity_remaining > 0 AND (transaction_type = 'buy' OR transaction_type = 'short')`,
-      [id]
+      'SELECT * FROM transactions WHERE source_id = ? AND is_paper_trade = 0 AND quantity_remaining > 0',
+      id
     );
+
+    // --- START: MODIFICATION ---
+    // Fetch current prices for all unique tickers
+    const tickers = [...new Set(trades.map((trade) => trade.ticker))];
+    const pricePromises = tickers.map((ticker) => getPriceV2(ticker));
+    const prices = await Promise.all(pricePromises);
+    const priceMap = tickers.reduce((acc, ticker, index) => {
+      acc[ticker] = prices[index];
+      return acc;
+    }, {});
+
+    const tradesWithPrices = trades.map((trade) => ({
+      ...trade,
+      current_price: priceMap[trade.ticker] || null,
+    }));
     // --- END: FIX ---
-    res.json(trades);
+    res.json(tradesWithPrices);
   } catch (error) {
     console.error(`Failed to get open trades for source ${id}:`, error);
     res.status(500).json({ error: 'Failed to get open trades' });
@@ -222,33 +238,53 @@ router.get('/:id/open-trades', async (req, res) => {
 router.get('/:id/paper-trades', async (req, res) => {
   const { id } = req.params;
   try {
-    // --- START: FIX ---
-    const db = await getDb(); // Use getDb()
-    // --- END: FIX ---
-    const paperTrades = await db.all(
-      `
-      SELECT 
-        w.id, 
-        w.ticker as symbol, 
-        t.transaction_type as direction, 
-        t.price as entry_price, 
-        w.take_profit_high as target_price,
-        COUNT(t.id) AS trade_count
-      FROM watched_items w
-      LEFT JOIN transactions t ON w.id = t.watched_item_id AND t.is_paper_trade = 1
-      WHERE w.source_id = ? AND w.status = 'EXECUTED'
-      GROUP BY w.id, w.ticker, t.transaction_type, t.price, w.take_profit_high
-      ORDER BY w.created_date DESC
-    `,
-      [id]
+    const db = await getDb();
+    // This is the corrected query. It ensures ONLY paper trades are returned.
+    const trades = await db.all(
+      'SELECT * FROM transactions WHERE source_id = ? AND is_paper_trade = 1',
+      id
     );
-    res.json(paperTrades);
+
+    // Fetch current prices for any trades that are not fully closed
+    const openPaperTickers = [
+      ...new Set(
+        trades.filter((t) => !t.exit_date).map((trade) => trade.ticker)
+      ),
+    ];
+    const pricePromises = openPaperTickers.map((ticker) => getPriceV2(ticker));
+    const prices = await Promise.all(pricePromises);
+    const priceMap = openPaperTickers.reduce((acc, ticker, index) => {
+      acc[ticker] = prices[index];
+      return acc;
+    }, {});
+
+    const tradesWithPrices = trades.map((trade) => ({
+      ...trade,
+      current_price: priceMap[trade.ticker] || null,
+    }));
+    res.json(tradesWithPrices);
   } catch (error) {
     console.error(`Failed to get paper trades for source ${id}:`, error);
     res.status(500).json({ error: 'Failed to get paper trades' });
   }
 });
 
+// GET /api/sources/:id/closed-trades
+router.get('/:id/closed-trades', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const db = await getDb();
+    // This query fetches all trades (paper and real) that have been closed.
+    const trades = await db.all(
+      "SELECT * FROM transactions WHERE source_id = ? AND transaction_type = 'SELL'",
+      id
+    );
+    res.json(trades);
+  } catch (error) {
+    console.error(`Failed to get closed trades for source ${id}:`, error);
+    res.status(500).json({ error: 'Failed to get closed trades' });
+  }
+});
 // --- START: FIX ---
 export default router; // Changed to ES Module export
 // --- END: FIX ---

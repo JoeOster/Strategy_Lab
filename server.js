@@ -12,6 +12,17 @@ import { getDb } from './services/database.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+// In your main server file (e.g., server.js or index.js)
+
+// ... after const app = express();
+
+// Middleware to disable caching for all API routes
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
+// ... rest of your routes and app.listen()
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);

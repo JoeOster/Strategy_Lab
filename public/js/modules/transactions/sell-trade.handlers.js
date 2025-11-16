@@ -3,6 +3,9 @@
 import { formatCurrency } from '../../utils/formatters.js';
 import { getTransaction, sellTransaction } from './api.js';
 
+const sellTradeModal = document.getElementById('sell-trade-modal');
+const sellTradeForm = document.getElementById('sell-trade-form');
+
 /**
  * Opens the "Sell Trade" modal.
  * @param {string} tradeId - The ID of the trade to sell.
@@ -12,6 +15,9 @@ export async function openSellTradeModal(tradeId) {
   if (modal) {
     try {
       const trade = await getTransaction(tradeId);
+      // @ts-ignore
+      document.getElementById('sell-trade-id').value = trade.id;
+
       const detailsContainer = document.getElementById('sell-trade-details');
       if (detailsContainer) {
         detailsContainer.innerHTML = `
@@ -23,21 +29,6 @@ export async function openSellTradeModal(tradeId) {
         `;
       }
       modal.style.display = 'block';
-
-      const confirmBtn = document.getElementById('confirm-sell-btn');
-      if (confirmBtn) {
-        confirmBtn.onclick = async () => {
-          try {
-            await sellTransaction(tradeId);
-            alert('Trade sold successfully!');
-            closeSellTradeModal();
-            // TODO: Refresh the table
-          } catch (error) {
-            console.error('Failed to sell trade:', error);
-            alert('Error: Could not sell trade. Please check the console.');
-          }
-        };
-      }
     } catch (error) {
       console.error('Failed to get trade details:', error);
       alert('Error: Could not get trade details. Please check the console.');
@@ -53,6 +44,33 @@ export async function openSellTradeModal(tradeId) {
       cancelBtn.addEventListener('click', closeSellTradeModal);
     }
   }
+}
+
+if (sellTradeForm) {
+  sellTradeForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(sellTradeForm);
+    const sellData = Object.fromEntries(formData.entries());
+    const tradeId = sellData.trade_id;
+
+    try {
+      const result = await sellTransaction(tradeId, sellData);
+      alert('Trade sold successfully!');
+      closeSellTradeModal();
+
+      // Dispatch an event to trigger UI refresh
+      if (result.sourceId) {
+        document.dispatchEvent(
+          new CustomEvent('tradeCreated', {
+            detail: { sourceId: result.sourceId },
+          })
+        );
+      }
+    } catch (error) {
+      console.error('Failed to sell trade:', error);
+      alert('Error: Could not sell trade. Please check the console.');
+    }
+  });
 }
 
 /**

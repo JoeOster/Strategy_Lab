@@ -91,6 +91,17 @@ router.post('/:id/sell', async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params;
+    const { quantity: sellQuantity, price: sellPrice } = req.body;
+
+    if (!sellQuantity || !sellPrice) {
+      return res
+        .status(400)
+        .json({ error: 'Sell quantity and price are required.' });
+    }
+
+    const parsedSellQuantity = Number(sellQuantity);
+    const parsedSellPrice = Number(sellPrice);
+
     const originalTx = await db.get(
       'SELECT * FROM transactions WHERE id = ?',
       id
@@ -100,14 +111,15 @@ router.post('/:id/sell', async (req, res) => {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    const now = new Date().toISOString();
-    const sellPrice = await getPriceV2(originalTx.ticker);
-    if (!sellPrice) {
-      return res
-        .status(500)
-        .json({ error: 'Could not fetch current price to sell trade' });
+    if (parsedSellQuantity > originalTx.quantity_remaining) {
+      return res.status(400).json({
+        error: `Cannot sell more than the remaining quantity of ${originalTx.quantity_remaining}.`,
+      });
     }
 
+    const now = new Date().toISOString();
+
+    // Create the new SELL transaction
     const result = await db.run(
       `INSERT INTO transactions 
          (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
@@ -120,23 +132,25 @@ router.post('/:id/sell', async (req, res) => {
         now,
         originalTx.ticker,
         'SELL',
-        originalTx.quantity,
-        sellPrice,
+        parsedSellQuantity,
+        parsedSellPrice,
         0,
         now,
         now,
       ]
     );
 
+    // Update the original BUY transaction's remaining quantity
     await db.run(
-      'UPDATE transactions SET quantity_remaining = 0, updated_date = ? WHERE id = ?',
-      [now, id]
+      'UPDATE transactions SET quantity_remaining = quantity_remaining - ?, updated_date = ? WHERE id = ?',
+      [parsedSellQuantity, now, id]
     );
 
     res.status(201).json({
       message: 'Trade sold successfully',
       newTransactionId: result.lastID,
       originalTransactionId: id,
+      sourceId: originalTx.source_id, // Return sourceId for UI refresh
     });
   } catch (err) {
     console.error(`Failed to sell transaction ${req.params.id}:`, err);

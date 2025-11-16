@@ -84,6 +84,11 @@
  */
 
 /**
+ * Represents a Transaction with current price information added by the API.
+ * @typedef {Transaction & { current_price: number | null }} TransactionWithPrice
+ */
+
+/**
  * Represents a Paper Trade from the mock API.
  * @typedef {object} PaperTrade
  * @property {number} id
@@ -109,6 +114,7 @@
  * @property {number | null} [exit_price]
  * @property {number | null} [pnl]
  * @property {number | null} [return_pct]
+ * @property {number | null} [current_price] - (Added by the API)
  */
 // --- END: NEW TYPE ---
 

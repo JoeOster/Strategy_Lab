@@ -20,7 +20,10 @@ export async function initializeDatabase() {
   if (db) return db;
   try {
     db = await open({
+      // --- START: FIX ---
+      // Use in-memory DB only if TEST_ENV is explicitly 'true' for tests.
       filename: path.resolve(__dirname, '../db/strategy_lab.db'),
+      // --- END: FIX ---
       driver: sqlite3.Database,
     });
     await db.migrate({

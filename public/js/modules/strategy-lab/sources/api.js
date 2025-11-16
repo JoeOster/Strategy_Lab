@@ -26,7 +26,9 @@ export async function addStrategy(strategyData) {
  * @returns {Promise<Strategy[]>} A promise that resolves to an array of strategies.
  */
 export async function getStrategiesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/strategies`);
+  return api.get(`/api/sources/${sourceId}/strategies`, {
+    cache: 'no-cache',
+  });
 }
 
 /**
@@ -35,7 +37,7 @@ export async function getStrategiesForSource(sourceId) {
  * @returns {Promise<Strategy>}
  */
 export async function getStrategy(strategyId) {
-  return api.get(`/api/strategies/${strategyId}`);
+  return api.get(`/api/strategies/${strategyId}`, { cache: 'no-cache' });
 }
 
 // --- START: NEW SOURCE-SPECIFIC API FUNCTIONS ---
@@ -46,7 +48,7 @@ export async function getStrategy(strategyId) {
  * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of WatchedItems.
  */
 export async function getOpenIdeasForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/open-ideas`);
+  return api.get(`/api/sources/${sourceId}/open-ideas`, { cache: 'no-cache' });
 }
 
 /**
@@ -55,7 +57,7 @@ export async function getOpenIdeasForSource(sourceId) {
  * @returns {Promise<Transaction[]>} A promise that resolves to an array of Transactions.
  */
 export async function getOpenTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/open-trades`);
+  return api.get(`/api/sources/${sourceId}/open-trades`, { cache: 'no-cache' });
 }
 
 /**
@@ -64,7 +66,16 @@ export async function getOpenTradesForSource(sourceId) {
  * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of Transactions.
  */
 export async function getPaperTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/paper-trades`);
+  return api.get(`/api/sources/${sourceId}/paper-trades`, { cache: 'no-cache' });
+}
+
+/**
+ * Fetches all "Closed Trades" for a specific source ID.
+ * @param {string|number} sourceId - The ID of the source.
+ * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of closed trades.
+ */
+export async function getClosedTradesForSource(sourceId) {
+  return api.get(`/api/sources/${sourceId}/closed-trades`, { cache: 'no-cache' });
 }
 
 /**

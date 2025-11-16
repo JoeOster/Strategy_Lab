@@ -40,7 +40,7 @@ router.post('/ideas', async (req, res) => {
       idea.user_id || 1,
       idea.source_id || null,
       idea.strategy_id || null,
-      idea.ticker.toUpperCase(),
+      idea.ticker ? idea.ticker.toUpperCase() : null,
       idea.order_type || null,
       idea.buy_price_high || null,
       idea.buy_price_low || null,
@@ -222,13 +222,11 @@ router.post('/:id/to-paper', async (req, res) => {
   } catch (err) {
     console.error(`Failed to move idea ${req.params.id} to paper:`, err);
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({
-        error: 'Failed to move idea to paper',
-        details: message,
-        debug: err.message,
-      });
+    res.status(500).json({
+      error: 'Failed to move idea to paper',
+      details: message,
+      debug: err.message,
+    });
   }
 });
 
@@ -329,13 +327,11 @@ router.post('/:id/to-real', async (req, res) => {
   } catch (err) {
     console.error(`Failed to move idea ${req.params.id} to real trade:`, err);
     const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({
-        error: 'Failed to move idea to real trade',
-        details: message,
-        debug: err.message,
-      });
+    res.status(500).json({
+      error: 'Failed to move idea to real trade',
+      details: message,
+      debug: err.message,
+    });
   }
 });
 

@@ -229,12 +229,14 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
           <td>${item.status || 'WATCHING'}</td>
           <td>${item.notes || ''}</td>
           <td>
-            <button class="btn table-action-btn idea-buy-btn" data-id="${
-              item.id
-            }">Buy</button>
-            <button class="btn table-action-btn btn-secondary idea-paper-btn" data-id="${
-              item.id
-            }">Paper</button>
+            ${
+              item.status === 'EXECUTED'
+                ? `<button class="btn table-action-btn" disabled>&#10004; Executed</button>`
+                : `
+              <button class="btn table-action-btn idea-buy-btn" data-id="${item.id}">Buy</button>
+              <button class="btn table-action-btn btn-secondary idea-paper-btn" data-id="${item.id}">Paper</button>
+            `
+            }
             <button class="btn table-action-btn btn-secondary idea-edit-btn" data-id="${
               item.id
             }">Edit</button>

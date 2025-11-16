@@ -14,6 +14,7 @@ import { openSourceFormModal } from '../../settings/sources.handlers.js';
 // --- END: MODIFICATION ---
 import {
   renderOpenTradesForSource,
+  renderClosedTradesForSource,
   renderPaperTradesForSource,
 } from '../../transactions/render.js';
 import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
@@ -21,6 +22,7 @@ import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
   deleteStrategy,
   getOpenIdeasForSource,
+  getClosedTradesForSource,
   getOpenTradesForSource,
   getPaperTradesForSource,
   getStrategiesForSource,
@@ -60,6 +62,9 @@ export async function openSourceDetailModal(sourceId) {
   const paperTradesPlaceholder = document.getElementById(
     'paper-trades-table-placeholder'
   );
+  const closedTradesPlaceholder = document.getElementById(
+    'closed-trades-table-placeholder'
+  );
 
   if (ideasPlaceholder) {
     ideasPlaceholder.style.display = 'block'; // Ensure it's visible by default
@@ -70,6 +75,9 @@ export async function openSourceDetailModal(sourceId) {
   }
   if (paperTradesPlaceholder) {
     paperTradesPlaceholder.innerHTML = '<h3>Paper Trades</h3><p>Loading...</p>';
+  }
+  if (closedTradesPlaceholder) {
+    closedTradesPlaceholder.innerHTML = '<h3>Closed Trades</h3><p>Loading...</p>';
   }
 
   if (
@@ -160,6 +168,7 @@ export async function openSourceDetailModal(sourceId) {
     }
     loadOpenTradesForSource(sourceId);
     loadPaperTradesForSource(sourceId);
+    loadClosedTradesForSource(sourceId);
 
     // Display the modal
     // @ts-ignore
@@ -222,6 +231,7 @@ export async function openSourceDetailModal(sourceId) {
       if (eventSourceId === currentSourceId) {
         loadOpenTradesForSource(currentSourceId);
         loadPaperTradesForSource(currentSourceId);
+        loadClosedTradesForSource(currentSourceId);
         // Also refresh open ideas, as one was just executed
         loadOpenIdeasForSource(currentSourceId);
       }
@@ -281,6 +291,8 @@ export function closeSourceDetailModal() {
       'paper-trades-table-placeholder'
     );
     if (paperTrades) paperTrades.innerHTML = '';
+    const closedTrades = document.getElementById('closed-trades-table-placeholder');
+    if (closedTrades) closedTrades.innerHTML = '';
 
     // Remove event listener for the modal body
     const modalBody = modal.querySelector('.modal-body');
@@ -441,6 +453,22 @@ export async function loadPaperTradesForSource(sourceId) {
   }
 }
 
+/**
+ * Fetches and renders the "Closed Trades" table for the source.
+ * @param {string|number} sourceId - The ID of the source.
+ */
+export async function loadClosedTradesForSource(sourceId) {
+  const containerId = 'closed-trades-table-placeholder';
+  try {
+    const trades = await getClosedTradesForSource(sourceId);
+    renderClosedTradesForSource(trades, containerId);
+  } catch (err) {
+    console.error(`Failed to load closed trades for source ${sourceId}:`, err);
+    const error = err instanceof Error ? err : new Error(String(err));
+    renderClosedTradesForSource(null, containerId, error);
+  }
+}
+
 // --- END: NEW LOADER FUNCTIONS ---
 
 import { openEditTradeModal } from '../../transactions/edit-trade.handlers.js';
@@ -465,18 +493,24 @@ async function handleModalBottomPanelClicks(event) {
   let shouldRefreshPaperTrades = false;
   let movedToPaper = false;
 
+  // Set the trade type for the idea form
+  const tradeTypeInput = document.getElementById('idea-trade-type');
+
   // Check for "Open Ideas" buttons
   if (button.classList.contains('idea-delete-btn')) {
     shouldRefreshIdeas = await watchedListHandlers.handleDeleteIdeaClick(id);
   } else if (button.classList.contains('idea-paper-btn')) {
-    shouldRefreshIdeas =
+    if (tradeTypeInput) tradeTypeInput.value = 'paper';
+    movedToPaper =
       await watchedListHandlers.handleMoveIdeaToPaperClick(id);
     if (shouldRefreshIdeas) {
       movedToPaper = true;
     }
   } else if (button.classList.contains('idea-buy-btn')) {
+    if (tradeTypeInput) tradeTypeInput.value = 'real';
     await watchedListHandlers.handleBuyIdeaClick(id);
   } else if (button.classList.contains('idea-edit-btn')) {
+    if (tradeTypeInput) tradeTypeInput.value = 'edit';
     await watchedListHandlers.handleEditIdeaClick(id);
   }
 
@@ -502,7 +536,7 @@ async function handleModalBottomPanelClicks(event) {
     if (shouldRefreshIdeas) {
       loadOpenIdeasForSource(sourceId); // Re-load ideas
     }
-    if (movedToPaper || shouldRefreshPaperTrades) {
+    if (movedToPaper) {
       // If we moved an idea to paper, OR deleted a paper trade,
       // refresh the paper trades table
       loadPaperTradesForSource(sourceId);
