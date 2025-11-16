@@ -191,7 +191,7 @@ export async function openSourceDetailModal(sourceId) {
         if (!modal) return;
         // @ts-ignore
         const currentSourceId = modal.dataset.sourceId || null;
-        handleShowIdeaForm(event, currentSourceId, null, true, false);
+        handleShowIdeaForm(event, currentSourceId, null, false, false);
       });
       // --- END: MODIFICATION ---
     }

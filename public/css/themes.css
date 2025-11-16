@@ -30,6 +30,7 @@
   --primary-hover: #2563eb;
   --positive-color: #10b981;
   --negative-color: #ef4444;
+  --input-bg: #f9fafb;
 
   /* Secondary Button Variables */
   --button-secondary-bg: #6b7280;
@@ -48,6 +49,7 @@ body[data-theme="dark"] {
   --table-header-bg: #4b5563;
   --table-row-even-bg: #4b5563;
   --shadow-color: rgba(0, 0, 0, 0.2);
+  --input-bg: #2d3748;
 
   /* Link colors for dark theme */
   a {
@@ -70,6 +72,7 @@ body[data-theme="sepia"] {
   --table-header-bg: #f7efe0;
   --table-row-even-bg: #f7efe0;
   --shadow-color: rgba(0, 0, 0, 0.07);
+  --input-bg: #f7efe0;
 }
 
 body[data-theme="contrast"] {
@@ -85,4 +88,5 @@ body[data-theme="contrast"] {
   --shadow-color: rgba(255, 255, 255, 0.2);
   --primary-color: #00aaff;
   --primary-hover: #0088cc;
+  --input-bg: #333333;
 }

@@ -111,3 +111,19 @@
   }
 }
 /* --- END: Source Detail Modal Styles --- */
+
+.modal-content label {
+  color: var(--text-color);
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content textarea {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--container-border);
+  padding: 8px;
+  border-radius: 4px;
+  width: calc(100% - 18px); /* Account for padding and border */
+  margin-bottom: 10px;
+}

@@ -168,11 +168,10 @@ router.delete('/:id', async (req, res) => {
 });
 
 // POST /api/watched-items/:id/to-paper
-router.post('/:id/to-paper', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
+
+    const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
+    const parsedPrice = Number(price) || 0;     // Ensure it's a number, default to 0
 
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
@@ -193,9 +192,9 @@ router.post('/:id/to-paper', async (req, res) => {
         now,
         idea.ticker,
         'BUY',
-        quantity,
-        price,
-        quantity, // quantity_remaining
+        parsedQuantity,
+        parsedPrice,
+        parsedQuantity, // quantity_remaining
         now,
         now,
         limit_low || null,
@@ -273,6 +272,9 @@ router.post('/:id/to-real', async (req, res) => {
     const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
+    const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
+    const parsedPrice = Number(price) || 0;     // Ensure it's a number, default to 0
+
     /** @type {WatchedItem | undefined} */
     const idea = await db.get('SELECT * FROM watched_items WHERE id = ?', id);
     if (!idea) {
@@ -292,9 +294,9 @@ router.post('/:id/to-real', async (req, res) => {
         now,
         idea.ticker,
         'BUY',
-        quantity,
-        price,
-        quantity, // quantity_remaining
+        parsedQuantity,
+        parsedPrice,
+        parsedQuantity, // quantity_remaining
         now,
         now,
         limit_low || null,
