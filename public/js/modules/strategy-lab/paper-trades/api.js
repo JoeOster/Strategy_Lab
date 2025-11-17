@@ -6,7 +6,7 @@ import { api } from '../../../services/apiFetch.js';
 
 /**
  * Fetches the list of all paper trades.
- * @returns {Promise<Transaction[]>} A promise that resolves to an array of paper trades.
+ * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of paper trades.
  */
 export async function getPaperTrades() {
   // --- FIX: Call the real API endpoint ---

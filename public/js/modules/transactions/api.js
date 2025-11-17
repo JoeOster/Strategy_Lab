@@ -10,7 +10,7 @@ import { api } from '../../services/apiFetch.js';
  * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
  */
 export async function getTransaction(transactionId) {
-  return api.get(`/api/transactions/${transactionId}`);
+  return api.get(`/api/transactions/single/${transactionId}`);
 }
 
 /**

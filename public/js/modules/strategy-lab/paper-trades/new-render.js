@@ -1,42 +1,35 @@
-// Suggested change for public/js/modules/transactions/render.js
+// d:\Code Projects\Strategy_lab\public\js\modules\strategy-lab\paper-trades\new-render.js
 
-/** @typedef {import('../../types.js').PaperTradeSummary} PaperTradeSummary */
-/** @typedef {import('../../types.js').Transaction} Transaction */
-/** @typedef {import('../../types.js').TransactionWithPrice} TransactionWithPrice */
-/** @typedef {import('../../types.js').Transaction} Transaction */
+/** @typedef {import('../../../types.js').PaperTradeSummary} PaperTradeSummary */
+/** @typedef {import('../../../types.js').Transaction} Transaction */
+/** @typedef {import('../../../types.js').TransactionWithPrice} TransactionWithPrice */
 
 /**
- * Renders the table of "Paper Trades" for a source.
+ * Renders the table of "Paper Trades".
  * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
- * @param {string} containerId - The ID of the element to render into.
+ * @param {HTMLElement | null} container - The container element to render into.
  * @param {Error | null} [error] - An optional error object.
  */
-export function renderPaperTradesForSource(trades, containerId, error = null) {
-  const container = document.getElementById(containerId);
+export function renderPaperTrades(trades, container, error = null) {
   renderTradesTable(container, 'Paper Trades', trades, error, true);
 }
 
 /**
- * Renders the table of "Open Trades" (real money) for a source.
- * @param {TransactionWithPrice[] | null} trades - An array of Transaction objects with current price.
- * @param {string} containerId - The ID of the element to render into.
+ * Renders the table of "Closed Trades".
+ * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
+ * @param {HTMLElement | null} container - The container element to render into.
  * @param {Error | null} [error] - An optional error object.
+ * @param {boolean} [isPaperTrade=false] - True if rendering closed paper trades, false for real closed trades.
  */
-export function renderOpenTradesForSource(trades, containerId, error = null) {
-  const container = document.getElementById(containerId);
-  renderTradesTable(container, 'Open Trades', trades, error, false);
+export function renderClosedTrades(
+  trades,
+  container,
+  error = null,
+  isPaperTrade = false
+) {
+  renderTradesTable(container, 'Closed Trades', trades, error, isPaperTrade);
 }
 
-/**
- * Renders the table of "Closed Trades" for a source.
- * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
- * @param {string} containerId - The ID of the element to render into.
- * @param {Error | null} [error] - An optional error object.
- */
-export function renderClosedTradesForSource(trades, containerId, error = null) {
-  const container = document.getElementById(containerId);
-  renderTradesTable(container, 'Closed Trades', trades, error, false);
-}
 /**
  * A generic function to render a table of trades.
  * @param {HTMLElement | null} container - The container element to render into.
@@ -45,7 +38,7 @@ export function renderClosedTradesForSource(trades, containerId, error = null) {
  * @param {Error | null} error - An optional error object.
  * @param {boolean} isPaper - True if rendering paper trades, false for real trades.
  */
-export function renderTradesTable(container, title, trades, error, isPaper) {
+function renderTradesTable(container, title, trades, error, isPaper) {
   if (!container) {
     console.error(`Container for "${title}" not found.`);
     return;
@@ -72,11 +65,11 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
         <th>Qty</th>
         <th>Entry Date</th>
         <th>Entry Price</th>
-        <th>Current Price</th>
-        <th>Unrealized P/L $</th>
-        <th>Unrealized P/L %</th>
-        <th class="${title === 'Open Trades' ? 'hidden' : ''}">Realized P/L $</th>
-        <th class="${title === 'Open Trades' ? 'hidden' : ''}">Realized P/L %</th>
+        <th class="${title === 'Closed Trades' ? 'hidden' : ''}">Current Price</th>
+        <th class="${title === 'Closed Trades' ? 'hidden' : ''}">Unrealized P/L $</th>
+        <th class="${title === 'Closed Trades' ? 'hidden' : ''}">Unrealized P/L %</th>
+        <th class="${title === 'Open Trades' || title === 'Paper Trades' ? 'hidden' : ''}">Realized P/L $</th>
+        <th class="${title === 'Open Trades' || title === 'Paper Trades' ? 'hidden' : ''}">Realized P/L %</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -128,17 +121,15 @@ function renderTradeRow(trade, isPaper, title) {
       <td>${trade.quantity}</td>
       <td>${entryDate ? entryDate.split('T')[0] : 'N/A'}</td>
       <td>${entryPrice}</td>
-      <td>${trade.current_price || 'N/A'}</td>
-      <td>${unrealizedPl !== null ? unrealizedPl.toFixed(2) : 'N/A'}</td>
-      <td>${
-        unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'
-      }</td>
-      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
+      <td class="${title === 'Closed Trades' ? 'hidden' : ''}">${trade.current_price || 'N/A'}</td>
+      <td class="${title === 'Closed Trades' ? 'hidden' : ''}">${unrealizedPl !== null ? unrealizedPl.toFixed(2) : 'N/A'}</td>
+      <td class="${title === 'Closed Trades' ? 'hidden' : ''}">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}</td>
+      <td class="${title === 'Open Trades' || title === 'Paper Trades' ? 'hidden' : ''}">${
         (isPaper || title === 'Closed Trades') && trade.pnl
           ? trade.pnl.toFixed(2)
           : 'N/A'
       }</td>
-      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
+      <td class="${title === 'Open Trades' || title === 'Paper Trades' ? 'hidden' : ''}">${
         (isPaper || title === 'Closed Trades') && trade.return_pct
           ? `${trade.return_pct.toFixed(2)}%`
           : 'N/A'

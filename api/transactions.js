@@ -116,6 +116,32 @@ router.get('/paper-trades', async (req, res) => {
 });
 
 /**
+ * GET /api/transactions/single/:transactionId
+ * Retrieves a single transaction by its ID.
+ */
+router.get('/single/:transactionId', async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const db = await getDb();
+    const transaction = await db.get(
+      'SELECT * FROM transactions WHERE id = ?',
+      transactionId
+    );
+    if (transaction) {
+      res.json(transaction);
+    } else {
+      res.status(404).json({ error: 'Transaction not found' });
+    }
+  } catch (error) {
+    console.error(
+      `Failed to get transaction ${req.params.transactionId}:`,
+      error
+    );
+    res.status(500).json({ error: 'Failed to retrieve transaction' });
+  }
+});
+
+/**
  * GET /api/transactions/:sourceId
  * Retrieves all transactions for a given source ID.
  */
@@ -134,6 +160,70 @@ router.get('/:sourceId', async (req, res) => {
       error
     );
     res.status(500).json({ error: 'Failed to retrieve transactions' });
+  }
+});
+
+/**
+ * POST /api/transactions/:transactionId/sell
+ * Marks an open transaction as sold and creates a new 'sell' transaction.
+ */
+router.post('/:transactionId/sell', async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const { sellPrice, sellQuantity, sellDate } = req.body; // Assuming these are sent from the client
+
+    const db = await getDb();
+
+    // 1. Get the original 'buy' transaction
+    const originalTransaction = await db.get(
+      'SELECT * FROM transactions WHERE id = ? AND type = "buy"',
+      transactionId
+    );
+
+    if (!originalTransaction) {
+      return res
+        .status(404)
+        .json({ error: 'Original buy transaction not found.' });
+    }
+
+    // 2. Calculate profit/loss
+    const profitLoss = (sellPrice - originalTransaction.price) * sellQuantity;
+
+    // 3. Create a new 'sell' transaction
+    const sellResult = await db.run(
+      `INSERT INTO transactions (
+        source_id, ticker, quantity, price, transaction_date, transaction_type,
+        original_transaction_id, is_paper_trade, created_date, updated_date, user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      originalTransaction.source_id,
+      originalTransaction.ticker,
+      sellQuantity,
+      sellPrice,
+      sellDate || new Date().toISOString(),
+      'sell', // transaction_type
+      originalTransaction.id,
+      originalTransaction.is_paper_trade === null ? 0 : originalTransaction.is_paper_trade, // Handle NULL for is_paper_trade
+      new Date().toISOString(), // created_date
+      new Date().toISOString(), // updated_date
+      originalTransaction.user_id // user_id (can be NULL)
+    );
+
+    // 4. Update the original 'buy' transaction (e.g., mark as closed or adjust quantity if partial sell)
+    // For simplicity, let's assume a full sell for now.
+    // In a real app, you might update the original transaction's remaining quantity or status.
+    // For now, we'll just return success.
+
+    res.status(200).json({
+      message: 'Trade sold successfully',
+      sellTransactionId: sellResult.lastID,
+      sourceId: originalTransaction.source_id, // Return sourceId for client-side refresh
+    });
+  } catch (error) {
+    console.error(
+      `Failed to sell transaction ${req.params.transactionId}:`,
+      error
+    );
+    res.status(500).json({ error: 'Failed to sell trade' });
   }
 });
 

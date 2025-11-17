@@ -12,11 +12,7 @@ import { getSource } from '../../settings/sources.api.js';
 // Replaced openEditSourceModal with openSourceFormModal from the refactor
 import { openSourceFormModal } from '../../settings/sources.handlers.js';
 // --- END: MODIFICATION ---
-import {
-  renderClosedTradesForSource,
-  renderOpenTradesForSource,
-  renderPaperTradesForSource,
-} from '../../transactions/render.js';
+import { renderOpenTradesForSource } from '../../transactions/render.js';
 import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
 import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
@@ -59,12 +55,6 @@ export async function openSourceDetailModal(sourceId) {
   const openTradesPlaceholder = document.getElementById(
     'open-trades-table-placeholder'
   );
-  const paperTradesPlaceholder = document.getElementById(
-    'paper-trades-table-placeholder'
-  );
-  const closedTradesPlaceholder = document.getElementById(
-    'closed-trades-table-placeholder'
-  );
 
   if (ideasPlaceholder) {
     ideasPlaceholder.style.display = 'block'; // Ensure it's visible by default
@@ -72,13 +62,6 @@ export async function openSourceDetailModal(sourceId) {
   }
   if (openTradesPlaceholder) {
     openTradesPlaceholder.innerHTML = '<h3>Open Trades</h3><p>Loading...</p>';
-  }
-  if (paperTradesPlaceholder) {
-    paperTradesPlaceholder.innerHTML = '<h3>Paper Trades</h3><p>Loading...</p>';
-  }
-  if (closedTradesPlaceholder) {
-    closedTradesPlaceholder.innerHTML =
-      '<h3>Closed Trades</h3><p>Loading...</p>';
   }
 
   if (
@@ -125,12 +108,14 @@ export async function openSourceDetailModal(sourceId) {
 
     // Populate profile container
     profileContainer.innerHTML = `
-      <img 
-        src="${finalImagePath}" 
-        alt="${source.name}" 
-        class="source-profile-image"
-        onerror="this.onerror=null; this.src='${genericPlaceholder}';"
-      >
+      <a href="${finalImagePath}" target="_blank" class="source-profile-image-link">
+        <img 
+          src="${finalImagePath}" 
+          alt="${source.name}" 
+          class="source-profile-image source-profile-thumbnail"
+          onerror="this.onerror=null; this.src='${genericPlaceholder}';"
+        >
+      </a>
       <h3>${source.name}</h3> 
       <p>Type: ${source.type}</p>
       ${source.description ? `<p>${source.description}</p>` : ''}
@@ -168,8 +153,6 @@ export async function openSourceDetailModal(sourceId) {
       loadOpenIdeasForSource(sourceId);
     }
     loadOpenTradesForSource(sourceId);
-    loadPaperTradesForSource(sourceId);
-    loadClosedTradesForSource(sourceId);
 
     // Display the modal
     // @ts-ignore
@@ -231,8 +214,6 @@ export async function openSourceDetailModal(sourceId) {
       const currentSourceId = modal.dataset.sourceId;
       if (eventSourceId === currentSourceId) {
         loadOpenTradesForSource(currentSourceId);
-        loadPaperTradesForSource(currentSourceId);
-        loadClosedTradesForSource(currentSourceId);
         // Also refresh open ideas, as one was just executed
         loadOpenIdeasForSource(currentSourceId);
       }
@@ -288,14 +269,6 @@ export function closeSourceDetailModal() {
     }
     const openTrades = document.getElementById('open-trades-table-placeholder');
     if (openTrades) openTrades.innerHTML = '';
-    const paperTrades = document.getElementById(
-      'paper-trades-table-placeholder'
-    );
-    if (paperTrades) paperTrades.innerHTML = '';
-    const closedTrades = document.getElementById(
-      'closed-trades-table-placeholder'
-    );
-    if (closedTrades) closedTrades.innerHTML = '';
 
     // Remove event listener for the modal body
     const modalBody = modal.querySelector('.modal-body');

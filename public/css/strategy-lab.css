@@ -53,3 +53,73 @@ body #sources-panel #source-cards-grid {
   color: var(--text-color);
 }
 /* --- END FIX --- */
+
+/* Styles for source detail grid layout */
+.source-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns, equal width */
+  gap: 20px; /* Space between grid items */
+  /* Define grid areas for explicit placement */
+  grid-template-areas:
+    "profile strategies"
+    "profile ideas" /* Profile spans two rows, ideas is in second row, second column */
+    "open-trades paper-trades"
+    "closed-trades closed-paper-trades";
+}
+
+/* Assign grid areas to specific items */
+#source-profile-container {
+  grid-area: profile;
+}
+#logged-strategies-container {
+  grid-area: strategies;
+}
+#open-ideas-table-placeholder {
+  grid-area: ideas;
+}
+#open-trades-table-placeholder {
+  grid-area: open-trades;
+}
+#new-paper-trades-table {
+  grid-area: paper-trades;
+}
+#new-closed-trades-table {
+  grid-area: closed-trades;
+}
+#new-paper-trades-closed-table {
+  grid-area: closed-paper-trades;
+}
+
+/* Media query for single column layout on smaller screens or zoomed in */
+@media (max-width: 768px) {
+  /* Adjust this breakpoint as needed */
+  .source-detail-grid {
+    grid-template-columns: 1fr; /* Single column */
+    grid-template-areas:
+      "profile"
+      "strategies"
+      "ideas"
+      "open-trades"
+      "paper-trades"
+      "closed-trades"
+      "closed-paper-trades";
+  }
+}
+
+/* Styles for profile image thumbnail */
+.source-profile-thumbnail {
+  max-width: 100px; /* Thumbnail size */
+  height: auto;
+  border-radius: 8px; /* Slightly rounded corners */
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.source-profile-thumbnail:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.source-profile-image-link {
+  display: inline-block; /* Allows for proper scaling and margin */
+  margin-bottom: 15px; /* Space below the thumbnail */
+}
