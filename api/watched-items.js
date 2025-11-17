@@ -175,6 +175,10 @@ router.post('/:id/to-paper', async (req, res) => {
     const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
 
+    if (!exchange) {
+      return res.status(400).json({ error: 'Exchange is required.' });
+    }
+
     const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
     const parsedPrice = Number(price) || 0; // Ensure it's a number, default to 0
 
@@ -279,6 +283,10 @@ router.post('/:id/to-real', async (req, res) => {
     const db = await getDb();
     const { id } = req.params; // This is the ideaId
     const { quantity, price, limit_low, limit_high, exchange, time } = req.body;
+
+    if (!exchange) {
+      return res.status(400).json({ error: 'Exchange is required.' });
+    }
 
     const parsedQuantity = Number(quantity) || 0; // Ensure it's a number, default to 0
     const parsedPrice = Number(price) || 0; // Ensure it's a number, default to 0

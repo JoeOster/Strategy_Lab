@@ -11,7 +11,14 @@ import { getSource } from '../../settings/sources.api.js';
 // --- START: MODIFICATION ---
 // Replaced openEditSourceModal with openSourceFormModal from the refactor
 import { openSourceFormModal } from '../../settings/sources.handlers.js';
-import { renderPaperTrades } from '../paper-trades/render.js'; // Added
+// --- END: MODIFICATION ---
+import {
+  renderClosedTradesForSource,
+  renderOpenTradesForSource,
+  renderPaperTradesForSource,
+} from '../../transactions/render.js';
+import { handleDeletePaperTradeClick } from '../paper-trades/handlers.js';
+import * as watchedListHandlers from '../watched-list/handlers.js';
 import {
   deleteStrategy,
   getClosedTradesForSource,
@@ -19,11 +26,9 @@ import {
   getOpenTradesForSource,
   getPaperTradesForSource,
   getStrategiesForSource,
-  updateStrategy, // Added this as it's used in the file
 } from './api.js';
-// --- END: MODIFICATION ---
+import { handleShowIdeaForm } from './idea-form.handlers.js';
 import {
-  renderClosedTradesTable, // Added
   renderOpenIdeasForSource,
   renderStrategiesTable,
   renderTradeIdeasTable,
@@ -54,9 +59,11 @@ export async function openSourceDetailModal(sourceId) {
   const openTradesPlaceholder = document.getElementById(
     'open-trades-table-placeholder'
   );
-  const paperTradesPlaceholder = document.getElementById('paper-trades-table');
+  const paperTradesPlaceholder = document.getElementById(
+    'paper-trades-table-placeholder'
+  );
   const closedTradesPlaceholder = document.getElementById(
-    'closed-trades-table'
+    'closed-trades-table-placeholder'
   );
 
   if (ideasPlaceholder) {
@@ -281,9 +288,13 @@ export function closeSourceDetailModal() {
     }
     const openTrades = document.getElementById('open-trades-table-placeholder');
     if (openTrades) openTrades.innerHTML = '';
-    const paperTrades = document.getElementById('paper-trades-table');
+    const paperTrades = document.getElementById(
+      'paper-trades-table-placeholder'
+    );
     if (paperTrades) paperTrades.innerHTML = '';
-    const closedTrades = document.getElementById('closed-trades-table');
+    const closedTrades = document.getElementById(
+      'closed-trades-table-placeholder'
+    );
     if (closedTrades) closedTrades.innerHTML = '';
 
     // Remove event listener for the modal body
@@ -418,7 +429,7 @@ export async function loadOpenTradesForSource(sourceId) {
   const containerId = 'open-trades-table-placeholder';
   try {
     const trades = await getOpenTradesForSource(sourceId);
-    renderOpenTradesTable(trades, containerId);
+    renderOpenTradesForSource(trades, containerId);
   } catch (err) {
     console.error(`Failed to load open trades for source ${sourceId}:`, err);
     const error = err instanceof Error ? err : new Error(String(err));
@@ -431,17 +442,17 @@ export async function loadOpenTradesForSource(sourceId) {
  * @param {string|number} sourceId - The ID of the source.
  */
 export async function loadPaperTradesForSource(sourceId) {
-  const containerId = 'paper-trades-table';
+  const containerId = 'paper-trades-table-placeholder';
   try {
     // --- START: MODIFICATION ---
     /** @type {PaperTradeSummary[]} */
     const trades = await getPaperTradesForSource(sourceId);
     // --- END: MODIFICATION ---
-    renderPaperTrades(trades, containerId);
+    renderPaperTradesForSource(trades, containerId);
   } catch (err) {
     console.error(`Failed to load paper trades for source ${sourceId}:`, err);
     const error = err instanceof Error ? err : new Error(String(err));
-    renderPaperTrades(null, containerId, error);
+    renderPaperTradesForSource(null, containerId, error);
   }
 }
 
@@ -450,14 +461,14 @@ export async function loadPaperTradesForSource(sourceId) {
  * @param {string|number} sourceId - The ID of the source.
  */
 export async function loadClosedTradesForSource(sourceId) {
-  const containerId = 'closed-trades-table';
+  const containerId = 'closed-trades-table-placeholder';
   try {
     const trades = await getClosedTradesForSource(sourceId);
-    renderClosedTradesTable(trades, containerId);
+    renderClosedTradesForSource(trades, containerId);
   } catch (err) {
     console.error(`Failed to load closed trades for source ${sourceId}:`, err);
     const error = err instanceof Error ? err : new Error(String(err));
-    renderClosedTradesTable(null, containerId, error);
+    renderClosedTradesForSource(null, containerId, error);
   }
 }
 

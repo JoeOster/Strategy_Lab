@@ -35,7 +35,7 @@ export function renderOpenTradesForSource(trades, containerId, error = null) {
  */
 export function renderClosedTradesForSource(trades, containerId, error = null) {
   const container = document.getElementById(containerId);
-  renderTradesTable(container, 'Closed Trades', trades, error, true);
+  renderTradesTable(container, 'Closed Trades', trades, error, false);
 }
 /**
  * A generic function to render a table of trades.
@@ -95,8 +95,13 @@ function renderTradesTable(container, title, trades, error, isPaper) {
  * @returns {string} The HTML string for the table row.
  */
 function renderTradeRow(trade, isPaper, title) {
-  const entryPrice = isPaper ? trade.entry_price : trade.price;
-  const entryDate = isPaper ? trade.entry_date : trade.transaction_date;
+  // For Open Trades, use the direct properties. For Paper and Closed, use the summary/joined properties.
+  const entryPrice =
+    isPaper || title === 'Closed Trades' ? trade.entry_price : trade.price;
+  const entryDate =
+    isPaper || title === 'Closed Trades'
+      ? trade.entry_date
+      : trade.transaction_date;
 
   const unrealizedPl = trade.current_price
     ? (trade.current_price - entryPrice) * trade.quantity
@@ -105,12 +110,14 @@ function renderTradeRow(trade, isPaper, title) {
     ? ((trade.current_price - entryPrice) / entryPrice) * 100
     : null;
 
-  const actions = isPaper
-    ? `
+  // Closed trades have the same actions as paper trades (Details/Delete)
+  const actions =
+    isPaper || title === 'Closed Trades'
+      ? `
     <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
     <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
   `
-    : `
+      : `
     <button class="btn table-action-btn btn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
     <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
   `;
@@ -123,12 +130,18 @@ function renderTradeRow(trade, isPaper, title) {
       <td>${entryPrice}</td>
       <td>${trade.current_price || 'N/A'}</td>
       <td>${unrealizedPl !== null ? unrealizedPl.toFixed(2) : 'N/A'}</td>
-      <td>${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}</td>
-      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
-        isPaper && trade.pnl ? trade.pnl.toFixed(2) : 'N/A'
+      <td>${
+        unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'
       }</td>
       <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
-        isPaper && trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : 'N/A'
+        (isPaper || title === 'Closed Trades') && trade.pnl
+          ? trade.pnl.toFixed(2)
+          : 'N/A'
+      }</td>
+      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
+        (isPaper || title === 'Closed Trades') && trade.return_pct
+          ? `${trade.return_pct.toFixed(2)}%`
+          : 'N/A'
       }</td>
       <td>${actions}</td>
     </tr>

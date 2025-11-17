@@ -1,163 +1,139 @@
-// api/transactions.js
-import { Router } from 'express';
+import express from 'express';
 import { getDb } from '../services/database.js';
 
-const router = Router();
+const router = express.Router();
 
-// GET /api/transactions/paper-trades
+const statements = {};
+
+/**
+ * @async
+ * @description Initializes prepared statements for transaction operations.
+ * This function is designed to be called on-demand to ensure the database is ready.
+ * @returns {Promise<void>}
+ */
+const initializeStatements = async () => {
+  // If statements are already prepared, do nothing.
+  if (Object.keys(statements).length > 0) {
+    return;
+  }
+
+  const db = await getDb();
+  statements.getClosedTrades = await db.prepare(
+    `
+    SELECT
+        t_buy.id AS buy_id,
+        t_buy.source_id,
+        t_buy.transaction_date AS buy_date,
+        t_buy.ticker AS symbol,
+        t_buy.quantity AS buy_quantity,
+        t_buy.price AS buy_price,
+        t_sell.id AS sell_id,
+        t_sell.transaction_date AS sell_date,
+        t_sell.quantity AS sell_quantity,
+        t_sell.price AS sell_price,
+        (t_sell.price - t_buy.price) * t_sell.quantity AS profit_loss
+    FROM transactions t_sell
+    JOIN transactions t_buy ON t_sell.original_transaction_id = t_buy.id
+    WHERE t_sell.type = 'sell'
+      AND t_sell.source_id = ?
+    ORDER BY t_sell.transaction_date DESC;
+    `
+  );
+  statements.getOpenPositions = await db.prepare(
+    `
+    SELECT
+        ticker as symbol,
+        SUM(CASE WHEN type = 'buy' THEN quantity ELSE -quantity END) as open_quantity,
+        SUM(CASE WHEN type = 'buy' THEN quantity * price ELSE 0 END) / SUM(CASE WHEN type = 'buy' THEN quantity ELSE 0 END) as avg_buy_price
+    FROM transactions
+    WHERE source_id = ?
+    GROUP BY ticker
+    HAVING SUM(CASE WHEN type = 'buy' THEN quantity ELSE -quantity END) > 0;
+    `
+  );
+  statements.getPaperTrades = await db.prepare(
+    `
+    SELECT *
+    FROM transactions
+    WHERE is_paper_trade = 1
+    ORDER BY transaction_date DESC;
+    `
+  );
+};
+
+/**
+ * GET /api/transactions/closed-trades/:sourceId
+ * Retrieves all closed trades for a given source ID.
+ */
+router.get('/closed-trades/:sourceId', async (req, res) => {
+  try {
+    // Ensure statements are initialized before use.
+    await initializeStatements();
+    const { sourceId } = req.params;
+    const trades = await statements.getClosedTrades.all(sourceId);
+    res.json(trades);
+  } catch (error) {
+    console.error(
+      `Failed to get closed trades for source ${req.params.sourceId}:`,
+      error
+    );
+    res.status(500).json({ error: 'Failed to retrieve closed trades' });
+  }
+});
+
+/**
+ * GET /api/transactions/open-positions/:sourceId
+ * Retrieves all open positions for a given source ID.
+ */
+router.get('/open-positions/:sourceId', async (req, res) => {
+  try {
+    await initializeStatements();
+    const { sourceId } = req.params;
+    const positions = await statements.getOpenPositions.all(sourceId);
+    res.json(positions);
+  } catch (error) {
+    console.error(
+      `Failed to get open positions for source ${req.params.sourceId}:`,
+      error
+    );
+    res.status(500).json({ error: 'Failed to retrieve open positions' });
+  }
+});
+
+/**
+ * GET /api/transactions/paper-trades
+ * Retrieves all transactions that are marked as paper trades.
+ */
 router.get('/paper-trades', async (req, res) => {
   try {
-    const db = await getDb();
-    const paperTrades = await db.all(
-      'SELECT * FROM transactions WHERE is_paper_trade = 1 ORDER BY transaction_date DESC'
-    );
+    await initializeStatements();
+    const paperTrades = await statements.getPaperTrades.all();
     res.json(paperTrades);
-  } catch (err) {
-    console.error('Failed to get paper trades:', err);
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get paper trades', details: message });
+  } catch (error) {
+    console.error('Failed to get paper trades:', error);
+    res.status(500).json({ error: 'Failed to retrieve paper trades' });
   }
 });
 
-// DELETE /api/transactions/:id
-router.delete('/:id', async (req, res) => {
+/**
+ * GET /api/transactions/:sourceId
+ * Retrieves all transactions for a given source ID.
+ */
+router.get('/:sourceId', async (req, res) => {
   try {
+    const { sourceId } = req.params;
     const db = await getDb();
-    const { id } = req.params;
-    const result = await db.run('DELETE FROM transactions WHERE id = ?', id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Transaction not found' });
-    }
-    res.status(204).send();
-  } catch (err) {
-    console.error(`Failed to delete transaction ${req.params.id}:`, err);
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to delete transaction', details: message });
-  }
-});
-
-router.get('/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { id } = req.params;
-    const transaction = await db.get(
-      'SELECT * FROM transactions WHERE id = ?',
-      id
+    const transactions = await db.all(
+      'SELECT * FROM transactions WHERE source_id = ? ORDER BY transaction_date DESC',
+      sourceId
     );
-    if (!transaction) {
-      return res.status(404).json({ error: 'Transaction not found' });
-    }
-    res.json(transaction);
-  } catch (err) {
-    console.error(`Failed to get transaction ${req.params.id}:`, err);
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to get transaction', details: message });
-  }
-});
-
-router.put('/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { id } = req.params;
-    const { ticker, quantity, price } = req.body;
-    const result = await db.run(
-      'UPDATE transactions SET ticker = ?, quantity = ?, price = ? WHERE id = ?',
-      [ticker, quantity, price, id]
+    res.json(transactions);
+  } catch (error) {
+    console.error(
+      `Failed to get transactions for source ${req.params.sourceId}:`,
+      error
     );
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Transaction not found' });
-    }
-    const updatedTransaction = await db.get(
-      'SELECT * FROM transactions WHERE id = ?',
-      id
-    );
-    res.json(updatedTransaction);
-  } catch (err) {
-    console.error(`Failed to update transaction ${req.params.id}:`, err);
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to update transaction', details: message });
-  }
-});
-
-router.post('/:id/sell', async (req, res) => {
-  try {
-    const db = await getDb();
-    const { id } = req.params;
-    const { quantity: sellQuantity, price: sellPrice } = req.body;
-
-    if (!sellQuantity || !sellPrice) {
-      return res
-        .status(400)
-        .json({ error: 'Sell quantity and price are required.' });
-    }
-
-    const parsedSellQuantity = Number(sellQuantity);
-    const parsedSellPrice = Number(sellPrice);
-
-    const originalTx = await db.get(
-      'SELECT * FROM transactions WHERE id = ?',
-      id
-    );
-
-    if (!originalTx) {
-      return res.status(404).json({ error: 'Transaction not found' });
-    }
-
-    if (parsedSellQuantity > originalTx.quantity_remaining) {
-      return res.status(400).json({
-        error: `Cannot sell more than the remaining quantity of ${originalTx.quantity_remaining}.`,
-      });
-    }
-
-    const now = new Date().toISOString();
-
-    // Create the new SELL transaction
-    const result = await db.run(
-      `INSERT INTO transactions 
-         (is_paper_trade, user_id, source_id, watched_item_id, transaction_date, ticker, transaction_type, quantity, price, quantity_remaining, created_date, updated_date) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        originalTx.is_paper_trade,
-        originalTx.user_id,
-        originalTx.source_id,
-        originalTx.watched_item_id,
-        now,
-        originalTx.ticker,
-        'SELL',
-        parsedSellQuantity,
-        parsedSellPrice,
-        0,
-        now,
-        now,
-      ]
-    );
-
-    // Update the original BUY transaction's remaining quantity
-    await db.run(
-      'UPDATE transactions SET quantity_remaining = quantity_remaining - ?, updated_date = ? WHERE id = ?',
-      [parsedSellQuantity, now, id]
-    );
-
-    res.status(201).json({
-      message: 'Trade sold successfully',
-      newTransactionId: result.lastID,
-      originalTransactionId: id,
-      sourceId: originalTx.source_id, // Return sourceId for UI refresh
-    });
-  } catch (err) {
-    console.error(`Failed to sell transaction ${req.params.id}:`, err);
-    const message = err instanceof Error ? err.message : String(err);
-    res
-      .status(500)
-      .json({ error: 'Failed to sell transaction', details: message });
+    res.status(500).json({ error: 'Failed to retrieve transactions' });
   }
 });
 

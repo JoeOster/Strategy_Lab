@@ -14,13 +14,14 @@ function Write-Log($Message, $Level = "INFO") {
 
 function Initialize-Environment {
     Write-Log "Initializing environment..."
+    $OutputEncoding = [System.Text.Encoding]::UTF8
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
     $script:logDir = "$PSScriptRoot\log"
     $script:termLogFile = "$logDir\term.log"
 
-    if (-not (Test-Path -Path $logDir)) {
-        New-Item -Path $logDir -ItemType Directory -Force | Out-Null # Biome might suggest named parameters
+    if (-not (Test-Path $logDir)) {
+        New-Item -Path $logDir -ItemType Directory -Force | Out-Null
     }
     if (Test-Path $script:termLogFile) {
         Remove-Item $script:termLogFile -ErrorAction SilentlyContinue
@@ -29,14 +30,14 @@ function Initialize-Environment {
 
 function Prepare-Database($dbDir, $dbFile, [switch]$remove) {
     Write-Log "Checking database directory: $dbDir"
-    if (-not (Test-Path -Path $dbDir)) {
+    if (-not (Test-Path $dbDir)) {
         Write-Log "Database directory not found. Creating..."
         New-Item -Path $dbDir -ItemType Directory -Force | Out-Null
     }
 
     if ($remove) {
         Write-Log "Attempting to remove database file: $dbFile"
-        if (Test-Path -Path $dbFile) {
+        if (Test-Path $dbFile) {
             try {
                 Remove-Item $dbFile -ErrorAction Stop
                 Write-Log "Removed database file successfully."
@@ -50,7 +51,7 @@ function Prepare-Database($dbDir, $dbFile, [switch]$remove) {
 }
 
 function Ensure-Dependencies {
-    if (-not (Test-Path -Path "node_modules")) {
+    if (-not (Test-Path "node_modules")) {
         Write-Log "Node modules not found. Running 'npm ci' for a clean install..."
         npm ci *>&1 | ForEach-Object { Write-Log $_ }
     }
@@ -134,7 +135,7 @@ function Wait-ForServer($serverJob, $port) {
 
 function Enter-InteractiveWait($serverJob) {
     Write-Host "`nServer is running. Press any key in this window to shut down." -ForegroundColor Green
-    while (-not [Console]::KeyAvailable) { # Biome would likely prefer this over a do-while for this check
+    while (-not [Console]::KeyAvailable) {
         if ($serverJob.HasMoreData) {
             $output = Receive-Job $serverJob | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
             if ($output) {
@@ -171,7 +172,7 @@ function Main {
     # 2. Prerequisites
     Prepare-Database -dbDir $dbDir -dbFile $dbFile -remove:$rm
     Ensure-Dependencies
-    if ($skipChecks.IsPresent -eq $false) {
+    if (-not $skipChecks) {
         if (-not (Run-QualityChecks)) { return }
     }
 

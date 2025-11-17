@@ -12,11 +12,11 @@ export async function getExchanges() {
 
 /**
  * Adds a new exchange to the backend.
- * @param {Object} exchange - The exchange object to add.
+ * @param {string} name - The name of the exchange to add.
  * @returns {Promise<Object>} A promise that resolves to the added exchange object.
  */
-export async function addExchange(exchange) {
-  return api.post('/api/exchanges', exchange);
+export async function addExchange(name) {
+  return api.post('/api/exchanges', { name });
 }
 
 /**
