@@ -37,7 +37,7 @@ export function renderPaperTrades(paperTrades, error = null) {
         <th>Type</th>
         <th>Quantity</th>
         <th>Price</th>
-        <th>Actions</th>
+        <th class="actions-column">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -50,13 +50,15 @@ export function renderPaperTrades(paperTrades, error = null) {
           <td>${trade.transaction_type}</td>
           <td>${trade.quantity}</td>
           <td>${formatCurrency(trade.price)}</td>
-          <td>
-            <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${
-              trade.id
-            }">Details</button>
-            <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${
-              trade.id
-            }">Delete</button>
+          <td class="actions-column">
+            <div class="table-actions">
+              <button class="btn table-action-btn btn-secondary small-btn paper-details-btn" data-id="${
+                trade.id
+              }">Details</button>
+              <button class="btn table-action-btn btn-danger small-btn paper-delete-btn" data-id="${
+                trade.id
+              }">Delete</button>
+            </div>
           </td>
         </tr>
       `

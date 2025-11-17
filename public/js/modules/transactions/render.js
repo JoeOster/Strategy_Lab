@@ -123,12 +123,12 @@ function renderTradeRow(trade, isPaper, title) {
       <td>${entryPrice}</td>
       <td>${trade.current_price || 'N/A'}</td>
       <td>${unrealizedPl !== null ? unrealizedPl.toFixed(2) : 'N/A'}</td>
-      <td>${unrealizedPlPct !== null ? unrealizedPlPct.toFixed(2) + '%' : 'N/A'}</td>
+      <td>${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}</td>
       <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
         isPaper && trade.pnl ? trade.pnl.toFixed(2) : 'N/A'
       }</td>
       <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
-        isPaper && trade.return_pct ? trade.return_pct.toFixed(2) + '%' : 'N/A'
+        isPaper && trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : 'N/A'
       }</td>
       <td>${actions}</td>
     </tr>

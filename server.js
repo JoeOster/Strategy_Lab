@@ -7,7 +7,7 @@ import express from 'express';
 dotenv.config();
 // --- START: NEW API ROUTER IMPORT ---
 import apiRouter from './api/index.js';
-import { getDb } from './services/database.js';
+import { getDb, initializeDatabase } from './services/database.js';
 // --- END: NEW API ROUTER IMPORT ---
 
 const app = express();
@@ -62,6 +62,7 @@ app.use((req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  await initializeDatabase(); // Initialize the database here
   // Ensure the database connection is closed when the server shuts down
   process.on('SIGINT', async () => {
     const db = await getDb();

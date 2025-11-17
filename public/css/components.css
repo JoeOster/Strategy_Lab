@@ -207,4 +207,18 @@
   margin-right: 4px;
   margin-bottom: 0; /* Ensure no extra margin */
 }
+
+/* Actions column styling */
+.actions-column {
+  min-width: 180px; /* Adjust as needed to prevent wrapping */
+  white-space: nowrap; /* Prevent buttons from wrapping */
+}
+
+/* Button grouping within table cells */
+.table-actions {
+  display: flex;
+  gap: 5px; /* Space between buttons */
+  justify-content: flex-start; /* Align buttons to the start */
+  align-items: center;
+}
 /* --- END: NEW TABLE STYLES --- */

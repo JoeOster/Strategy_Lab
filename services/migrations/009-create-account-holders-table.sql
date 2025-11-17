@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS account_holders (
 );
 
 -- Insert a default account holder
-INSERT INTO account_holders (holder_name, is_default) VALUES ('Default Holder', 1);
+INSERT OR IGNORE INTO account_holders (holder_name, is_default) VALUES ('Default Holder', 1);

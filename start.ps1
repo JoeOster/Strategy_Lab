@@ -3,225 +3,197 @@ param (
     [switch]$rm,
     [switch]$skipChecks
 )
-# --- FIX: Set encoding for BOTH external commands AND the console itself ---
-$OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# --- NEW: Centralized Configuration ---
-$port = 8080
-$dbDir = "$PSScriptRoot\db"
-$dbFile = "$dbDir\strategy_lab.db"
-# --- END NEW ---
-
-# --- Define Log Paths and Clean Previous Log ---
-$logDir = "$PSScriptRoot\log"
-$termLogFile = "$logDir\term.log"
-$serverStdoutFile = "$logDir\server_stdout.log"
-$serverStderrFile = "$logDir\server_stderr.log"
-
-# Create log directory if it doesn't exist
-if (-not (Test-Path $logDir)) {
-    New-Item -Path $logDir -ItemType Directory -Force | Out-Null
+function Write-Log($Message, $Level = "INFO") {
+    if ([string]::IsNullOrWhiteSpace($Message)) { return }
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $formattedMessage = "[$timestamp] [$Level] $Message"
+    Write-Host $formattedMessage
+    $formattedMessage | Out-File -FilePath $script:termLogFile -Append
 }
 
-# --- UPDATED: Clear ALL previous logs ---
-if (Test-Path $termLogFile) {
-    Remove-Item $termLogFile -ErrorAction SilentlyContinue
-}
-if (Test-Path $serverStdoutFile) {
-    Remove-Item $serverStdoutFile -ErrorAction SilentlyContinue
-}
-if (Test-Path $serverStderrFile) {
-    Remove-Item $serverStderrFile -ErrorAction SilentlyContinue
-}
-# --- END UPDATED ---
+function Initialize-Environment {
+    Write-Log "Initializing environment..."
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Redirect all subsequent output to term.log
-function Write-Log {
-    param([string]$Message)
-    Write-Host $Message
-    $Message | Out-File -FilePath $termLogFile -Append
-}
+    $script:logDir = "$PSScriptRoot\log"
+    $script:termLogFile = "$logDir\term.log"
 
-# --- Define Log Paths and Clean Previous Log ---
-$filteredLogFile = "$logDir\frontend-session.log"
-
-if (Test-Path $filteredLogFile) {
-    Write-Log "Removing previous filtered log: $filteredLogFile"
-    # SilentlyContinue in case the file is locked or permissions are bad
-    Remove-Item $filteredLogFile -ErrorAction SilentlyContinue
-}# --- End New Section ---
-
-# --- IMPROVEMENT: Auto-create 'db' directory and check correct DB file ---
-Write-Log "Checking for database directory: $dbDir"
-if (-not (Test-Path $dbDir)) {
-    Write-Log "Database directory not found. Creating..."
-    New-Item -Path $dbDir -ItemType Directory -Force | Out-Null
-}
-
-if ($rm) {
-    Write-Log "Checking for database file to remove: $dbFile"
-    if (Test-Path $dbFile) {
-        try {
-            Remove-Item $dbFile -ErrorAction Stop
-            Write-Log "Removed database file: $dbFile"
-        } catch {
-            Write-Log "Could not remove database file: $dbFile. It might be in use by another process. Error: $_"
-        }
-    } else {
-        Write-Log "Database file not found, no need to remove: $dbFile"
+    if (-not (Test-Path -Path $logDir)) {
+        New-Item -Path $logDir -ItemType Directory -Force | Out-Null # Biome might suggest named parameters
+    }
+    if (Test-Path $script:termLogFile) {
+        Remove-Item $script:termLogFile -ErrorAction SilentlyContinue
     }
 }
 
-if (Test-Path $dbFile) {
-    Write-Log "Database file exists: $dbFile"
-} else {
-    Write-Log "Database file does NOT exist: $dbFile. It will be created and migrated on server startup."
-}
-# --- END IMPROVEMENT ---
+function Prepare-Database($dbDir, $dbFile, [switch]$remove) {
+    Write-Log "Checking database directory: $dbDir"
+    if (-not (Test-Path -Path $dbDir)) {
+        Write-Log "Database directory not found. Creating..."
+        New-Item -Path $dbDir -ItemType Directory -Force | Out-Null
+    }
 
-# --- IMPROVEMENT: Use npm ci for faster, deterministic install ---
-if (-not (Test-Path "node_modules")) {
-    Write-Log "Node modules not found. Running 'npm ci'..."
-    npm ci *>&1 | Tee-Object -FilePath $termLogFile -Append # Use Tee
+    if ($remove) {
+        Write-Log "Attempting to remove database file: $dbFile"
+        if (Test-Path -Path $dbFile) {
+            try {
+                Remove-Item $dbFile -ErrorAction Stop
+                Write-Log "Removed database file successfully."
+            } catch {
+                Write-Log "Could not remove database file. It may be in use. Error: $_" -Level "WARN"
+            }
+        } else {
+            Write-Log "Database file not found, no removal needed."
+        }
+    }
 }
-# --- END IMPROVEMENT ---
 
-# --- UPDATED QUALITY CHEKS (Visible Output + Fail Check) ---
-if (-not $skipChecks) {
+function Ensure-Dependencies {
+    if (-not (Test-Path -Path "node_modules")) {
+        Write-Log "Node modules not found. Running 'npm ci' for a clean install..."
+        npm ci *>&1 | ForEach-Object { Write-Log $_ }
+    }
+}
+
+function Run-QualityChecks {
     Clear-Host
     Write-Log "Running Biome to format and lint all files..."
-    # Use Tee-Object to see output in real-time AND log it
-    npm run fix *>&1 | Tee-Object -FilePath $termLogFile -Append
+    npm run fix *>&1 | ForEach-Object { Write-Log $_ }
+
     Write-Log "Checking for any remaining Biome errors..."
-    
-    # Run the check and also tee the output
-    npm run check *>&1 | Tee-Object -FilePath $termLogFile -Append
-    
-    # Check the exit code of the last command
+    npm run check *>&1 | ForEach-Object { Write-Log $_ }
+
     if ($LASTEXITCODE -ne 0) {
-        Write-Host ""
-        Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
+        Write-Host "`n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
         Write-Host "!!! Biome check FAILED. Please fix the errors above. !!!" -ForegroundColor Red
-        Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
-        Write-Log "Biome check FAILED. Stopping script."
+        Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`n" -ForegroundColor Red
+        Write-Log "Biome check FAILED. Stopping script." -Level "ERROR"
         Read-Host -Prompt "Press Enter to exit"
-        return # Exit the script
+        return $false # Indicate failure
     }
-    
-    Write-Log "Biome checks passed. Continuing..."
-    Start-Sleep -Seconds 2 # Give a moment to read the "passed" message
+
+    Write-Log "Biome checks passed."
+    Start-Sleep -Seconds 1
     Clear-Host
-} else {
-    Clear-Host
-}
-# --- END UPDATED BLOCK ---
-
-# --- IMPROVEMENT: Use cross-env to pass the $port variable to the server ---
-Write-Log "Checking for and closing any existing listeners on port $port..."
-(Get-NetTCPConnection -LocalPort $port).OwningProcess | ForEach-Object {
-    try {
-        Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue
-        Write-Log "Closed process $_ listening on port $port."
-    } catch {
-        Write-Log "Could not close process $_ listening on port $port. Error: $_"
-    }
-}
-Write-Log "Starting server with 'npm run dev' on port $port..."
-# We use npx to run cross-env, which sets the PORT env variable
-# Then we run the 'dev' script from package.json
-$serverProcess = Start-Process -FilePath "npx.cmd" -ArgumentList "cross-env", "PORT=$port", "npm", "run", "dev" -WorkingDirectory $PSScriptRoot -PassThru
-# --- END IMPROVEMENT ---
-
-Write-Log "Server job 'DevServer' started."
-
-# --- Wait for Server to be Online (Uses $port variable) ---
-Write-Log "Waiting for the dev server at http://localhost:$port..."
-$serverReady = $false
-$maxAttempts = 20 # Max wait of 30 seconds (20 * 1.5s)
-$attempt = 0
-
-while (-not $serverReady -and $attempt -lt $maxAttempts) {
-    $attempt++
-    try {
-        Invoke-WebRequest -Uri "http://localhost:$port" -UseBasicParsing -ErrorAction Stop | Out-Null
-        $serverReady = $true
-        Write-Log "Server is online!"
-    } catch {
-        Write-Log "($attempt/$maxAttempts) Server not ready, retrying in 1.5s..."
-        Start-Sleep -Milliseconds 1500
-    }
+    return $true # Indicate success
 }
 
-if (-not $serverReady) {
-    Write-Log "Server failed to start after $maxAttempts attempts. Stopping script."
-    # Attempt to find and stop any process listening on the port if server didn't start correctly
-    try {
-        $failedProcess = (Get-NetTCPConnection -LocalPort ${port} | Select-Object -First 1).OwningProcess
-        if ($failedProcess) {
-            Stop-Process -Id $failedProcess -Force -ErrorAction SilentlyContinue
-            Write-Log "Stopped process $failedProcess that was listening on port ${port}."
+function Stop-ProcessesOnPort($port) {
+    Write-Log "Checking for and closing any existing listeners on port $port..."
+    $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+    if ($connections) {
+        $pidsToStop = $connections.OwningProcess | Select-Object -Unique | Where-Object { $_ -gt 4 }
+        if ($pidsToStop) {
+            Write-Log "Attempting to stop processes on port ${port}: $($pidsToStop -join ', ')"
+            foreach ($pid in $pidsToStop) {
+                try {
+                    Stop-Process -Id $pid -Force -ErrorAction Stop
+                    Write-Log "Successfully stopped process with PID $pid."
+                } catch {
+                    Write-Log "Could not stop process with PID $pid. It may have already closed." -Level "WARN"
+                }
+            }
         }
-    } catch {
-        Write-Log "Error during cleanup of failed server start: $_"
     }
-    return # Exit the script
 }
 
-# --- NEW: Find the actual PID listening on the port ---
-$actualServerPid = $null
-try {
-    $connection = Get-NetTCPConnection -LocalPort ${port} | Select-Object -First 1
-    if ($connection) {
-        $actualServerPid = $connection.OwningProcess
-        Write-Log "Actual process listening on port ${port}: PID $actualServerPid"
-    } else {
-        Write-Log "Could not find a process listening on port ${port} after server started."
+function Start-ServerJob($port, $dbFile) {
+    Write-Log "Starting server with 'npm run dev' on port $port and DB file $dbFile..."
+    $env:PORT = $port
+    $env:DB_FILE = $dbFile
+    $serverJob = Start-Job -ScriptBlock {
+        Set-Location -Path $using:PSScriptRoot; npm run dev
+    } -Name "DevServer"
+    Write-Log "Server job 'DevServer' started."
+    return $serverJob
+}
+
+function Wait-ForServer($serverJob, $port) {
+    Write-Log "Waiting for the dev server at http://localhost:$port..."
+    $maxAttempts = 20
+    $attempt = 0
+    while ($attempt -lt $maxAttempts) {
+        if ($serverJob.HasMoreData) { Receive-Job $serverJob | ForEach-Object { Write-Log $_ } }
+        $attempt++
+        try {
+            Invoke-WebRequest -Uri "http://localhost:$port" -UseBasicParsing -ErrorAction Stop | Out-Null
+            Write-Log "Server is online!"
+            if ($serverJob.HasMoreData) { Receive-Job $serverJob | ForEach-Object { Write-Log $_ } }
+            return $true
+        } catch {
+            Write-Log "($attempt/$maxAttempts) Server not ready, retrying in 1.5s..."
+            Start-Sleep -Milliseconds 1500
+        }
     }
-} catch {
-    Write-Log "Error finding actual server PID: $_"
+
+    Write-Log "Server failed to start after $maxAttempts attempts. Please check the logs." -Level "ERROR"
+    if ($serverJob.HasMoreData) { Receive-Job $serverJob | ForEach-Object { Write-Log $_ } }
+    return $false
 }
-# --- END NEW ---
 
-# --- IMPROVEMENT: Launch in default browser ---
-Write-Log "Launching default browser. The script will wait for you to close the browser."
-Start-Process "http://localhost:${port}"
-Write-Host "Press any key to close the browser and continue..."
-$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
-# --- END IMPROVEMENT ---
-
-
-# --- Automatic Cleanup (Runs AFTER Browser is closed) ---
-Write-Log ""
-Write-Log "Browser closed. Starting automated cleanup..."
-
-# --- IMPROVEMENT: Removed obsolete browser log filtering section ---
-
-# --- FIX: Explicitly stop the server process using taskkill ---
-if ($actualServerPid) {
-    Write-Log "Attempting to terminate server process (PID: $actualServerPid) using taskkill /F..."
-    try {
-        taskkill /PID $actualServerPid /F | Out-Null
-        Write-Log "Server process terminated."
-    } catch {
-        Write-Log "Error terminating server process: $_"
+function Enter-InteractiveWait($serverJob) {
+    Write-Host "`nServer is running. Press any key in this window to shut down." -ForegroundColor Green
+    while (-not [Console]::KeyAvailable) { # Biome would likely prefer this over a do-while for this check
+        if ($serverJob.HasMoreData) {
+            $output = Receive-Job $serverJob | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+            if ($output) {
+            Write-Host "`n--- Server Log Update ---" -ForegroundColor DarkGray
+                $output | ForEach-Object { Write-Log $_ }
+            Write-Host "-----------------------" -ForegroundColor DarkGray
+            Write-Host "`nServer is running. Press any key in this window to shut down." -ForegroundColor Green
+            }
+        }
+        Start-Sleep -Milliseconds 500
     }
-} else {
-    Write-Log "No server process PID found to stop."
-}
-# --- END FIX ---
-
-Write-Log "Server job stopped."
-
-# Append server logs to term.log
-if (Test-Path $serverStdoutFile) {
-    Get-Content $serverStdoutFile | Out-File -FilePath $termLogFile -Append
-    # Remove-Item $serverStdoutFile # Keep for inspection
-}
-if (Test-Path $serverStderrFile) {
-    Get-Content $serverStderrFile | Out-File -FilePath $termLogFile -Append
-    # Remove-Item $serverStderrFile # Keep for inspection
+    [Console]::ReadKey($true) | Out-Null # Clear the key press from the buffer
 }
 
-Write-Log ""
-Write-Log "Cleanup complete. Goodbye!"
+function Stop-ServerJob($serverJob) {
+    Write-Log "Shutting down server..."
+    Stop-Job $serverJob
+    if ($serverJob.HasMoreData) {
+        Write-Log "Final server output:"
+        Receive-Job $serverJob | ForEach-Object { Write-Log $_ }
+    }
+    Remove-Job $serverJob -Force
+    Write-Log "Server job stopped and removed."
+}
+
+function Main {
+    # 1. Setup
+    Initialize-Environment
+    $port = 8080
+    $dbDir = "$PSScriptRoot\db"
+    $dbFile = "$dbDir\strategy_lab.db"
+    Write-Log "Script started with parameters: -rm:$rm -skipChecks:$skipChecks"
+
+    # 2. Prerequisites
+    Prepare-Database -dbDir $dbDir -dbFile $dbFile -remove:$rm
+    Ensure-Dependencies
+    if ($skipChecks.IsPresent -eq $false) {
+        if (-not (Run-QualityChecks)) { return }
+    }
+
+    # 3. Server Startup
+    Stop-ProcessesOnPort -port $port
+    $serverJob = Start-ServerJob -port $port -dbFile $dbFile
+    Write-Host "-------------------- SERVER LOGS (START) --------------------" -ForegroundColor Cyan
+    if (-not (Wait-ForServer -serverJob $serverJob -port $port)) {
+        Stop-ServerJob -serverJob $serverJob
+        return
+    }
+    Write-Host "-------------------- SERVER LOGS (END) ----------------------" -ForegroundColor Cyan
+
+    # 4. Interactive Session
+    Start-Process "http://localhost:${port}"
+    Enter-InteractiveWait -serverJob $serverJob
+
+    # 5. Cleanup
+    Write-Log "User requested shutdown. Starting automated cleanup..."
+    Stop-ServerJob -serverJob $serverJob
+    Write-Log "Cleanup complete. Goodbye!"
+}
+
+# Execute the main function
+Main

@@ -77,7 +77,7 @@ export function renderStrategiesTable(strategies) {
           <th>Page</th>
           <th>Description</th>
           <th>PDF</th>
-          <th>Actions</th>
+          <th class="actions-column">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -97,16 +97,18 @@ export function renderStrategiesTable(strategies) {
         <td>${strategy.page_number || ''}</td>
         <td>${strategy.description || ''}</td>
         <td>${strategy.pdf_path || ''}</td>
-        <td>
-          <button class="table-action-btn btn btn-secondary" data-strategy-id="${
-            strategy.id
-          }" data-ticker="${strategy.ticker || ''}">Add Idea</button>
-          <button class="table-action-btn btn btn-secondary strategy-edit-btn" data-strategy-id="${
-            strategy.id
-          }">Edit</button>
-          <button class="table-action-btn btn btn-danger strategy-delete-btn" data-strategy-id="${
-            strategy.id
-          }">Delete</button>
+        <td class="actions-column">
+          <div class="table-actions">
+            <button class="table-action-btn btn btn-secondary small-btn" data-strategy-id="${
+              strategy.id
+            }" data-ticker="${strategy.ticker || ''}">Add Idea</button>
+            <button class="table-action-btn btn btn-secondary small-btn strategy-edit-btn" data-strategy-id="${
+              strategy.id
+            }">Edit</button>
+            <button class="table-action-btn btn btn-danger small-btn strategy-delete-btn" data-strategy-id="${
+              strategy.id
+            }">Delete</button>
+          </div>
         </td>
       `;
       tbody.appendChild(row);
@@ -140,7 +142,7 @@ export function renderTradeIdeasTable(ideas) {
           <th>Targets</th>
           <th>Stop Loss</th>
           <th>Status</th>
-          <th>Actions</th>
+          <th class="actions-column">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -159,13 +161,15 @@ export function renderTradeIdeasTable(ideas) {
         <td>${item.take_profit_low || ''} / ${item.take_profit_high || ''}</td>
         <td>${item.escape_price || ''}</td>
         <td>${item.status || 'WATCHING'}</td>
-        <td>
-          <button class="btn table-action-btn idea-edit-btn" data-id="${
-            item.id
-          }">Edit</button>
-          <button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${
-            item.id
-          }">Delete</button>
+        <td class="actions-column">
+          <div class="table-actions">
+            <button class="btn table-action-btn small-btn idea-edit-btn" data-id="${
+              item.id
+            }">Edit</button>
+            <button class="btn table-action-btn btn-danger small-btn idea-delete-btn" data-id="${
+              item.id
+            }">Delete</button>
+          </div>
         </td>
       `;
       tbody.appendChild(row);
@@ -212,7 +216,7 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
         <th>Stop Loss</th>
         <th>Status</th>
         <th>Notes</th>
-        <th>Actions</th>
+        <th class="actions-column">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -228,21 +232,171 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
           <td>${item.escape_price || ''}</td>
           <td>${item.status || 'WATCHING'}</td>
           <td>${item.notes || ''}</td>
-          <td>
+          <td class="actions-column">
+            <div class="table-actions">
             ${
               item.status === 'EXECUTED'
-                ? `<button class="btn table-action-btn" disabled>&#10004; Executed</button>`
+                ? `<button class="btn table-action-btn small-btn" disabled>&#10004; Executed</button>`
                 : `
-              <button class="btn table-action-btn idea-buy-btn" data-id="${item.id}">Buy</button>
-              <button class="btn table-action-btn btn-secondary idea-paper-btn" data-id="${item.id}">Paper</button>
+              <button class="btn table-action-btn small-btn idea-buy-btn" data-id="${item.id}">Buy</button>
+              <button class="btn table-action-btn btn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
             `
             }
-            <button class="btn table-action-btn btn-secondary idea-edit-btn" data-id="${
+            <button class="btn table-action-btn btn-secondary small-btn idea-edit-btn" data-id="${
               item.id
             }">Edit</button>
-            <button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${
+            <button class="btn table-action-btn btn-danger small-btn idea-delete-btn" data-id="${
               item.id
             }">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  `;
+  container.appendChild(table);
+}
+
+/**
+ * Renders the table of "Open Trades" for a source.
+ * @param {import('../../../types.js').TransactionWithPrice[] | null} openTrades - An array of TransactionWithPrice objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function renderOpenTradesTable(openTrades, containerId, error = null) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container not found: ${containerId}`);
+    return;
+  }
+
+  // Clear placeholder and add title
+  container.innerHTML = '<h3>Open Trades</h3>';
+
+  if (error) {
+    container.innerHTML += '<p class="error">Failed to load open trades.</p>';
+    return;
+  }
+
+  if (!openTrades || openTrades.length === 0) {
+    container.innerHTML += '<p>No open trades from this source.</p>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'strategy-table'; // Re-use the existing table style
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Quantity</th>
+        <th>Entry Date</th>
+        <th>Entry Price</th>
+        <th>Current Price</th>
+        <th>Unrealized P&L</th>
+        <th>Unrealized P&L %</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${openTrades
+        .map(
+          (trade) => `
+        <tr data-id="${trade.id}">
+          <td>${trade.ticker || ''}</td>
+          <td>${trade.quantity || ''}</td>
+          <td>${trade.transaction_date ? trade.transaction_date.split('T')[0] : 'N/A'}</td>
+          <td>${trade.price || 'N/A'}</td>
+          <td>${trade.current_price || 'N/A'}</td>
+          <td>${trade.pnl !== null ? trade.pnl.toFixed(2) : 'N/A'}</td>
+          <td>${trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A'}</td>
+          <td class="actions-column">
+            <div class="table-actions">
+              <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${
+                trade.id
+              }">Details</button>
+              <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${
+                trade.id
+              }">Sell</button>
+            </div>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  `;
+  container.appendChild(table);
+}
+
+/**
+ * Renders the table of "Closed Trades" for a source.
+ * @param {import('../../../types.js').PaperTradeSummary[] | null} closedTrades - An array of PaperTradeSummary objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function renderClosedTradesTable(
+  closedTrades,
+  containerId,
+  error = null
+) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container not found: ${containerId}`);
+    return;
+  }
+
+  // Clear placeholder and add title
+  container.innerHTML = '<h3>Closed Trades</h3>';
+
+  if (error) {
+    container.innerHTML += '<p class="error">Failed to load closed trades.</p>';
+    return;
+  }
+
+  if (!closedTrades || closedTrades.length === 0) {
+    container.innerHTML += '<p>No closed trades from this source.</p>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'strategy-table'; // Re-use the existing table style
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Entry Date</th>
+        <th>Entry Price</th>
+        <th>Exit Date</th>
+        <th>Exit Price</th>
+        <th>P&L</th>
+        <th>Return %</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${closedTrades
+        .map(
+          (trade) => `
+        <tr data-id="${trade.id}">
+          <td>${trade.ticker || ''}</td>
+          <td>${trade.entry_date ? trade.entry_date.split('T')[0] : 'N/A'}</td>
+          <td>${trade.entry_price || 'N/A'}</td>
+          <td>${trade.exit_date ? trade.exit_date.split('T')[0] : 'N/A'}</td>
+          <td>${trade.exit_price || 'N/A'}</td>
+          <td>${trade.pnl !== null ? trade.pnl.toFixed(2) : 'N/A'}</td>
+          <td>${trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A'}</td>
+          <td class="actions-column">
+            <div class="table-actions">
+              <button class="btn table-action-btn btn-secondary small-btn closed-trade-details-btn" data-id="${
+                trade.id
+              }">Details</button>
+              <button class="btn table-action-btn btn-danger small-btn closed-trade-delete-btn" data-id="${
+                trade.id
+              }">Delete</button>
+            </div>
           </td>
         </tr>
       `
