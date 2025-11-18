@@ -31,3 +31,11 @@ export async function updateTransaction(transactionId, transactionData) {
 export async function sellTransaction(sellData) {
   return api.post('/api/transactions/sell', sellData);
 }
+
+/**
+ * Fetches all available exchanges.
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of exchange objects.
+ */
+export async function getExchanges() {
+  return api.get('/api/exchanges');
+}

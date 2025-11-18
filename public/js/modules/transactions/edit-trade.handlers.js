@@ -5,7 +5,7 @@ import {
   moveIdeaToPaper,
   moveIdeaToRealTrade,
 } from '../strategy-lab/watched-list/api.js';
-import { getTransaction, sellTransaction, updateTransaction } from './api.js';
+import { getTransaction, sellTransaction, updateTransaction, getExchanges } from './api.js';
 
 /**
  * Opens the "Edit Trade" modal for editing an existing trade or creating a new one from an idea.
@@ -23,6 +23,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
   const modalTitle = document.getElementById('edit-trade-modal-title');
   const tickerInput = form.elements.ticker;
   const submitButton = form.querySelector('button[type="submit"]');
+  const exchangeSelect = form.elements.exchange;
 
   // Reset form and ticker state
   form.reset();
@@ -34,6 +35,16 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
   }
 
   try {
+    // Populate exchanges dropdown
+    const exchanges = await getExchanges();
+    exchangeSelect.innerHTML = '<option value="" disabled selected>Select an Exchange</option>';
+    exchanges.forEach(exchange => {
+      const option = document.createElement('option');
+      option.value = exchange.id;
+      option.textContent = exchange.name;
+      exchangeSelect.appendChild(option);
+    });
+
     if (tradeId) {
       const trade = await getTransaction(tradeId);
       if (isSell) {
@@ -45,6 +56,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
         tickerInput.readOnly = true;
         form.elements.quantity.value = trade.quantity; // Pre-fill with available quantity
         form.elements.price.value = trade.current_price || ''; // Pre-fill with current price if available
+        exchangeSelect.value = trade.exchange_id; // Pre-select exchange
 
         // Add a hidden input to signify this is a sell action
         const sellInput = document.createElement('input');
@@ -61,6 +73,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
         tickerInput.readOnly = true; // Lock ticker when editing
         form.elements.quantity.value = trade.quantity;
         form.elements.price.value = trade.price;
+        exchangeSelect.value = trade.exchange_id; // Pre-select exchange
       }
     } else if (ideaId) {
       // --- NEW TRADE MODE ---
@@ -77,7 +90,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
     }
 
     modal.style.display = 'block';
-  } catch (error) {
+  } catch (error) { 
     console.error('Failed to open trade modal:', error);
     alert('Error: Could not open trade modal. Please check the console.');
   }

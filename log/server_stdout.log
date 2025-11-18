@@ -5,81 +5,193 @@
 api/index.js router initialized.
 Database connection and migrations successful.
 Server is running on http://localhost:8080
-[2025-11-18T04:23:26.771Z] GET /
-[2025-11-18T04:23:26.986Z] GET /
-[2025-11-18T04:23:27.036Z] GET /css/main.css?v=1.0.2
-[2025-11-18T04:23:27.068Z] GET /css/themes.css?v=1.0.1
-[2025-11-18T04:23:27.075Z] GET /js/app-main.js
-[2025-11-18T04:23:27.078Z] GET /images/strategy-lab-logo.svg
-[2025-11-18T04:23:27.102Z] GET /css/base.css
-[2025-11-18T04:23:27.106Z] GET /css/navigation.css
-[2025-11-18T04:23:27.109Z] GET /css/forms.css
-[2025-11-18T04:23:27.113Z] GET /css/modals.css
-[2025-11-18T04:23:27.124Z] GET /css/components.css
-[2025-11-18T04:23:27.127Z] GET /css/settings.css
-[2025-11-18T04:23:27.131Z] GET /css/strategy-lab.css
-[2025-11-18T04:23:27.134Z] GET /css/themes.css
-[2025-11-18T04:23:27.137Z] GET /js/modules/navigation/index.js
-[2025-11-18T04:23:27.140Z] GET /js/modules/settings/appearance.handlers.js
-[2025-11-18T04:23:27.148Z] GET /js/modules/strategy-lab/paper-trades/new-render.js
-[2025-11-18T04:23:27.150Z] GET /js/modules/user-selector/index.js
-[2025-11-18T04:23:27.153Z] GET /js/utils/loadHtmlPartial.js
-[2025-11-18T04:23:27.218Z] GET /_source-form-modal.html
-[2025-11-18T04:23:27.444Z] GET /images/contacts/default.png
-[2025-11-18T04:23:27.447Z] GET /_source-detail-modal.html
-[2025-11-18T04:23:27.453Z] GET /favicon.ico
-[2025-11-18T04:23:27.465Z] GET /_add-strategy-modal.html
-[2025-11-18T04:23:27.505Z] GET /_sell-trade-modal.html
-[2025-11-18T04:23:27.528Z] GET /_edit-trade-modal.html
-[2025-11-18T04:23:27.540Z] GET /_paper-trade-details-modal.html
-[2025-11-18T04:23:27.549Z] GET /_add-idea-modal.html
-[2025-11-18T04:23:27.561Z] GET /_edit-strategy-modal.html
-[2025-11-18T04:23:27.575Z] GET /_dashboard.html
-[2025-11-18T04:23:27.612Z] GET /js/modules/dashboard/index.js
-[2025-11-18T04:26:38.602Z] GET /_strategy-lab.html
-[2025-11-18T04:26:38.610Z] GET /js/modules/strategy-lab/index.js
-[2025-11-18T04:26:38.936Z] GET /js/modules/transactions/edit-trade.handlers.js
-[2025-11-18T04:26:38.973Z] GET /js/modules/strategy-lab/handlers.js
-[2025-11-18T04:26:38.975Z] GET /js/modules/strategy-lab/sources/handlers.js
-[2025-11-18T04:26:38.977Z] GET /js/modules/strategy-lab/watched-list/handlers.js
-[2025-11-18T04:26:38.980Z] GET /js/modules/strategy-lab/paper-trades/handlers.js
-[2025-11-18T04:26:38.983Z] GET /js/modules/strategy-lab/watched-list/api.js
-[2025-11-18T04:26:38.985Z] GET /js/modules/transactions/api.js
-[2025-11-18T04:26:38.988Z] GET /js/modules/settings/sources.api.js
-[2025-11-18T04:26:38.990Z] GET /js/modules/strategy-lab/sources/modal.handlers.js
-[2025-11-18T04:26:38.992Z] GET /js/modules/strategy-lab/sources/render.js
-[2025-11-18T04:26:38.994Z] GET /js/modules/strategy-lab/sources/idea-form.handlers.js
-[2025-11-18T04:26:38.995Z] GET /js/modules/strategy-lab/watched-list/render.js
-[2025-11-18T04:26:38.998Z] GET /js/modules/strategy-lab/paper-trades/api.js
-[2025-11-18T04:26:39.000Z] GET /js/services/apiFetch.js
-[2025-11-18T04:26:39.004Z] GET /js/modules/settings/sources.handlers.js
-[2025-11-18T04:26:39.007Z] GET /js/modules/transactions/render.js
-[2025-11-18T04:26:39.008Z] GET /js/modules/strategy-lab/sources/api.js
-[2025-11-18T04:26:39.010Z] GET /js/modules/strategy-lab/sources/strategy-form.handlers.js
-[2025-11-18T04:26:39.011Z] GET /js/modules/transactions/paper-trade-details.handlers.js
-[2025-11-18T04:26:39.013Z] GET /js/api.js
-[2025-11-18T04:26:39.021Z] GET /js/modules/settings/sources_books.handlers.js
-[2025-11-18T04:26:39.028Z] GET /js/modules/settings/webapps.api.js
-[2025-11-18T04:26:39.030Z] GET /js/utils/formatters.js
-[2025-11-18T04:26:39.037Z] GET /api/sources
-[2025-11-18T04:26:39.898Z] GET /api/sources/1
-[2025-11-18T04:26:39.909Z] GET /api/sources/1/strategies
-[2025-11-18T04:26:39.949Z] GET /images/books/http://books.google.com/books/content?id=UIctvQEACAAJ&printsec=frontcover&img=1&zoom=1&sRestarting 'server.js'
-api/index.js router initialized.
-Database connection and migrations successful.
-Server is running on http://localhost:8080
-r CIFR from Finnhub...
+[2025-11-18T19:02:10.894Z] GET /
+[2025-11-18T19:02:11.153Z] GET /
+[2025-11-18T19:02:11.204Z] GET /css/main.css?v=1.0.2
+[2025-11-18T19:02:11.218Z] GET /css/themes.css?v=1.0.1
+[2025-11-18T19:02:11.224Z] GET /js/app-main.js
+[2025-11-18T19:02:11.240Z] GET /images/strategy-lab-logo.svg
+[2025-11-18T19:02:11.291Z] GET /css/base.css
+[2025-11-18T19:02:11.295Z] GET /css/navigation.css
+[2025-11-18T19:02:11.302Z] GET /css/forms.css
+[2025-11-18T19:02:11.306Z] GET /css/modals.css
+[2025-11-18T19:02:11.313Z] GET /css/strategy-lab.css
+[2025-11-18T19:02:11.316Z] GET /css/themes.css
+[2025-11-18T19:02:11.319Z] GET /js/modules/navigation/index.js
+[2025-11-18T19:02:11.321Z] GET /css/components.css
+[2025-11-18T19:02:11.323Z] GET /css/settings.css
+[2025-11-18T19:02:11.325Z] GET /js/modules/settings/appearance.handlers.js
+[2025-11-18T19:02:11.331Z] GET /js/modules/strategy-lab/paper-trades/new-render.js
+[2025-11-18T19:02:11.335Z] GET /js/modules/user-selector/index.js
+[2025-11-18T19:02:11.338Z] GET /js/utils/loadHtmlPartial.js
+[2025-11-18T19:02:11.382Z] GET /_source-form-modal.html
+[2025-11-18T19:02:11.564Z] GET /images/contacts/default.png
+[2025-11-18T19:02:11.571Z] GET /_source-detail-modal.html
+[2025-11-18T19:02:11.598Z] GET /favicon.ico
+[2025-11-18T19:02:11.661Z] GET /_add-strategy-modal.html
+[2025-11-18T19:02:11.670Z] GET /_sell-trade-modal.html
+[2025-11-18T19:02:11.685Z] GET /_edit-trade-modal.html
+[2025-11-18T19:02:11.703Z] GET /_paper-trade-details-modal.html
+[2025-11-18T19:02:11.723Z] GET /_add-idea-modal.html
+[2025-11-18T19:02:11.737Z] GET /_edit-strategy-modal.html
+[2025-11-18T19:02:11.748Z] GET /_dashboard.html
+[2025-11-18T19:02:11.779Z] GET /js/modules/dashboard/index.js
+[2025-11-18T19:02:15.300Z] GET /_strategy-lab.html
+[2025-11-18T19:02:15.308Z] GET /js/modules/strategy-lab/index.js
+[2025-11-18T19:02:15.350Z] GET /js/modules/transactions/edit-trade.handlers.js
+[2025-11-18T19:02:15.358Z] GET /js/modules/strategy-lab/handlers.js
+[2025-11-18T19:02:15.360Z] GET /js/modules/strategy-lab/sources/handlers.js
+[2025-11-18T19:02:15.363Z] GET /js/modules/strategy-lab/watched-list/handlers.js
+[2025-11-18T19:02:15.369Z] GET /js/modules/strategy-lab/paper-trades/handlers.js
+[2025-11-18T19:02:15.372Z] GET /js/modules/strategy-lab/sources/idea-form.handlers.js
+[2025-11-18T19:02:15.373Z] GET /js/modules/strategy-lab/watched-list/api.js
+[2025-11-18T19:02:15.374Z] GET /js/modules/strategy-lab/watched-list/render.js
+[2025-11-18T19:02:15.376Z] GET /js/modules/settings/sources.api.js
+[2025-11-18T19:02:15.378Z] GET /js/modules/strategy-lab/sources/modal.handlers.js
+[2025-11-18T19:02:15.382Z] GET /js/modules/strategy-lab/sources/render.js
+[2025-11-18T19:02:15.384Z] GET /js/modules/transactions/api.js
+[2025-11-18T19:02:15.386Z] GET /js/api.js
+[2025-11-18T19:02:15.388Z] GET /js/modules/strategy-lab/paper-trades/api.js
+[2025-11-18T19:02:15.390Z] GET /js/services/apiFetch.js
+[2025-11-18T19:02:15.392Z] GET /js/modules/settings/sources.handlers.js
+[2025-11-18T19:02:15.393Z] GET /js/modules/transactions/render.js
+[2025-11-18T19:02:15.394Z] GET /js/modules/strategy-lab/sources/api.js
+[2025-11-18T19:02:15.397Z] GET /js/modules/strategy-lab/sources/strategy-form.handlers.js
+[2025-11-18T19:02:15.399Z] GET /js/modules/transactions/paper-trade-details.handlers.js
+[2025-11-18T19:02:15.401Z] GET /js/modules/settings/sources_books.handlers.js
+[2025-11-18T19:02:15.403Z] GET /js/modules/settings/webapps.api.js
+[2025-11-18T19:02:15.405Z] GET /js/utils/formatters.js
+[2025-11-18T19:02:15.411Z] GET /api/sources
+[2025-11-18T19:02:16.842Z] GET /api/sources/1
+[2025-11-18T19:02:16.862Z] GET /api/sources/1/strategies
+[2025-11-18T19:02:16.889Z] GET /images/books/default.png
+[2025-11-18T19:02:16.899Z] GET /api/sources/1/open-ideas
+[2025-11-18T19:02:16.912Z] GET /api/sources/1/open-trades
+Fetching price for TEST_STRAT from Finnhub...
 Fetching price for INTC from Finnhub...
-Fetching price for AAPL from Finnhub...
-Fetching price for PLUG from Finnhub...
-Successfully fetched price for PLUG: 2.085
-Successfully fetched price for INTC: 34.71
-Successfully fetched price for CIFR: 14.35
-Successfully fetched price for AAPL: 267.46
-[2025-11-18T04:26:43.312Z] GET /api/transactions/single/1
-[2025-11-18T04:27:03.962Z] POST /api/transactions/sell
-Received POST request to /api/transactions/sell
+Successfully fetched price for INTC: 34.625
+[2025-11-18T19:02:33.988Z] POST /api/watched-items/ideas
+[2025-11-18T19:02:35.881Z] GET /api/sources/1/open-trades
+Fetching price for TEST_STRAT from Finnhub...
+Fetching price for INTC from Finnhub...
+[2025-11-18T19:02:35.961Z] GET /api/sources/1/open-ideas
+Successfully fetched price for INTC: 34.62
+[2025-11-18T19:02:41.955Z] GET /api/watched-items/3
+[2025-11-18T19:03:11.496Z] GET /.well-known/appspecific/com.chrome.devtools.json
+[2025-11-18T19:03:11.525Z] GET /css/main.css?v=1.0.2
+[2025-11-18T19:03:11.529Z] GET /css/base.css
+[2025-11-18T19:03:11.531Z] GET /css/navigation.css
+[2025-11-18T19:03:11.533Z] GET /css/forms.css
+[2025-11-18T19:03:11.536Z] GET /css/modals.css
+[2025-11-18T19:03:11.538Z] GET /css/components.css
+[2025-11-18T19:03:11.542Z] GET /css/settings.css
+[2025-11-18T19:03:11.565Z] GET /css/strategy-lab.css
+[2025-11-18T19:03:11.566Z] GET /css/themes.css
+[2025-11-18T19:03:11.568Z] GET /css/themes.css?v=1.0.1
+[2025-11-18T19:03:27.609Z] GET /api/watched-items/3
+[2025-11-18T19:04:06.127Z] GET /api/watched-items/3
 Restarting 'server.js'
 api/index.js router initialized.
 Database connection and migrations successful.
 Server is running on http://localhost:8080
+[2025-11-18T19:18:14.653Z] GET /_strategy-lab.html
+[2025-11-18T19:18:16.802Z] GET /_strategy-lab.html
+[2025-11-18T19:18:50.469Z] GET /
+[2025-11-18T19:18:50.490Z] GET /css/main.css?v=1.0.2
+[2025-11-18T19:18:50.518Z] GET /css/themes.css?v=1.0.1
+[2025-11-18T19:18:50.520Z] GET /images/strategy-lab-logo.svg
+[2025-11-18T19:18:50.539Z] GET /js/app-main.js
+[2025-11-18T19:18:50.542Z] GET /css/base.css
+[2025-11-18T19:18:50.544Z] GET /css/navigation.css
+[2025-11-18T19:18:50.583Z] GET /css/forms.css
+[2025-11-18T19:18:50.608Z] GET /css/modals.css
+[2025-11-18T19:18:50.610Z] GET /css/components.css
+[2025-11-18T19:18:50.623Z] GET /css/settings.css
+[2025-11-18T19:18:50.630Z] GET /css/strategy-lab.css
+[2025-11-18T19:18:50.632Z] GET /css/themes.css
+[2025-11-18T19:18:50.662Z] GET /js/modules/navigation/index.js
+[2025-11-18T19:18:50.672Z] GET /js/modules/settings/appearance.handlers.js
+[2025-11-18T19:18:50.674Z] GET /js/modules/strategy-lab/paper-trades/new-render.js
+[2025-11-18T19:18:50.679Z] GET /js/modules/user-selector/index.js
+[2025-11-18T19:18:50.681Z] GET /js/utils/loadHtmlPartial.js
+[2025-11-18T19:18:50.686Z] GET /_source-form-modal.html
+[2025-11-18T19:18:50.714Z] GET /images/contacts/default.png
+[2025-11-18T19:18:50.741Z] GET /_source-detail-modal.html
+[2025-11-18T19:18:50.856Z] GET /_add-strategy-modal.html
+[2025-11-18T19:18:50.864Z] GET /_sell-trade-modal.html
+[2025-11-18T19:18:50.897Z] GET /_edit-trade-modal.html
+[2025-11-18T19:18:50.925Z] GET /_paper-trade-details-modal.html
+[2025-11-18T19:18:50.932Z] GET /_add-idea-modal.html
+[2025-11-18T19:18:50.939Z] GET /_edit-strategy-modal.html
+[2025-11-18T19:18:50.951Z] GET /_dashboard.html
+[2025-11-18T19:18:51.051Z] GET /js/modules/dashboard/index.js
+[2025-11-18T19:18:51.285Z] GET /favicon.ico
+[2025-11-18T19:18:53.464Z] GET /_strategy-lab.html
+[2025-11-18T19:18:53.472Z] GET /js/modules/strategy-lab/index.js
+[2025-11-18T19:18:53.524Z] GET /js/modules/transactions/edit-trade.handlers.js
+[2025-11-18T19:18:53.531Z] GET /js/modules/strategy-lab/handlers.js
+[2025-11-18T19:18:53.533Z] GET /js/modules/strategy-lab/sources/handlers.js
+[2025-11-18T19:18:53.536Z] GET /js/modules/strategy-lab/watched-list/handlers.js
+[2025-11-18T19:18:53.542Z] GET /js/modules/settings/sources.api.js
+[2025-11-18T19:18:53.544Z] GET /js/modules/strategy-lab/sources/modal.handlers.js
+[2025-11-18T19:18:53.546Z] GET /js/modules/strategy-lab/sources/render.js
+[2025-11-18T19:18:53.549Z] GET /js/modules/strategy-lab/paper-trades/handlers.js
+[2025-11-18T19:18:53.552Z] GET /js/modules/strategy-lab/watched-list/api.js
+[2025-11-18T19:18:53.555Z] GET /js/modules/strategy-lab/watched-list/render.js
+[2025-11-18T19:18:53.556Z] GET /js/modules/strategy-lab/sources/idea-form.handlers.js
+[2025-11-18T19:18:53.559Z] GET /js/modules/transactions/api.js
+[2025-11-18T19:18:53.562Z] GET /js/services/apiFetch.js
+[2025-11-18T19:18:53.564Z] GET /js/modules/transactions/render.js
+[2025-11-18T19:18:53.566Z] GET /js/modules/settings/sources.handlers.js
+[2025-11-18T19:18:53.568Z] GET /js/modules/strategy-lab/sources/api.js
+[2025-11-18T19:18:53.570Z] GET /js/modules/strategy-lab/sources/strategy-form.handlers.js
+[2025-11-18T19:18:53.573Z] GET /js/modules/transactions/paper-trade-details.handlers.js
+[2025-11-18T19:18:53.576Z] GET /js/modules/strategy-lab/paper-trades/api.js
+[2025-11-18T19:18:53.596Z] GET /js/api.js
+[2025-11-18T19:18:53.600Z] GET /js/modules/settings/sources_books.handlers.js
+[2025-11-18T19:18:53.602Z] GET /js/modules/settings/webapps.api.js
+[2025-11-18T19:18:53.605Z] GET /js/utils/formatters.js
+[2025-11-18T19:18:53.611Z] GET /api/sources
+[2025-11-18T19:18:54.683Z] GET /api/sources/1
+[2025-11-18T19:18:54.695Z] GET /api/sources/1/strategies
+[2025-11-18T19:18:54.735Z] GET /images/books/default.png
+[2025-11-18T19:18:54.761Z] GET /api/sources/1/open-ideas
+[2025-11-18T19:18:54.764Z] GET /api/sources/1/open-trades
+Fetching price for TEST_STRAT from Finnhub...
+Fetching price for INTC from Finnhub...
+Successfully fetched price for INTC: 34.56
+[2025-11-18T19:18:59.290Z] GET /api/exchanges
+[2025-11-18T19:18:59.297Z] GET /api/watched-items/3
+[2025-11-18T19:19:10.144Z] POST /api/watched-items/3/to-real
+Received request to move idea to real trade: {
+  id: '',
+  idea_id: '3',
+  source_id: '1',
+  is_paper: 'false',
+  ticker: 'CIFR',
+  quantity: '33',
+  price: '44',
+  limit_low: '',
+  limit_high: '',
+  exchange: '3',
+  time: '2025-11-18T19:19:10.138Z'
+}
+[2025-11-18T19:19:13.486Z] GET /api/sources/1/open-ideas
+[2025-11-18T19:19:13.489Z] GET /api/sources/1/open-trades
+Fetching price for TEST_STRAT from Finnhub...
+Fetching price for INTC from Finnhub...
+Fetching price for CIFR from Finnhub...
+Successfully fetched price for INTC: 34.5314
+Successfully fetched price for CIFR: 14.75
+[2025-11-18T19:20:49.962Z] POST /api/watched-items/ideas
+[2025-11-18T19:20:52.033Z] GET /api/sources/1/open-ideas
+[2025-11-18T19:20:52.036Z] GET /api/sources/1/open-trades
+Fetching price for TEST_STRAT from Finnhub...
+Fetching price for INTC from Finnhub...
+Fetching price for CIFR from Finnhub...
+Successfully fetched price for CIFR: 14.74
+Successfully fetched price for INTC: 34.5
+[2025-11-18T19:20:54.276Z] GET /api/exchanges
+[2025-11-18T19:20:54.285Z] GET /api/watched-items/4
+[2025-11-18T19:21:18.079Z] GET /api/exchanges
+[2025-11-18T19:21:18.086Z] GET /api/transactions/single/1

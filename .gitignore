@@ -13,7 +13,7 @@ lerna-debug.log*
 
 # User-specified
 /scripts
-
+/log/*.log
 # Environment variables
 .env
 .env.local
