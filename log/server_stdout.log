@@ -195,3 +195,11 @@ Successfully fetched price for INTC: 34.5
 [2025-11-18T19:20:54.285Z] GET /api/watched-items/4
 [2025-11-18T19:21:18.079Z] GET /api/exchanges
 [2025-11-18T19:21:18.086Z] GET /api/transactions/single/1
+Restarting 'server.js'
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
+Restarting 'server.js'
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
