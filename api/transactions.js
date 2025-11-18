@@ -18,6 +18,8 @@ const initializeStatements = async () => {
   }
 
   const db = await getDb();
+
+  // FIX: Changed 't_sell.type' to 't_sell.transaction_type' to match DB schema
   statements.getClosedTrades = await db.prepare(
     `
     SELECT
@@ -34,23 +36,23 @@ const initializeStatements = async () => {
         (t_sell.price - t_buy.price) * t_sell.quantity AS profit_loss
     FROM transactions t_sell
     JOIN transactions t_buy ON t_sell.original_transaction_id = t_buy.id
-    WHERE t_sell.type = 'sell'
+    WHERE t_sell.transaction_type = 'sell'
       AND t_sell.source_id = ?
     ORDER BY t_sell.transaction_date DESC;
     `
   );
-  statements.getOpenPositions = await db.prepare(
+
+  statements.getOpenTrades = await db.prepare(
     `
-    SELECT
-        ticker as symbol,
-        SUM(CASE WHEN type = 'buy' THEN quantity ELSE -quantity END) as open_quantity,
-        SUM(CASE WHEN type = 'buy' THEN quantity * price ELSE 0 END) / SUM(CASE WHEN type = 'buy' THEN quantity ELSE 0 END) as avg_buy_price
+    SELECT *
     FROM transactions
     WHERE source_id = ?
-    GROUP BY ticker
-    HAVING SUM(CASE WHEN type = 'buy' THEN quantity ELSE -quantity END) > 0;
+      AND UPPER(transaction_type) = 'BUY'
+      AND status = 'open'
+    ORDER BY transaction_date DESC;
     `
   );
+
   statements.getPaperTrades = await db.prepare(
     `
     SELECT *
@@ -82,21 +84,21 @@ router.get('/closed-trades/:sourceId', async (req, res) => {
 });
 
 /**
- * GET /api/transactions/open-positions/:sourceId
- * Retrieves all open positions for a given source ID.
+ * GET /api/transactions/open-trades/:sourceId
+ * Retrieves all open trades for a given source ID.
  */
-router.get('/open-positions/:sourceId', async (req, res) => {
+router.get('/open-trades/:sourceId', async (req, res) => {
   try {
     await initializeStatements();
     const { sourceId } = req.params;
-    const positions = await statements.getOpenPositions.all(sourceId);
+    const positions = await statements.getOpenTrades.all(sourceId);
     res.json(positions);
   } catch (error) {
     console.error(
-      `Failed to get open positions for source ${req.params.sourceId}:`,
+      `Failed to get open trades for source ${req.params.sourceId}:`,
       error
     );
-    res.status(500).json({ error: 'Failed to retrieve open positions' });
+    res.status(500).json({ error: 'Failed to retrieve open trades' });
   }
 });
 
@@ -164,19 +166,26 @@ router.get('/:sourceId', async (req, res) => {
 });
 
 /**
- * POST /api/transactions/:transactionId/sell
+ * POST /api/transactions/sell
  * Marks an open transaction as sold and creates a new 'sell' transaction.
  */
-router.post('/:transactionId/sell', async (req, res) => {
+router.post('/sell', async (req, res) => {
+  console.log('Received POST request to /api/transactions/sell');
   try {
-    const { transactionId } = req.params;
-    const { sellPrice, sellQuantity, sellDate } = req.body; // Assuming these are sent from the client
+    const { id, quantity, price } = req.body; // id is the transactionId
+    const transactionId = id;
+
+    if (!transactionId || !quantity || !price) {
+      return res
+        .status(400)
+        .json({ error: 'Transaction ID, quantity, and price are required.' });
+    }
 
     const db = await getDb();
 
     // 1. Get the original 'buy' transaction
     const originalTransaction = await db.get(
-      'SELECT * FROM transactions WHERE id = ? AND type = "buy"',
+      'SELECT * FROM transactions WHERE id = ? AND UPPER(transaction_type) = "BUY"',
       transactionId
     );
 
@@ -186,10 +195,25 @@ router.post('/:transactionId/sell', async (req, res) => {
         .json({ error: 'Original buy transaction not found.' });
     }
 
-    // 2. Calculate profit/loss
-    const profitLoss = (sellPrice - originalTransaction.price) * sellQuantity;
+    // Calculate remaining quantity after this sell
+    const currentSoldQuantity =
+      (
+        await db.get(
+          'SELECT SUM(quantity) as sold_qty FROM transactions WHERE original_transaction_id = ? AND transaction_type = "sell"',
+          transactionId
+        )
+      )?.sold_qty || 0;
 
-    // 3. Create a new 'sell' transaction
+    const availableQuantity =
+      originalTransaction.quantity - currentSoldQuantity;
+
+    if (quantity > availableQuantity) {
+      return res
+        .status(400)
+        .json({ error: 'Selling more than available quantity.' });
+    }
+
+    // 2. Create a new 'sell' transaction
     const sellResult = await db.run(
       `INSERT INTO transactions (
         source_id, ticker, quantity, price, transaction_date, transaction_type,
@@ -197,21 +221,37 @@ router.post('/:transactionId/sell', async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       originalTransaction.source_id,
       originalTransaction.ticker,
-      sellQuantity,
-      sellPrice,
-      sellDate || new Date().toISOString(),
+      quantity, // Use the quantity from the request body
+      price, // Use the price from the request body
+      new Date().toISOString(), // Use current date for sell transaction
       'sell', // transaction_type
       originalTransaction.id,
-      originalTransaction.is_paper_trade === null ? 0 : originalTransaction.is_paper_trade, // Handle NULL for is_paper_trade
+      originalTransaction.is_paper_trade === null
+        ? 0
+        : originalTransaction.is_paper_trade,
       new Date().toISOString(), // created_date
       new Date().toISOString(), // updated_date
-      originalTransaction.user_id // user_id (can be NULL)
+      originalTransaction.user_id
     );
 
-    // 4. Update the original 'buy' transaction (e.g., mark as closed or adjust quantity if partial sell)
-    // For simplicity, let's assume a full sell for now.
-    // In a real app, you might update the original transaction's remaining quantity or status.
-    // For now, we'll just return success.
+    // 3. Update the original buy transaction if fully sold
+    const newTotalSoldQuantity = currentSoldQuantity + quantity;
+    if (newTotalSoldQuantity === originalTransaction.quantity) {
+      await db.run(
+        'UPDATE transactions SET status = "closed", updated_date = ? WHERE id = ?',
+        new Date().toISOString(),
+        originalTransaction.id
+      );
+    } else {
+      // Optionally, you might want to update a 'quantity_remaining' field here
+      // or rely on the sum of sell transactions to determine remaining quantity.
+      // For now, we'll just ensure the status is 'open' if not fully closed.
+      await db.run(
+        'UPDATE transactions SET status = "open", updated_date = ? WHERE id = ?',
+        new Date().toISOString(),
+        originalTransaction.id
+      );
+    }
 
     res.status(200).json({
       message: 'Trade sold successfully',
@@ -219,10 +259,7 @@ router.post('/:transactionId/sell', async (req, res) => {
       sourceId: originalTransaction.source_id, // Return sourceId for client-side refresh
     });
   } catch (error) {
-    console.error(
-      `Failed to sell transaction ${req.params.transactionId}:`,
-      error
-    );
+    console.error(`Failed to sell transaction ${transactionId}:`, error);
     res.status(500).json({ error: 'Failed to sell trade' });
   }
 });

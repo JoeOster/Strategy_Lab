@@ -27,15 +27,12 @@
         <input type="number" id="edit-trade-limit-high" name="limit_high" step="0.01" />
 
         <label for="edit-trade-exchange">Exchange:</label>
-        <input type="text" id="edit-trade-exchange" name="exchange" />
+        <select id="edit-trade-exchange" name="exchange" required>
+          <option value="" disabled selected>Select an Exchange</option>
+        </select>
 
         <input type="hidden" id="edit-trade-time" name="time" />
 
         <div class="form-actions">
           <button type="submit" class="btn">Save Changes</button>
-          <button type="button" id="cancel-edit-trade-btn" class="btn secondary-btn">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+          <button type="button" id="cancel-edit-trade-btn" class="btn secondar

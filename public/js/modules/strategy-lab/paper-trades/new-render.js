@@ -11,7 +11,10 @@
  * @param {Error | null} [error] - An optional error object.
  */
 export function renderPaperTrades(trades, container, error = null) {
-  renderTradesTable(container, 'Paper Trades', trades, error, true);
+  const openTrades = trades
+    ? trades.filter((trade) => trade.status === 'open')
+    : [];
+  renderTradesTable(container, 'Paper Trades', openTrades, error, true);
 }
 
 /**
@@ -27,7 +30,16 @@ export function renderClosedTrades(
   error = null,
   isPaperTrade = false
 ) {
-  renderTradesTable(container, 'Closed Trades', trades, error, isPaperTrade);
+  const closedTrades = trades
+    ? trades.filter((trade) => trade.status === 'closed')
+    : [];
+  renderTradesTable(
+    container,
+    'Closed Trades',
+    closedTrades,
+    error,
+    isPaperTrade
+  );
 }
 
 /**
@@ -104,16 +116,21 @@ function renderTradeRow(trade, isPaper, title) {
     : null;
 
   // Closed trades have the same actions as paper trades (Details/Delete)
-  const actions =
-    isPaper || title === 'Closed Trades'
-      ? `
-    <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
-    <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
-  `
-      : `
-    <button class="btn table-action-btn btn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
-    <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
-  `;
+  let actions = '';
+  if (isPaper || title === 'Closed Trades') {
+    actions = `
+      <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
+    `;
+  } else if (trade.status === 'open') {
+    // Only show sell button for open real trades
+    actions = `
+      <button class="btn table-action-btn btn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
+      <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
+    `;
+  } else {
+    actions = 'N/A'; // No actions for closed real trades
+  }
 
   return `
     <tr data-id="${trade.id}">

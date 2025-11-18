@@ -204,36 +204,42 @@ router.get('/:id/open-ideas', async (req, res) => {
 router.get('/:id/open-trades', async (req, res) => {
   const { id } = req.params;
   try {
-    // --- START: FIX ---
-    const db = await getDb(); // Use getDb()
+    const db = await getDb();
     // This query ensures ONLY real trades are returned.
     const trades = await db.all(
-      'SELECT * FROM transactions WHERE source_id = ? AND is_paper_trade = 0 AND quantity_remaining > 0',
+      "SELECT * FROM transactions WHERE source_id = ? AND is_paper_trade = 0 AND status = 'open' AND UPPER(transaction_type) = 'BUY'",
       id
     );
 
-    // --- START: MODIFICATION ---
-    // Fetch current prices for all unique tickers
-    const tickers = [
-      ...new Set(
-        trades.map((/** @type {{ ticker: any; }} */ trade) => trade.ticker)
-      ),
-    ];
-    const pricePromises = tickers.map((ticker) => getPriceV2(ticker));
-    const prices = await Promise.all(pricePromises);
-    /** @type {Object<string, any>} */
-    const priceMap = tickers.reduce((acc, ticker, index) => {
-      acc[ticker] = prices[index];
-      return acc;
-    }, {});
+    let tradesWithPrices = trades; // Default to trades without prices
 
-    const tradesWithPrices = trades.map(
-      (/** @type {{ ticker: string | number; }} */ trade) => ({
-        ...trade,
-        current_price: priceMap[trade.ticker] || null,
-      })
-    );
-    // --- END: FIX ---
+    try {
+      // --- Price fetching logic ---
+      const tickers = [...new Set(trades.map((trade) => trade.ticker))].filter(
+        Boolean
+      ); // filter(Boolean) removes null/undefined tickers
+      if (tickers.length > 0) {
+        const pricePromises = tickers.map((ticker) => getPriceV2(ticker));
+        const prices = await Promise.all(pricePromises);
+        const priceMap = tickers.reduce((acc, ticker, index) => {
+          acc[ticker] = prices[index];
+          return acc;
+        }, {});
+
+        tradesWithPrices = trades.map((trade) => ({
+          ...trade,
+          current_price: priceMap[trade.ticker] || null,
+        }));
+      }
+    } catch (priceError) {
+      console.error(
+        `Failed to fetch prices for open trades for source ${id}:`,
+        priceError
+      );
+      // If price fetching fails, we can still return the trades without prices.
+      // The client-side should handle the case where current_price is null.
+    }
+
     res.json(tradesWithPrices);
   } catch (error) {
     console.error(`Failed to get open trades for source ${id}:`, error);

@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
   try {
     // --- START: FIX ---
     const db = await getDb(); // Use getDb()
-    const exchanges = await db.all('SELECT * FROM exchanges');
+    const exchanges = await db.all('SELECT * FROM exchanges ORDER BY name ASC');
     // --- END: FIX ---
     res.json(exchanges);
   } catch (error) {

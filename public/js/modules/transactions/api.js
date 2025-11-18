@@ -25,10 +25,9 @@ export async function updateTransaction(transactionId, transactionData) {
 
 /**
  * Sells a transaction.
- * @param {string} transactionId - The ID of the transaction to sell.
- * @param {object} sellData - The data for the sell transaction (quantity, price).
+ * @param {object} sellData - The data for the sell transaction (id, quantity, price).
  * @returns {Promise<any>}
  */
-export async function sellTransaction(transactionId, sellData) {
-  return api.post(`/api/transactions/${transactionId}/sell`, sellData);
+export async function sellTransaction(sellData) {
+  return api.post('/api/transactions/sell', sellData);
 }

@@ -21,6 +21,14 @@ CREATE TABLE IF NOT EXISTS exchanges (
     name TEXT UNIQUE NOT NULL
 );
 
+-- Default Exchanges
+INSERT OR IGNORE INTO exchanges (name) VALUES ('Fidelity');
+INSERT OR IGNORE INTO exchanges (name) VALUES ('E-trade');
+INSERT OR IGNORE INTO exchanges (name) VALUES ('Robinhood');
+INSERT OR IGNORE INTO exchanges (name) VALUES ('Miloer');
+INSERT OR IGNORE INTO exchanges (name) VALUES ('Lexunex');
+INSERT OR IGNORE INTO exchanges (name) VALUES ('coinbase');
+
 CREATE TABLE IF NOT EXISTS web_apps (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL
@@ -105,6 +113,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     quantity REAL NOT NULL,
     price REAL NOT NULL,
     quantity_remaining REAL,
+    status TEXT NOT NULL DEFAULT 'open', -- Added status column
     created_date TEXT NOT NULL,
     updated_date TEXT NOT NULL,
     limit_low REAL,

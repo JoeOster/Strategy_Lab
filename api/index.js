@@ -1,6 +1,7 @@
 // api/index.js
 import express from 'express';
 const router = express.Router();
+console.log('api/index.js router initialized.');
 
 // --- START: ADD THIS ---
 import bookLookupApi from './book-lookup.js';

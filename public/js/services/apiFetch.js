@@ -10,7 +10,7 @@ class ApiFetchError extends Error {
    * @param {string} message - The error message.
    * @param {number} status - The HTTP status code.
    * @param {string} statusText - The HTTP status text.
-   * @param {object | string} [data] - The parsed JSON error response or text.
+   * @param {object | string | Error} [data] - The parsed JSON error response or text.
    */
   constructor(message, status, statusText, data) {
     super(message);
@@ -61,7 +61,9 @@ async function apiFetch(url, options = {}) {
       'Network error, please check connection.',
       0,
       'Network Error',
-      networkError
+      networkError instanceof Error
+        ? networkError
+        : new Error(String(networkError)) // Cast to Error
     );
   }
 
@@ -71,7 +73,8 @@ async function apiFetch(url, options = {}) {
     try {
       // Try to parse error response as JSON
       errorData = JSON.parse(errorText);
-    } catch (e) {
+    } catch (_e) {
+      // Renamed 'e' to '_e'
       // If not JSON, use the raw text
       errorData = errorText;
     }
@@ -100,7 +103,7 @@ async function apiFetch(url, options = {}) {
       'Failed to parse JSON response.',
       response.status,
       response.statusText,
-      jsonError
+      jsonError instanceof Error ? jsonError : new Error(String(jsonError)) // Cast to Error
     );
   }
 }

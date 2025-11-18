@@ -184,23 +184,21 @@ export function handleMainTabClick(event) {
   if (panel) {
     panel.classList.add('active');
 
-    // --- START: FIX ---
-    // Load content for the newly activated tab
+    // FIX: IDs must match the HTML data-tab attributes (e.g., 'exchanges-panel', not 'exchanges-settings-panel')
     switch (tabId) {
-      case 'sources-settings-panel':
+      case 'sources-panel':
         loadSourcesList();
         break;
-      case 'exchanges-settings-panel':
+      case 'exchanges-panel':
         loadExchangesList();
         break;
-      case 'users-settings-panel':
+      case 'users-panel':
         loadAccountHoldersList();
         break;
-      case 'webapps-settings-panel':
+      case 'webapps-panel':
         loadWebAppsList();
         break;
     }
-    // --- END: FIX ---
   }
 }
 
@@ -256,17 +254,18 @@ export function loadInitialTabContent() {
   if (!tabId) return;
 
   // Load content based on the active tab's ID
+  // FIX: IDs must match the HTML data-tab attributes
   switch (tabId) {
-    case 'sources-settings-panel':
+    case 'sources-panel':
       loadSourcesList();
       break;
-    case 'exchanges-settings-panel':
+    case 'exchanges-panel':
       loadExchangesList();
       break;
-    case 'users-settings-panel':
+    case 'users-panel':
       loadAccountHoldersList();
       break;
-    case 'webapps-settings-panel':
+    case 'webapps-panel':
       loadWebAppsList();
       break;
   }

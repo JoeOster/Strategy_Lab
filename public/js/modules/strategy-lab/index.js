@@ -1,5 +1,6 @@
 // public/js/modules/strategy-lab/index.js
 
+import { openEditTradeModal } from '../transactions/edit-trade.handlers.js';
 import * as handlers from './handlers.js';
 // Import the card click handler from the new sources sub-module
 import { handleSourceCardClick } from './sources/handlers.js';
@@ -25,7 +26,7 @@ export function initializeModule() {
     tabElement.addEventListener('click', handlers.handleSubTabClick);
   }
 
-  // Add delegated listener for source card clicks
+  // Add delegated listener for source card clicks and sell button clicks
   strategyLabContainer.addEventListener('click', (event) => {
     // --- START: FIX ---
     // Add type guard to ensure event.target is an Element
@@ -36,6 +37,12 @@ export function initializeModule() {
 
     if (event.target.closest('.source-card')) {
       handleSourceCardClick(event);
+    } else if (event.target.closest('.real-sell-btn')) {
+      const sellButton = event.target.closest('.real-sell-btn');
+      const tradeId = sellButton.dataset.id;
+      if (tradeId) {
+        openEditTradeModal({ tradeId: tradeId, isSell: true });
+      }
     }
   });
 

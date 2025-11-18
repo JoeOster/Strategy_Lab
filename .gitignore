@@ -1,7 +1,6 @@
 # Logs
-log/
-/log
-*.log
+#log/
+#*.log
 
 # Node
 node_modules/

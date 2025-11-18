@@ -1,6 +1,7 @@
 // public/js/modules/strategy-lab/paper-trades/handlers.js
 
 import { deletePaperTrade, getPaperTrades } from './api.js';
+import { renderPaperTrades } from './new-render.js'; // Assuming this is the correct path to the render function
 
 /**
  * Fetches and renders the content for the "Paper Trades" sub-tab.
@@ -9,15 +10,17 @@ export async function loadPaperTradesContent() {
   console.log('Loading Paper Trades content...');
   try {
     const paperTrades = await getPaperTrades();
-    // renderPaperTrades(paperTrades, 'paper-trades-table');
-    console.log(
-      'Paper Trades display is currently disabled as per user request.'
+    const newPaperTradesContainer = document.getElementById(
+      'new-paper-trades-table'
     );
+    if (newPaperTradesContainer) {
+      renderPaperTrades(paperTrades, newPaperTradesContainer);
+    }
   } catch (err) {
     console.error('Failed to load paper trades:', err);
     // Cast unknown 'err' to 'Error'
     const error = err instanceof Error ? err : new Error(String(err));
-    renderPaperTrades(null, 'paper-trades-table', error);
+    renderPaperTrades(null, 'new-paper-trades-table', error);
   }
 }
 

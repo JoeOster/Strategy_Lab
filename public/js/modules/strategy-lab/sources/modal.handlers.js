@@ -449,7 +449,6 @@ export async function loadClosedTradesForSource(sourceId) {
 
 import { openEditTradeModal } from '../../transactions/edit-trade.handlers.js';
 import { openPaperTradeDetailsModal } from '../../transactions/paper-trade-details.handlers.js';
-import { openSellTradeModal } from '../../transactions/sell-trade.handlers.js';
 
 /**
  * Handles all clicks within the modal's bottom panel.
@@ -498,9 +497,9 @@ async function handleModalBottomPanelClicks(event) {
 
   // Check for "Open Trades" buttons
   if (button.classList.contains('real-sell-btn')) {
-    openSellTradeModal(id);
+    openEditTradeModal({ tradeId: id, isSell: true });
   } else if (button.classList.contains('real-edit-btn')) {
-    openEditTradeModal(id);
+    openEditTradeModal({ tradeId: id });
   }
 
   // @ts-ignore

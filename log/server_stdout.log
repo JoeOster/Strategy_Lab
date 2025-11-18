@@ -1,0 +1,85 @@
+
+> strategy_lab@1.0.0 dev
+> node --watch server.js
+
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
+[2025-11-18T04:23:26.771Z] GET /
+[2025-11-18T04:23:26.986Z] GET /
+[2025-11-18T04:23:27.036Z] GET /css/main.css?v=1.0.2
+[2025-11-18T04:23:27.068Z] GET /css/themes.css?v=1.0.1
+[2025-11-18T04:23:27.075Z] GET /js/app-main.js
+[2025-11-18T04:23:27.078Z] GET /images/strategy-lab-logo.svg
+[2025-11-18T04:23:27.102Z] GET /css/base.css
+[2025-11-18T04:23:27.106Z] GET /css/navigation.css
+[2025-11-18T04:23:27.109Z] GET /css/forms.css
+[2025-11-18T04:23:27.113Z] GET /css/modals.css
+[2025-11-18T04:23:27.124Z] GET /css/components.css
+[2025-11-18T04:23:27.127Z] GET /css/settings.css
+[2025-11-18T04:23:27.131Z] GET /css/strategy-lab.css
+[2025-11-18T04:23:27.134Z] GET /css/themes.css
+[2025-11-18T04:23:27.137Z] GET /js/modules/navigation/index.js
+[2025-11-18T04:23:27.140Z] GET /js/modules/settings/appearance.handlers.js
+[2025-11-18T04:23:27.148Z] GET /js/modules/strategy-lab/paper-trades/new-render.js
+[2025-11-18T04:23:27.150Z] GET /js/modules/user-selector/index.js
+[2025-11-18T04:23:27.153Z] GET /js/utils/loadHtmlPartial.js
+[2025-11-18T04:23:27.218Z] GET /_source-form-modal.html
+[2025-11-18T04:23:27.444Z] GET /images/contacts/default.png
+[2025-11-18T04:23:27.447Z] GET /_source-detail-modal.html
+[2025-11-18T04:23:27.453Z] GET /favicon.ico
+[2025-11-18T04:23:27.465Z] GET /_add-strategy-modal.html
+[2025-11-18T04:23:27.505Z] GET /_sell-trade-modal.html
+[2025-11-18T04:23:27.528Z] GET /_edit-trade-modal.html
+[2025-11-18T04:23:27.540Z] GET /_paper-trade-details-modal.html
+[2025-11-18T04:23:27.549Z] GET /_add-idea-modal.html
+[2025-11-18T04:23:27.561Z] GET /_edit-strategy-modal.html
+[2025-11-18T04:23:27.575Z] GET /_dashboard.html
+[2025-11-18T04:23:27.612Z] GET /js/modules/dashboard/index.js
+[2025-11-18T04:26:38.602Z] GET /_strategy-lab.html
+[2025-11-18T04:26:38.610Z] GET /js/modules/strategy-lab/index.js
+[2025-11-18T04:26:38.936Z] GET /js/modules/transactions/edit-trade.handlers.js
+[2025-11-18T04:26:38.973Z] GET /js/modules/strategy-lab/handlers.js
+[2025-11-18T04:26:38.975Z] GET /js/modules/strategy-lab/sources/handlers.js
+[2025-11-18T04:26:38.977Z] GET /js/modules/strategy-lab/watched-list/handlers.js
+[2025-11-18T04:26:38.980Z] GET /js/modules/strategy-lab/paper-trades/handlers.js
+[2025-11-18T04:26:38.983Z] GET /js/modules/strategy-lab/watched-list/api.js
+[2025-11-18T04:26:38.985Z] GET /js/modules/transactions/api.js
+[2025-11-18T04:26:38.988Z] GET /js/modules/settings/sources.api.js
+[2025-11-18T04:26:38.990Z] GET /js/modules/strategy-lab/sources/modal.handlers.js
+[2025-11-18T04:26:38.992Z] GET /js/modules/strategy-lab/sources/render.js
+[2025-11-18T04:26:38.994Z] GET /js/modules/strategy-lab/sources/idea-form.handlers.js
+[2025-11-18T04:26:38.995Z] GET /js/modules/strategy-lab/watched-list/render.js
+[2025-11-18T04:26:38.998Z] GET /js/modules/strategy-lab/paper-trades/api.js
+[2025-11-18T04:26:39.000Z] GET /js/services/apiFetch.js
+[2025-11-18T04:26:39.004Z] GET /js/modules/settings/sources.handlers.js
+[2025-11-18T04:26:39.007Z] GET /js/modules/transactions/render.js
+[2025-11-18T04:26:39.008Z] GET /js/modules/strategy-lab/sources/api.js
+[2025-11-18T04:26:39.010Z] GET /js/modules/strategy-lab/sources/strategy-form.handlers.js
+[2025-11-18T04:26:39.011Z] GET /js/modules/transactions/paper-trade-details.handlers.js
+[2025-11-18T04:26:39.013Z] GET /js/api.js
+[2025-11-18T04:26:39.021Z] GET /js/modules/settings/sources_books.handlers.js
+[2025-11-18T04:26:39.028Z] GET /js/modules/settings/webapps.api.js
+[2025-11-18T04:26:39.030Z] GET /js/utils/formatters.js
+[2025-11-18T04:26:39.037Z] GET /api/sources
+[2025-11-18T04:26:39.898Z] GET /api/sources/1
+[2025-11-18T04:26:39.909Z] GET /api/sources/1/strategies
+[2025-11-18T04:26:39.949Z] GET /images/books/http://books.google.com/books/content?id=UIctvQEACAAJ&printsec=frontcover&img=1&zoom=1&sRestarting 'server.js'
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
+r CIFR from Finnhub...
+Fetching price for INTC from Finnhub...
+Fetching price for AAPL from Finnhub...
+Fetching price for PLUG from Finnhub...
+Successfully fetched price for PLUG: 2.085
+Successfully fetched price for INTC: 34.71
+Successfully fetched price for CIFR: 14.35
+Successfully fetched price for AAPL: 267.46
+[2025-11-18T04:26:43.312Z] GET /api/transactions/single/1
+[2025-11-18T04:27:03.962Z] POST /api/transactions/sell
+Received POST request to /api/transactions/sell
+Restarting 'server.js'
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
