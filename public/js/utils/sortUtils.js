@@ -31,3 +31,52 @@ export function sortData(data, key, direction) {
 
 	return sortedData;
 }
+
+/**
+ * Makes the headers of a table sortable.
+ * Looks for `<th>` elements with the class `sortable` and a `data-sort-key` attribute.
+ * @param {HTMLTableElement} table - The table element to make sortable.
+ */
+export function makeTableSortable(table) {
+    const headers = table.querySelectorAll('th.sortable');
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const tableBody = table.querySelector('tbody');
+            if (!tableBody) return;
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const sortDirection = header.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
+
+            // Reset sort direction for other headers
+            headers.forEach(h => {
+                if (h !== header) {
+                    h.removeAttribute('data-sort-direction');
+                }
+            });
+            header.dataset.sortDirection = sortDirection;
+
+            const headerIndex = Array.from(header.parentNode.children).indexOf(header);
+
+            rows.sort((a, b) => {
+                const aText = a.children[headerIndex]?.textContent.trim() || '';
+                const bText = b.children[headerIndex]?.textContent.trim() || '';
+
+                // Attempt to parse numbers, removing currency symbols, commas, and percentages
+                const aNum = parseFloat(aText.replace(/[$%,]/g, ''));
+                const bNum = parseFloat(bText.replace(/[$%,]/g, ''));
+
+                const aValue = !isNaN(aNum) ? aNum : aText.toLowerCase();
+                const bValue = !isNaN(bNum) ? bNum : bText.toLowerCase();
+
+                if (aValue < bValue) {
+                    return sortDirection === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            rows.forEach(row => tableBody.appendChild(row));
+        });
+    });
+}

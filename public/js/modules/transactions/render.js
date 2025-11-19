@@ -2,6 +2,7 @@
 /** @typedef {import('../../types.js').TransactionWithPrice} TransactionWithPrice */
 /** @typedef {import('../../types.js').Transaction} Transaction */
 import { formatCurrency } from "../../utils/formatters.js";
+import { makeTableSortable } from "../../utils/sortUtils.js";
 
 /**
  * Renders the table of "Paper Trades" for a source.
@@ -57,6 +58,7 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 	cardWrapper.appendChild(table);
 	container.innerHTML = ""; // Clear loading message
 	container.appendChild(cardWrapper);
+	makeTableSortable(table);
 }
 
 /**
@@ -92,13 +94,13 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
 	table.innerHTML = `
     <thead>
       <tr>
-        <th>Ticker</th>
-        <th>Entry Date</th>
-        <th>Exit Date</th>
-        <th>Entry Price</th>
-        <th>Exit Price</th>
-        <th>P/L $</th>
-        <th>P/L %</th>
+        <th class="sortable" data-sort-key="ticker">Ticker</th>
+        <th class="sortable" data-sort-key="entry_date">Entry Date</th>
+        <th class="sortable" data-sort-key="exit_date">Exit Date</th>
+        <th class="sortable" data-sort-key="entry_price">Entry Price</th>
+        <th class="sortable" data-sort-key="exit_price">Exit Price</th>
+        <th class="sortable" data-sort-key="pnl">P/L $</th>
+        <th class="sortable" data-sort-key="return_pct">P/L %</th>
       </tr>
     </thead>
     <tbody>
@@ -107,6 +109,7 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
 	cardWrapper.appendChild(table);
 	container.innerHTML = "";
 	container.appendChild(cardWrapper);
+	makeTableSortable(table);
 }
 
 /**
@@ -172,6 +175,7 @@ export function renderOpenTradesForSource(
 	cardWrapper.appendChild(table);
 	container.innerHTML = "";
 	container.appendChild(cardWrapper);
+	makeTableSortable(table);
 }
 
 /**
@@ -216,12 +220,12 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 	// Since this is a copy of Open Trades, we use the same headers.
 	// UPDATED: Use the new headers for closed trades.
 	const tableHeaders = `
-    <th>Ticker</th>
-    <th>Qty Sold</th>
-    <th>Basis</th>
-    <th>Sold $</th>
-    <th>Realized P/L $</th>
-    <th>Realized P/L %</th>
+    <th class="sortable" data-sort-key="ticker">Ticker</th>
+    <th class="sortable" data-sort-key="qty_sold">Qty Sold</th>
+    <th class="sortable" data-sort-key="basis">Basis</th>
+    <th class="sortable" data-sort-key="proceeds">Sold $</th>
+    <th class="sortable" data-sort-key="realized_pl">Realized P/L $</th>
+    <th class="sortable" data-sort-key="realized_pl_pct">Realized P/L %</th>
     <th>Actions</th>
   `;
 
@@ -252,6 +256,7 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 	cardWrapper.appendChild(table);
 	container.innerHTML = "";
 	container.appendChild(cardWrapper);
+	makeTableSortable(table);
 }
 
 /**

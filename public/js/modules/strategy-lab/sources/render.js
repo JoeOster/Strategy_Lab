@@ -5,6 +5,7 @@
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
 import { formatCurrency } from "../../../utils/formatters.js";
+import { makeTableSortable } from "../../../utils/sortUtils.js";
 
 /**
  * Renders the list of advice sources as cards in the grid.
@@ -68,23 +69,25 @@ export function renderStrategiesTable(strategies) {
 	}
 
 	// Create the table structure
-	container.innerHTML = `
-    <table class="strategy-table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Ticker</th>
-          <th>Chapter</th>
-          <th>Page</th>
-          <th>Description</th>
-          <th>PDF</th>
-          <th class="actions-column">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
+	const table = document.createElement("table");
+	table.className = "strategy-table";
+	table.innerHTML = `
+    <thead>
+      <tr>
+        <th class="sortable" data-sort-key="title">Title</th>
+        <th class="sortable" data-sort-key="ticker">Ticker</th>
+        <th class="sortable" data-sort-key="chapter">Chapter</th>
+        <th class="sortable" data-sort-key="page_number">Page</th>
+        <th class="sortable" data-sort-key="description">Description</th>
+        <th>PDF</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
   `;
+	container.innerHTML = "";
+	container.appendChild(table);
 
 	const tbody = container.querySelector("tbody");
 
@@ -115,6 +118,7 @@ export function renderStrategiesTable(strategies) {
 			tbody.appendChild(row);
 		}
 	}
+	makeTableSortable(table);
 }
 
 /**
@@ -134,22 +138,24 @@ export function renderTradeIdeasTable(ideas) {
 	}
 
 	// Create the table structure
-	container.innerHTML = `
-    <table class="strategy-table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Entry Zone</th>
-          <th>Targets</th>
-          <th>Stop Loss</th>
-          <th>Status</th>
-          <th class="actions-column">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
+	const table = document.createElement("table");
+	table.className = "strategy-table";
+	table.innerHTML = `
+    <thead>
+      <tr>
+        <th class="sortable" data-sort-key="ticker">Ticker</th>
+        <th class="sortable" data-sort-key="buy_price_low">Entry Zone</th>
+        <th class="sortable" data-sort-key="take_profit_low">Targets</th>
+        <th class="sortable" data-sort-key="escape_price">Stop Loss</th>
+        <th class="sortable" data-sort-key="status">Status</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
   `;
+	container.innerHTML = "";
+	container.appendChild(table);
 
 	const tbody = container.querySelector("tbody");
 
@@ -176,6 +182,7 @@ export function renderTradeIdeasTable(ideas) {
 			tbody.appendChild(row);
 		}
 	}
+	makeTableSortable(table);
 }
 
 // --- START: NEW RENDER FUNCTIONS FOR MODAL BOTTOM PANEL ---
@@ -214,12 +221,12 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 	table.innerHTML = `
     <thead>
       <tr>
-        <th>Ticker</th>
-        <th>Entry Zone</th>
-        <th>Targets</th>
-        <th>Stop Loss</th>
-        <th>Status</th>
-        <th>Notes</th>
+        <th class="sortable" data-sort-key="ticker">Ticker</th>
+        <th class="sortable" data-sort-key="buy_price_low">Entry Zone</th>
+        <th class="sortable" data-sort-key="take_profit_low">Targets</th>
+        <th class="sortable" data-sort-key="escape_price">Stop Loss</th>
+        <th class="sortable" data-sort-key="status">Status</th>
+        <th class="sortable" data-sort-key="notes">Notes</th>
         <th class="actions-column">Actions</th>
       </tr>
     </thead>
@@ -266,4 +273,5 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 	cardWrapper.appendChild(table);
 	container.innerHTML = "";
 	container.appendChild(cardWrapper);
+	makeTableSortable(table);
 }
