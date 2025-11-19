@@ -6,27 +6,26 @@
 /** @typedef {import('../../../types.js').PaperTradeSummary} PaperTradeSummary */
 /** @typedef {import('../../../types.js').TransactionWithPrice} TransactionWithPrice */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
+
 // --- END: NEW IMPORT ---
 
 import { getSource } from "../../settings/sources.api.js";
-// --- START: MODIFICATION ---
-// Replaced openEditSourceModal with openSourceFormModal from the refactor
 import { openSourceFormModal } from "../../settings/sources.handlers.js";
-// --- END: MODIFICATION ---
 import {
-	renderOpenTradesForSource,
+	pct_renderTradesTable,
 	renderPaperTradesForSource,
-	tct_renderTradesTable,
+	renderOpenTradesForSource,
+	tct_renderTradesTable
 } from "../../transactions/render.js";
 import { handleDeletePaperTradeClick } from "../paper-trades/handlers.js";
 import * as watchedListHandlers from "../watched-list/handlers.js";
 import {
-	deleteStrategy,
+	deleteStrategy, // Re-add this import for pct_loadTrades
 	getOpenIdeasForSource,
 	getOpenTradesForSource,
 	getPaperTradesForSource,
 	getStrategiesForSource, // TCT: Import the new API function
-	tct_getTradesForSource,
+	tct_getTradesForSource
 } from "./api.js";
 import { handleShowIdeaForm } from "./idea-form.handlers.js";
 import {
@@ -42,6 +41,51 @@ import {
 /** @type {EventListener | null} */
 let tradeCreatedHandler = null; // Use the generic EventListener type
 
+/**
+ * PCT: New loader function for all paper trades.
+ * Fetches all paper transactions and processes them into open and closed lists.
+ * @param {string|number} sourceId - The ID of the source.
+ */
+export async function pct_loadTrades(sourceId) {
+	const openContainerId = "paper-trades-table-placeholder";
+	const closedContainerId = "pct-closed-paper-trades-table-placeholder";
+
+	try {
+		const allPaperTransactions = await getPaperTradesForSource(sourceId);
+
+		const closedTradeIds = new Set(
+			allPaperTransactions
+				.filter((t) => t.transaction_type === "sell")
+				.map((t) => t.original_transaction_id),
+		);
+
+		const openPaperTrades = allPaperTransactions.filter(
+			(t) => t.transaction_type === "BUY" && !closedTradeIds.has(t.id),
+		);
+
+		const closedPaperTrades = allPaperTransactions
+			.filter((t) => t.transaction_type === "sell")
+			.map((sellTrade) => {
+				const buyTrade = allPaperTransactions.find(
+					(t) => t.id === sellTrade.original_transaction_id,
+				);
+				if (!buyTrade) return null;
+
+				const pnl = (sellTrade.price - buyTrade.price) * buyTrade.quantity;
+				const return_pct = (pnl / (buyTrade.price * buyTrade.quantity)) * 100;
+
+				return { id: buyTrade.id, ticker: buyTrade.ticker, entry_date: buyTrade.transaction_date, exit_date: sellTrade.transaction_date, entry_price: buyTrade.price, exit_price: sellTrade.price, pnl, return_pct };
+			})
+			.filter(Boolean);
+
+		renderPaperTradesForSource(openPaperTrades, openContainerId);
+		pct_renderTradesTable(closedPaperTrades, closedContainerId);
+	} catch (err) {
+		const error = err instanceof Error ? err : new Error(String(err));
+		renderPaperTradesForSource(null, openContainerId, error);
+		pct_renderTradesTable(null, closedContainerId, error);
+	}
+}
 /**
  * Opens the source detail modal and populates it with data.
  * @param {string} sourceId - The ID of the source to display.
@@ -166,6 +210,7 @@ export async function openSourceDetailModal(sourceId) {
 			loadOpenIdeasForSource(sourceId);
 		}
 		loadOpenTradesForSource(sourceId);
+		pct_loadTrades(sourceId); // Call the combined paper trade loader
 		tct_loadTrades(sourceId); // TCT: Call the new loader function
 
 		// Display the modal
@@ -286,6 +331,16 @@ export function closeSourceDetailModal() {
 		}
 		const openTrades = document.getElementById("open-trades-table-placeholder");
 		if (openTrades) openTrades.innerHTML = "";
+		const pctClosedPaperTrades = document.getElementById(
+			"pct-closed-paper-trades-table-placeholder",
+		);
+		if (pctClosedPaperTrades) pctClosedPaperTrades.innerHTML = "";
+
+		const testClosedTrades = document.getElementById(
+			"test-closed-trades-table-placeholder",
+		);
+		if (testClosedTrades) testClosedTrades.innerHTML = "";
+
 
 		// Remove event listener for the modal body
 		const modalBody = modal.querySelector(".modal-body");
@@ -485,6 +540,7 @@ async function handleModalBottomPanelClicks(event) {
 
 	let shouldRefreshIdeas = false;
 	let shouldRefreshPaperTrades = false;
+	let paperTradeClosed = false;
 	let movedToPaper = false;
 
 	// Set the trade type for the idea form
@@ -512,6 +568,9 @@ async function handleModalBottomPanelClicks(event) {
 		// This variable is currently unused, but we'll keep the call
 
 		shouldRefreshPaperTrades = await handleDeletePaperTradeClick(id);
+	} else if (button.classList.contains("paper-trade-close-btn")) {
+		paperTradeClosed = true;
+		openEditTradeModal({ tradeId: id, isSell: true, isPaper: true });
 	} else if (button.classList.contains("paper-details-btn")) {
 		openPaperTradeDetailsModal(id);
 	}
@@ -530,11 +589,11 @@ async function handleModalBottomPanelClicks(event) {
 	if (sourceId) {
 		if (shouldRefreshIdeas) {
 			loadOpenIdeasForSource(sourceId); // Re-load ideas
-		}
-		if (movedToPaper || shouldRefreshPaperTrades) {
-			// If we moved an idea to paper, OR deleted a paper trade,
-			// refresh the paper trades table
-			loadPaperTradesForSource(sourceId);
+		} else if (movedToPaper || shouldRefreshPaperTrades || paperTradeClosed) {
+			// If we moved an idea to paper, deleted a paper trade, or closed one,
+			// refresh both paper trade tables.
+			loadOpenIdeasForSource(sourceId); // Also refresh ideas to show the new "✔ Paper" status
+			pct_loadTrades(sourceId); // Refresh all paper trade tables
 		}
 	}
 }

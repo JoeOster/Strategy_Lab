@@ -286,7 +286,7 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
 
 	// Filter out paper trades from the open trades list
 	const realTrades = openTrades
-		? openTrades.filter((trade) => trade.is_paper_trade != 1)
+		? openTrades.filter((trade) => trade.is_paper_trade !== 1)
 		: [];
 
 	if (realTrades.length === 0) {

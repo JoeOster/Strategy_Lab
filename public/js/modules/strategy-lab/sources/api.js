@@ -61,9 +61,19 @@ export async function getOpenTradesForSource(sourceId) {
 /**
  * Fetches all "Paper Trades" for a specific source ID.
  * @param {string|number} sourceId - The ID of the source.
- * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of Transactions.
+ * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of PaperTradeSummary objects.
  */
 export async function getPaperTradesForSource(sourceId) {
+	return api.get(`/api/sources/${sourceId}/paper-trades`);
+}
+
+/**
+ * PCT: Fetches "Test Closed Paper Trades" for a specific source ID.
+ * @param {string|number} sourceId - The ID of the source.
+ * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of closed paper trades.
+ */
+export async function pct_getTradesForSource(sourceId) {
+	// This is the correct endpoint that returns all paper trades.
 	return api.get(`/api/sources/${sourceId}/paper-trades`);
 }
 
@@ -73,6 +83,7 @@ export async function getPaperTradesForSource(sourceId) {
  * @returns {Promise<Transaction[]>} A promise that resolves to an array of Transactions.
  */
 export async function tct_getTradesForSource(sourceId) {
+	// This endpoint correctly returns only real-money closed trades.
 	return api.get(`/api/sources/${sourceId}/test-closed-trades`);
 }
 

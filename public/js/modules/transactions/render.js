@@ -11,7 +11,90 @@ import { formatCurrency } from "../../utils/formatters.js";
  */
 export function renderPaperTradesForSource(trades, containerId, error = null) {
 	const container = document.getElementById(containerId);
-	renderTradesTable(container, "Paper Trades", trades, error, true);
+	if (!container) {
+		console.error(`Container for "Paper Trades" not found.`);
+		return;
+	}
+
+	container.innerHTML = "<h3>Paper Trades</h3>";
+
+	if (error) {
+		container.innerHTML += `<p class="error">Failed to load paper trades.</p>`;
+		return;
+	}
+
+	if (!trades || trades.length === 0) {
+		container.innerHTML += "<p>No open paper trades from this source.</p>";
+		return;
+	}
+
+	const table = document.createElement("table");
+	table.className = "strategy-table";
+
+	const tableHeaders = `
+    <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
+    <th class="text-center sortable" title="Quantity" data-sort-key="quantity">Qty</th>
+    <th class="text-center sortable" title="Entry Date" data-sort-key="entry_date">Entry Date</th>
+    <th class="text-center sortable" title="Entry Price" data-sort-key="entry_price">E. Price</th>
+    <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
+    <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
+    <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
+    <th class="text-center">Actions</th>
+  `;
+
+	table.innerHTML = `
+    <thead><tr>${tableHeaders}</tr></thead>
+    <tbody>
+      ${trades.map((trade) => renderTradeRow(trade, true, "Paper Trades")).join("")}
+    </tbody>
+  `;
+	container.appendChild(table);
+}
+
+/**
+ * PCT: Renders the "Test Closed Paper Trades" table.
+ * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
+ * @param {string} containerId - The ID of the element to render into.
+ * @param {Error | null} [error] - An optional error object.
+ */
+export function pct_renderTradesTable(trades, containerId, error = null) {
+	const container = document.getElementById(containerId);
+	if (!container) {
+		console.error(`PCT Container not found: ${containerId}`);
+		return;
+	}
+
+	container.innerHTML = "<h3>Test Closed Paper Trades</h3>";
+
+	if (error) {
+		container.innerHTML +=
+			'<p class="error">Failed to load test closed paper trades.</p>';
+		return;
+	}
+
+	if (!trades || trades.length === 0) {
+		container.innerHTML += "<p>No test closed paper trades found.</p>";
+		return;
+	}
+
+	const table = document.createElement("table");
+	table.className = "strategy-table";
+	table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Entry Date</th>
+        <th>Exit Date</th>
+        <th>Entry Price</th>
+        <th>Exit Price</th>
+        <th>P/L $</th>
+        <th>P/L %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${trades.map((trade) => renderClosedPaperTradeRow(trade)).join("")}
+    </tbody>`;
+	container.appendChild(table);
 }
 
 /**
@@ -25,7 +108,7 @@ export function renderOpenTradesForSource(
 	trades,
 	containerId,
 	error = null,
-	title = "Open Trades"
+	title = "Open Trades",
 ) {
 	const container = document.getElementById(containerId);
 	if (!container) {
@@ -41,7 +124,9 @@ export function renderOpenTradesForSource(
 	}
 
 	// This is the filter that was being bypassed.
-	const realTrades = trades ? trades.filter((trade) => trade.is_paper_trade != 1) : [];
+	const realTrades = trades
+		? trades.filter((trade) => trade.is_paper_trade !== 1)
+		: [];
 
 	if (!realTrades || realTrades.length === 0) {
 		container.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
@@ -72,66 +157,6 @@ export function renderOpenTradesForSource(
 }
 
 /**
- * Renders a raw data table for diagnostics. It creates columns based on the keys of the data objects.
- * @param {any[] | null} data - An array of data objects.
- * @param {string} containerId - The ID of the element to render into.
- * @param {Error | null} [error] - An optional error object.
- * @param {string} [title] - The title for the table section.
- */
-export function renderRawDataTable(
-	data,
-	containerId,
-	error = null,
-	title = "Raw Data",
-) {
-	const container = document.getElementById(containerId);
-	if (!container) {
-		console.error(`Container for "${title}" not found.`);
-		return;
-	}
-
-	container.innerHTML = `<h3>${title}</h3>`;
-
-	if (error) {
-		container.innerHTML += `<p class="error">Failed to load ${title.toLowerCase()}.</p>`;
-		return;
-	}
-
-	if (!data || data.length === 0) {
-		container.innerHTML += `<p>No ${title.toLowerCase()} data found.</p>`;
-		return;
-	}
-
-	const table = document.createElement("table");
-	table.className = "strategy-table";
-
-	// Dynamically create headers from the keys of the first object
-	const headers = Object.keys(data[0]);
-	const headerHtml = headers.map((header) => `<th>${header}</th>`).join("");
-
-	// Create rows
-	const rowsHtml = data
-		.map((row) => {
-			const cells = headers
-				.map(
-					(header) => `<td>${row[header] === null ? "NULL" : row[header]}</td>`,
-				)
-				.join("");
-			return `<tr>${cells}</tr>`;
-		})
-		.join("");
-
-	table.innerHTML = `
-    <thead>
-      <tr>${headerHtml}</tr>
-    </thead>
-    <tbody>
-      ${rowsHtml}
-    </tbody>`;
-	container.appendChild(table);
-}
-
-/**
  * TCT: Renders the "Test Closed Trades" table.
  * This is a new, isolated function for testing purposes.
  * @param {any[] | null} trades - An array of trade objects.
@@ -152,7 +177,11 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 		return;
 	}
 
-	if (!trades || trades.length === 0) {
+	// Filter for only REAL closed trades (where is_paper_trade is not 1)
+	const realTrades = trades
+		? trades.filter((trade) => trade.is_paper_trade != 1)
+		: [];
+	if (!realTrades || realTrades.length === 0) {
 		container.innerHTML += "<p>No test trades found.</p>";
 		return;
 	}
@@ -172,7 +201,7 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
     <th>Actions</th>
   `;
 
-	const rowsHtml = trades
+	const rowsHtml = realTrades
 		.map((trade) => {
 			return `
       <tr data-id="${trade.id}">
@@ -219,7 +248,11 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
 		return;
 	}
 
-	if (!trades || trades.length === 0) {
+	// Filter trades based on whether they are open or closed.
+	// For paper trades, an open trade does not have an exit_date.
+	const openTrades = isPaper ? trades.filter((trade) => !trade.exit_date) : []; // This function is now only for paper trades, so real trades are an empty array.
+
+	if (!openTrades || openTrades.length === 0) {
 		container.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
 		return;
 	}
@@ -267,7 +300,7 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
       </tr>
     </thead>
     <tbody>
-      ${trades.map((trade) => renderTradeRow(trade, isPaper, title)).join("")}
+      ${openTrades.map((trade) => renderTradeRow(trade, isPaper, title)).join("")}
     </tbody>
   `;
 	container.appendChild(table);
@@ -305,6 +338,7 @@ function renderTradeRow(trade, isPaper, title) {
 	if (isPaper) {
 		actions = `
       <button class="btn table-action-btn btn-secondary paper-edit-btn" data-id="${trade.id}">Edit</button>
+      <button class="btn table-action-btn btn-danger small-btn paper-trade-close-btn" data-id="${trade.id}">Close</button>
       <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
     `;
 		// UPDATED: Added SL, TP1, and TP2 cells to Paper Trades (Open)
@@ -317,7 +351,7 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${trade.tp1 ? formatCurrency(trade.tp1) : "N/A"}</td>
       <td class="text-center">${trade.tp2 ? formatCurrency(trade.tp2) : "N/A"}</td>
       <td class="text-center">${currentPriceCell}</td>
-      <td class="text-center">${formatCurrency(unrealizedPl)}</td>
+      <td class="text-center">${unrealizedPl !== null ? formatCurrency(unrealizedPl) : "N/A"}</td>
       <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
@@ -338,7 +372,6 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${formatCurrency(trade.price)}</td>
       <td class="text-center">${formatCurrency(unrealizedPl)}</td>
       <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
-      <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
           ${actions}
@@ -349,4 +382,23 @@ function renderTradeRow(trade, isPaper, title) {
 
 	// Added class and data attribute for the future modal handler to capture row click
 	return `<tr data-id="${trade.id}" class="clickable-trade-row" data-trade-type="${title.toLowerCase().replace(" ", "-")}">${rowContent}</tr>`;
+}
+
+/**
+ * Renders a single row for the "Closed Paper Trades" table.
+ * @param {PaperTradeSummary} trade - The closed paper trade summary object.
+ * @returns {string} The HTML string for the table row.
+ */
+function renderClosedPaperTradeRow(trade) {
+	return `
+    <tr data-id="${trade.id}">
+      <td class="text-center">${trade.ticker}</td>
+      <td class="text-center">${trade.entry_date ? trade.entry_date.split("T")[0] : "N/A"}</td>
+      <td class="text-center">${trade.exit_date ? trade.exit_date.split("T")[0] : "N/A"}</td>
+      <td class="text-center">${formatCurrency(trade.entry_price)}</td>
+      <td class="text-center">${trade.exit_price ? formatCurrency(trade.exit_price) : "N/A"}</td>
+      <td class="text-center">${trade.pnl ? formatCurrency(trade.pnl) : "N/A"}</td>
+      <td class="text-center">${trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : "N/A"}</td>
+    </tr>
+  `;
 }

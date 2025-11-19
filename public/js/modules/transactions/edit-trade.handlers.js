@@ -100,7 +100,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 			const trade = await getTransaction(tradeId);
 			if (isSell) {
 				// --- SELL MODE ---
-				modalTitle.textContent = "Sell Trade";
+				modalTitle.textContent = isPaper ? "Close Paper Trade" : "Sell Trade";
 				submitButton.textContent = "Confirm Sell";
 				submitButton.dataset.action = "sell"; // Set action for the handler
 				/** @type {HTMLInputElement} */ (form.elements.namedItem("id")).value =
