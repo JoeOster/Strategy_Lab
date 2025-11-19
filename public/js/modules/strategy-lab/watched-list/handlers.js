@@ -66,6 +66,12 @@ export async function handleWatchedListClicks(event) {
 }
 // --- END: MOVED FROM strategy-lab/handlers.js ---
 
+// Add listener for trade creation/update events to refresh the watched list
+document.addEventListener('tradeCreated', () => {
+  console.log('Trade created/updated event received. Refreshing watched list.');
+  loadWatchedListContent();
+});
+
 /**
  * Handles the click to delete a "Trade Idea".
  * @param {string} id - The ID of the watched item.

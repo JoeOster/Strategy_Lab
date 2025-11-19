@@ -39,3 +39,12 @@ export async function sellTransaction(sellData) {
 export async function getExchanges() {
   return api.get('/api/exchanges');
 }
+
+/**
+ * Fetches the sum of sold quantities for a given original transaction ID.
+ * @param {string} transactionId - The ID of the original transaction.
+ * @returns {Promise<{sold_quantity: number}>} A promise that resolves to an object containing the sold quantity.
+ */
+export async function getSoldQuantity(transactionId) {
+  return api.get(`/api/transactions/sold-quantity/${transactionId}`);
+}

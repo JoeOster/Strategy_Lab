@@ -205,9 +205,21 @@ router.get('/:id/open-trades', async (req, res) => {
   const { id } = req.params;
   try {
     const db = await getDb();
-    // This query ensures ONLY real trades are returned.
+    // This query ensures ONLY real trades are returned and filters out fully sold trades.
     const trades = await db.all(
-      "SELECT * FROM transactions WHERE source_id = ? AND is_paper_trade = 0 AND status = 'open' AND UPPER(transaction_type) = 'BUY'",
+      `
+      SELECT
+          t_buy.*,
+          SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END) AS sold_quantity
+      FROM transactions t_buy
+      LEFT JOIN transactions t_sell ON t_buy.id = t_sell.original_transaction_id
+      WHERE t_buy.source_id = ?
+        AND UPPER(t_buy.transaction_type) = 'BUY'
+        AND t_buy.status = 'open'
+      GROUP BY t_buy.id
+      HAVING (t_buy.quantity - SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END)) > 0
+      ORDER BY t_buy.transaction_date DESC;
+      `,
       id
     );
 

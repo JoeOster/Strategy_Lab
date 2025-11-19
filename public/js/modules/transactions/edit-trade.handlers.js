@@ -5,7 +5,13 @@ import {
   moveIdeaToPaper,
   moveIdeaToRealTrade,
 } from '../strategy-lab/watched-list/api.js';
-import { getTransaction, sellTransaction, updateTransaction, getExchanges } from './api.js';
+import {
+  getExchanges,
+  getSoldQuantity,
+  getTransaction,
+  sellTransaction,
+  updateTransaction,
+} from './api.js';
 
 /**
  * Opens the "Edit Trade" modal for editing an existing trade or creating a new one from an idea.
@@ -24,6 +30,20 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
   const tickerInput = form.elements.ticker;
   const submitButton = form.querySelector('button[type="submit"]');
   const exchangeSelect = form.elements.exchange;
+  const limitLowInput = form.elements.limit_low;
+  const limitHighInput = form.elements.limit_high;
+  const quantityInput = form.elements.quantity;
+
+  // Get references to labels
+  const exchangeLabel = document.querySelector(
+    'label[for="edit-trade-exchange"]'
+  );
+  const limitLowLabel = document.querySelector(
+    'label[for="edit-trade-limit-low"]'
+  );
+  const limitHighLabel = document.querySelector(
+    'label[for="edit-trade-limit-high"]'
+  );
 
   // Reset form and ticker state
   form.reset();
@@ -34,11 +54,25 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
     existingSellInput.remove();
   }
 
+  // Default to showing all fields
+  [
+    exchangeSelect,
+    limitLowInput,
+    limitHighInput,
+    exchangeLabel,
+    limitLowLabel,
+    limitHighLabel,
+  ].forEach((el) => {
+    if (el) el.style.display = '';
+  });
+  quantityInput.removeAttribute('max'); // Clear any previous max attribute
+
   try {
     // Populate exchanges dropdown
     const exchanges = await getExchanges();
-    exchangeSelect.innerHTML = '<option value="" disabled selected>Select an Exchange</option>';
-    exchanges.forEach(exchange => {
+    exchangeSelect.innerHTML =
+      '<option value="" disabled selected>Select an Exchange</option>';
+    exchanges.forEach((exchange) => {
       const option = document.createElement('option');
       option.value = exchange.id;
       option.textContent = exchange.name;
@@ -54,9 +88,28 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
         form.elements.id.value = trade.id;
         tickerInput.value = trade.ticker;
         tickerInput.readOnly = true;
-        form.elements.quantity.value = trade.quantity; // Pre-fill with available quantity
         form.elements.price.value = trade.current_price || ''; // Pre-fill with current price if available
         exchangeSelect.value = trade.exchange_id; // Pre-select exchange
+
+        // Fetch sold quantity and calculate available quantity
+        const { sold_quantity: currentSoldQuantity } =
+          await getSoldQuantity(tradeId);
+        const availableQuantity = trade.quantity - currentSoldQuantity;
+        quantityInput.value = availableQuantity; // Pre-fill with available quantity
+        quantityInput.setAttribute('max', availableQuantity); // Set max attribute
+
+        // Hide unnecessary fields for sell mode
+        [
+          exchangeSelect,
+          limitLowInput,
+          limitHighInput,
+          exchangeLabel,
+          limitLowLabel,
+          limitHighLabel,
+        ].forEach((el) => {
+          if (el) el.style.display = 'none';
+        });
+        exchangeSelect.removeAttribute('required');
 
         // Add a hidden input to signify this is a sell action
         const sellInput = document.createElement('input');
@@ -71,9 +124,10 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
         form.elements.id.value = trade.id;
         tickerInput.value = trade.ticker;
         tickerInput.readOnly = true; // Lock ticker when editing
-        form.elements.quantity.value = trade.quantity;
+        quantityInput.value = trade.quantity;
         form.elements.price.value = trade.price;
         exchangeSelect.value = trade.exchange_id; // Pre-select exchange
+        exchangeSelect.setAttribute('required', 'required');
       }
     } else if (ideaId) {
       // --- NEW TRADE MODE ---
@@ -87,10 +141,11 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
       form.elements.is_paper.value = isPaper;
       tickerInput.value = idea.ticker;
       tickerInput.readOnly = true; // Lock ticker when creating from idea
+      exchangeSelect.setAttribute('required', 'required');
     }
 
     modal.style.display = 'block';
-  } catch (error) { 
+  } catch (error) {
     console.error('Failed to open trade modal:', error);
     alert('Error: Could not open trade modal. Please check the console.');
   }
@@ -114,10 +169,37 @@ export function closeEditTradeModal() {
     modal.style.display = 'none';
     const form = document.getElementById('edit-trade-form');
     const tickerInput = form.elements.ticker;
+    const exchangeSelect = form.elements.exchange;
+    const limitLowInput = form.elements.limit_low;
+    const limitHighInput = form.elements.limit_high;
+
+    // Get references to labels
+    const exchangeLabel = document.querySelector(
+      'label[for="edit-trade-exchange"]'
+    );
+    const limitLowLabel = document.querySelector(
+      'label[for="edit-trade-limit-low"]'
+    );
+    const limitHighLabel = document.querySelector(
+      'label[for="edit-trade-limit-high"]'
+    );
 
     form.removeEventListener('submit', handleEditTradeSubmit);
     tickerInput.readOnly = false; // Always reset readonly state
     form.reset();
+
+    // Ensure all fields are visible when closing the modal
+    [
+      exchangeSelect,
+      limitLowInput,
+      limitHighInput,
+      exchangeLabel,
+      limitLowLabel,
+      limitHighLabel,
+    ].forEach((el) => {
+      if (el) el.style.display = '';
+    });
+    exchangeSelect.setAttribute('required', 'required');
   }
 }
 

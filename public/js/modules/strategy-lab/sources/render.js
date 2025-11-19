@@ -291,40 +291,43 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
     <thead>
       <tr>
         <th>Ticker</th>
-        <th>Quantity</th>
-        <th>Entry Date</th>
+        <th>Qty Purchased</th>
+        <th>Qty Remaining</th>
         <th>Entry Price</th>
+        <th>Unrealized $/ %</th>
         <th>Current Price</th>
-        <th>Unrealized P&L</th>
-        <th>Unrealized P&L %</th>
         <th class="actions-column">Actions</th>
       </tr>
     </thead>
     <tbody>
       ${openTrades
-        .map(
-          (trade) => `
-        <tr data-id="${trade.id}">
-          <td>${trade.ticker || ''}</td>
-          <td>${trade.quantity || ''}</td>
-          <td>${trade.transaction_date ? trade.transaction_date.split('T')[0] : 'N/A'}</td>
-          <td>${trade.price || 'N/A'}</td>
-          <td>${trade.current_price || 'N/A'}</td>
-          <td>${trade.pnl !== null ? trade.pnl.toFixed(2) : 'N/A'}</td>
-          <td>${trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A'}</td>
-          <td class="actions-column">
-            <div class="table-actions">
-              <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${
-                trade.id
-              }">Details</button>
-              <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${
-                trade.id
-              }">Sell</button>
-            </div>
-          </td>
-        </tr>
-      `
-        )
+        .map((trade) => {
+          const qtyRemaining = trade.quantity - (trade.sold_quantity || 0);
+          const unrealizedPL = trade.pnl !== null ? trade.pnl.toFixed(2) : 'N/A';
+          const unrealizedPLPct = trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A';
+          const unrealizedCombined = `${unrealizedPL} / ${unrealizedPLPct}`;
+
+          return `
+            <tr data-id="${trade.id}">
+              <td>${trade.ticker || ''}</td>
+              <td>${trade.quantity || ''}</td>
+              <td>${qtyRemaining}</td>
+              <td>${trade.price || 'N/A'}</td>
+              <td>${unrealizedCombined}</td>
+              <td>${trade.current_price || 'N/A'}</td>
+              <td class="actions-column">
+                <div class="table-actions">
+                  <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${
+                    trade.id
+                  }">Details</button>
+                  <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${
+                    trade.id
+                  }">Sell</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
         .join('')}
     </tbody>
   `;
