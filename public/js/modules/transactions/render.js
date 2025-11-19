@@ -51,7 +51,9 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 	table.innerHTML = `
     <thead><tr>${tableHeaders}</tr></thead>
     <tbody>
-      ${trades.map((trade) => renderTradeRow(trade, true, "Paper Trades")).join("")}
+      ${trades
+				.map((trade) => renderTradeRow(trade, true, "Paper Trades"))
+				.join("")}
     </tbody>
   `;
 	// Append the table to the card wrapper, then the wrapper to the container
@@ -205,7 +207,7 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 
 	// Filter for only REAL closed trades (where is_paper_trade is not 1)
 	const realTrades = trades
-		? trades.filter((trade) => trade.is_paper_trade != 1)
+		? trades.filter((trade) => trade.is_paper_trade !== 1)
 		: [];
 	if (!realTrades || realTrades.length === 0) {
 		cardWrapper.innerHTML += "<p>No test trades found.</p>";
@@ -241,7 +243,9 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
         <td>${trade.realized_pl_pct.toFixed(2)}%</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="btn table-action-btn btn-secondary small-btn" data-id="${trade.id}">Details</button>
+            <button class="btn table-action-btn btn-secondary small-btn" data-id="${
+							trade.id
+						}">Details</button>
           </div>
         </td>
       </tr>
@@ -282,7 +286,9 @@ function renderTradeRow(trade, isPaper, title) {
 	// Logic for the current price cell, including the new placeholder icon
 	const currentPriceCell =
 		trade.current_price !== null && trade.current_price !== undefined
-			? `${formatCurrency(trade.current_price)} <i class="price-movement-icon"></i>`
+			? `${formatCurrency(
+					trade.current_price,
+				)} <i class="price-movement-icon"></i>`
 			: "N/A";
 
 	let rowContent = "";
@@ -300,10 +306,18 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${trade.quantity}</td>
       <td class="text-center">-</td>
       <td class="text-center">${formatCurrency(entryPrice)}</td>
-      <td class="text-center">${trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"}</td>
-      <td class="text-center">${trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"}</td>
-      <td class="text-center">${unrealizedPl !== null ? formatCurrency(unrealizedPl) : "N/A"}</td>
-      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${
+				trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"
+			}</td>
+      <td class="text-center">${
+				trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"
+			}</td>
+      <td class="text-center">${
+				unrealizedPl !== null ? formatCurrency(unrealizedPl) : "N/A"
+			}</td>
+      <td class="text-center">${
+				unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"
+			}</td>
       <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
@@ -322,10 +336,16 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${trade.quantity || ""}</td>
       <td class="text-center">${qtyRemaining}</td>
       <td class="text-center">${formatCurrency(trade.price)}</td>
-      <td class="text-center">${trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"}</td>
-      <td class="text-center">${trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"}</td>
+      <td class="text-center">${
+				trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"
+			}</td>
+      <td class="text-center">${
+				trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"
+			}</td>
       <td class="text-center">${formatCurrency(unrealizedPl)}</td>
-      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${
+				unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"
+			}</td>
       <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
@@ -336,7 +356,11 @@ function renderTradeRow(trade, isPaper, title) {
 	}
 
 	// Added class and data attribute for the future modal handler to capture row click
-	return `<tr data-id="${trade.id}" class="clickable-trade-row" data-trade-type="${title.toLowerCase().replace(" ", "-")}">${rowContent}</tr>`;
+	return `<tr data-id="${
+		trade.id
+	}" class="clickable-trade-row" data-trade-type="${title
+		.toLowerCase()
+		.replace(" ", "-")}">${rowContent}</tr>`;
 }
 
 /**
@@ -348,12 +372,20 @@ function renderClosedPaperTradeRow(trade) {
 	return `
     <tr data-id="${trade.id}">
       <td class="text-center">${trade.ticker}</td>
-      <td class="text-center">${trade.entry_date ? trade.entry_date.split("T")[0] : "N/A"}</td>
-      <td class="text-center">${trade.exit_date ? trade.exit_date.split("T")[0] : "N/A"}</td>
+      <td class="text-center">${
+				trade.entry_date ? trade.entry_date.split("T")[0] : "N/A"
+			}</td>
+      <td class="text-center">${
+				trade.exit_date ? trade.exit_date.split("T")[0] : "N/A"
+			}</td>
       <td class="text-center">${formatCurrency(trade.entry_price)}</td>
-      <td class="text-center">${trade.exit_price ? formatCurrency(trade.exit_price) : "N/A"}</td>
+      <td class="text-center">${
+				trade.exit_price ? formatCurrency(trade.exit_price) : "N/A"
+			}</td>
       <td class="text-center">${trade.pnl ? formatCurrency(trade.pnl) : "N/A"}</td>
-      <td class="text-center">${trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${
+				trade.return_pct ? `${trade.return_pct.toFixed(2)}%` : "N/A"
+			}</td>
     </tr>
   `;
 }

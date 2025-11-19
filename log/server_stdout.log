@@ -1,0 +1,72 @@
+
+> strategy_lab@1.0.0 start
+> cross-env NODE_ENV=development node server.js
+
+api/index.js router initialized.
+Database connection and migrations successful.
+Server is running on http://localhost:8080
+[2025-11-19T21:45:24.172Z] GET /
+[2025-11-19T21:45:24.426Z] GET /
+[2025-11-19T21:45:24.471Z] GET /css/main.css?v=1.0.2
+[2025-11-19T21:45:24.475Z] GET /css/themes.css?v=1.0.1
+[2025-11-19T21:45:24.481Z] GET /images/strategy-lab-logo.svg
+[2025-11-19T21:45:24.487Z] GET /js/app-main.js
+[2025-11-19T21:45:24.512Z] GET /css/base.css
+[2025-11-19T21:45:24.525Z] GET /css/navigation.css
+[2025-11-19T21:45:24.528Z] GET /css/forms.css
+[2025-11-19T21:45:24.532Z] GET /css/modals.css
+[2025-11-19T21:45:24.537Z] GET /css/components.css
+[2025-11-19T21:45:24.540Z] GET /css/settings.css
+[2025-11-19T21:45:24.547Z] GET /css/strategy-lab.css
+[2025-11-19T21:45:24.550Z] GET /css/themes.css
+[2025-11-19T21:45:24.552Z] GET /js/modules/navigation/index.js
+[2025-11-19T21:45:24.555Z] GET /js/modules/settings/appearance.handlers.js
+[2025-11-19T21:45:24.557Z] GET /js/modules/strategy-lab/paper-trades/new-render.js
+[2025-11-19T21:45:24.560Z] GET /js/modules/transactions/edit-trade.handlers.js
+[2025-11-19T21:45:24.566Z] GET /js/modules/user-selector/index.js
+[2025-11-19T21:45:24.575Z] GET /js/utils/loadHtmlPartial.js
+[2025-11-19T21:45:24.685Z] GET /js/modules/strategy-lab/watched-list/api.js
+[2025-11-19T21:45:24.690Z] GET /js/modules/transactions/api.js
+[2025-11-19T21:45:24.752Z] GET /js/services/apiFetch.js
+[2025-11-19T21:45:24.759Z] GET /_source-form-modal.html
+[2025-11-19T21:45:24.913Z] GET /images/contacts/default.png
+[2025-11-19T21:45:24.915Z] GET /_source-detail-modal.html
+[2025-11-19T21:45:24.919Z] GET /favicon.ico
+[2025-11-19T21:45:24.929Z] GET /_add-strategy-modal.html
+[2025-11-19T21:45:24.959Z] GET /_sell-trade-modal.html
+[2025-11-19T21:45:24.966Z] GET /_edit-trade-modal.html
+[2025-11-19T21:45:24.972Z] GET /_paper-trade-details-modal.html
+[2025-11-19T21:45:24.993Z] GET /_add-idea-modal.html
+[2025-11-19T21:45:25.003Z] GET /_edit-strategy-modal.html
+[2025-11-19T21:45:25.033Z] GET /_dashboard.html
+[2025-11-19T21:45:25.093Z] GET /js/modules/dashboard/index.js
+[2025-11-19T21:45:29.226Z] GET /_strategy-lab.html
+[2025-11-19T21:45:29.232Z] GET /js/modules/strategy-lab/index.js
+[2025-11-19T21:45:29.251Z] GET /js/modules/strategy-lab/handlers.js
+[2025-11-19T21:45:29.254Z] GET /js/modules/strategy-lab/sources/handlers.js
+[2025-11-19T21:45:29.256Z] GET /js/modules/strategy-lab/watched-list/handlers.js
+[2025-11-19T21:45:29.261Z] GET /js/modules/strategy-lab/paper-trades/handlers.js
+[2025-11-19T21:45:29.263Z] GET /js/modules/settings/sources.api.js
+[2025-11-19T21:45:29.264Z] GET /js/modules/strategy-lab/sources/modal.handlers.js
+[2025-11-19T21:45:29.266Z] GET /js/modules/strategy-lab/sources/render.js
+[2025-11-19T21:45:29.267Z] GET /js/modules/strategy-lab/sources/idea-form.handlers.js
+[2025-11-19T21:45:29.269Z] GET /js/modules/strategy-lab/watched-list/render.js
+[2025-11-19T21:45:29.275Z] GET /js/modules/strategy-lab/paper-trades/api.js
+[2025-11-19T21:45:29.304Z] GET /js/api.js
+[2025-11-19T21:45:29.311Z] GET /js/modules/settings/sources.handlers.js
+[2025-11-19T21:45:29.325Z] GET /js/modules/transactions/render.js
+[2025-11-19T21:45:29.327Z] GET /js/modules/strategy-lab/sources/api.js
+[2025-11-19T21:45:29.328Z] GET /js/modules/strategy-lab/sources/strategy-form.handlers.js
+[2025-11-19T21:45:29.330Z] GET /js/modules/transactions/paper-trade-details.handlers.js
+[2025-11-19T21:45:29.333Z] GET /js/utils/formatters.js
+[2025-11-19T21:45:29.356Z] GET /js/utils/sortUtils.js
+[2025-11-19T21:45:29.358Z] GET /js/modules/settings/sources_books.handlers.js
+[2025-11-19T21:45:29.359Z] GET /js/modules/settings/webapps.api.js
+[2025-11-19T21:45:29.383Z] GET /api/sources
+[2025-11-19T21:45:30.585Z] GET /api/watched-items/ideas
+Fetching price for INTC from Finnhub...
+Successfully fetched price for INTC: 35.11
+[2025-11-19T21:45:31.787Z] GET /api/transactions/paper-trades
+[2025-11-19T21:45:33.164Z] GET /api/watched-items/ideas
+Fetching price for INTC from Finnhub...
+Successfully fetched price for INTC: 35.11

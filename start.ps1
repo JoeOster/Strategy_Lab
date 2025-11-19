@@ -63,10 +63,10 @@ function Ensure-Dependencies {
 function Run-QualityChecks {
     Clear-Host
     Write-Log "Running Biome to format and lint all files..."
-    # npm run fix *>&1 | ForEach-Object { Write-Log $_ }
+    npm run fix:biome *>&1 | ForEach-Object { Write-Log $_ }
 
-    # Write-Log "Checking for any remaining Biome errors..."
-    # npm run check *>&1 | ForEach-Object { Write-Log $_ }
+    Write-Log "Checking for any remaining Biome errors..."
+    npm run check:biome *>&1 | ForEach-Object { Write-Log $_ }
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "`n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red

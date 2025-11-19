@@ -36,36 +36,36 @@ a task log.
 Upon receiving a "Task Assignment," the Servant (GCA) **must** perform the
 following actions:
 
-1.  Read all guiding documents specified by the Leader (e.g.,
+1. Read all guiding documents specified by the Leader (e.g.,
     `V4_Migration_Map.md`, `Strategy-Lab_Wiring_Guide.md`).
-2.  Break the Leader's high-level task into a detailed, step-by-step checklist.
+2. Break the Leader's high-level task into a detailed, step-by-step checklist.
     This must account for all required file creations, modifications, and
     deletions.
-3.  Write this checklist into a new file named `docs/CURRENT_TASK_LOG.md`. This
+3. Write this checklist into a new file named `docs/CURRENT_TASK_LOG.md`. This
     log is a living document and should be updated as the task progresses to
     maintain context.
-4.  Report back to the Leader: "Log created. Ready to execute."
+4. Report back to the Leader: "Log created. Ready to execute."
 
 ### Phase 3: Execution (Leader)
 
 The Leader will initiate **one of two** execution modes:
 
-1.  **Single-Step Mode:** "GCA, execute the _next_ incomplete step from
+1. **Single-Step Mode:** "GCA, execute the _next_ incomplete step from
     `docs/CURRENT_TASK_LOG.md`."
-2.  **Continuous Mode:** "GCA, **run** `docs/CURRENT_TASK_LOG.md`."
+2. **Continuous Mode:** "GCA, **run** `docs/CURRENT_TASK_LOG.md`."
 
 ### Phase 4: Atomic Execution & State Update (Servant)
 
 This is the Servant's **Primary Directive** during execution.
 
-1.  **Read:** Read the `docs/CURRENT_TASK_LOG.md` file.
-2.  **Find:** Identify the _first_ incomplete step (e.g., `[ ] Step 4`).
-3.  **Execute:** Perform the action for _only_ that single step.
-4.  **Update:** _After_ the step is successfully completed, **immediately update
+1. **Read:** Read the `docs/CURRENT_TASK_LOG.md` file.
+2. **Find:** Identify the _first_ incomplete step (e.g., `[ ] Step 4`).
+3. **Execute:** Perform the action for _only_ that single step.
+4. **Update:** _After_ the step is successfully completed, **immediately update
     the `docs/CURRENT_TASK_LOG.md` file** to mark the step as complete (e.g.,
     `[x] Step 4`). This update should also include any new insights or changes
     to the plan that emerged during the execution of the step.
-5.  **Loop or Stop:**
+5. **Loop or Stop:**
     - If in "Continuous Mode," loop back to Step 1.
     - If in "Single-Step Mode," stop and await the Leader's next command.
 
@@ -73,16 +73,16 @@ This is the Servant's **Primary Directive** during execution.
 
 This is how we recover from _all_ errors, including GCA (LLM) context loss.
 
-1.  **Servant's Duty (The "Circuit Breaker"):** If the Servant (GCA) encounters
+1. **Servant's Duty (The "Circuit Breaker"):** If the Servant (GCA) encounters
     _any_ error (lint, test, `ReferenceError`, or internal LLM error) during
     "Execute" (Phase 4, Step 3), it **must** stop all work immediately.
-2.  **Servant's Duty (State Integrity):** The Servant **must not** mark the
+2. **Servant's Duty (State Integrity):** The Servant **must not** mark the
     failed step as complete.
-3.  **Leader's Action (Recovery):** The Leader will recover from _any_ error
+3. **Leader's Action (Recovery):** The Leader will recover from _any_ error
     (even a vanished chat dialog) by simply re-issuing the "Continuous Mode"
     command:
     > "GCA, **run** `docs/CURRENT_TASK_LOG.md`."
-4.  **Servant's Duty (Resumption):** Upon receiving this command, the Servant
+4. **Servant's Duty (Resumption):** Upon receiving this command, the Servant
     will (as per Phase 4) read the log, find the _first incomplete step_ (the
     one that failed), and resume work from that exact point. This prevents
     "garbage code" and ensures the plan is followed precisely.

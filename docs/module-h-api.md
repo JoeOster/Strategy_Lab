@@ -35,18 +35,18 @@ This file schedules all automated backend tasks, "untangled" from the old
 
 This is the "contract" for our new, "untangled" watchers.
 
-1.  **`runHighPriorityWatcher()` (Priority 1)**
+1. **`runHighPriorityWatcher()` (Priority 1)**
     - Gets targets from `pending_orders` and `journal_entries`.
     - Gets prices using `priceService.js` (this will be a high-priority call).
     - If a price is met, it sets the item's `status` to `ALERT` and sets the
       global `state.hasNewAlerts` flag to `true`.
-2.  **`runStaticDataPull()` (Priority 2)**
+2. **`runStaticDataPull()` (Priority 2)**
     - Gets all unique tickers from the `transactions` and `journal_entries`
       tables.
     - Calls the appropriate `priceService.js` function to fetch non-static data
       (e.g., EOD prices, etc.).
     - Saves this data to the database (e.g., `historical_prices`).
-3.  **`runCompanyProfileBackfill()` (Priority 3)**
+3. **`runCompanyProfileBackfill()` (Priority 3)**
     - Finds any ticker in the database that does _not_ have an entry in the
       `company_profile` table.
     - Uses a (low-priority) `priceService.js` call to fetch and save the static

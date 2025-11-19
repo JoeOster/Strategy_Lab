@@ -53,7 +53,9 @@ router.post("/ideas", async (req, res) => {
 			now,
 		].map((v) => (v === "" ? null : v));
 		const placeholders = columns.map(() => "?").join(",");
-		const sql = `INSERT INTO watched_items (${columns.join(",")}) VALUES (${placeholders})`;
+		const sql = `INSERT INTO watched_items (${columns.join(
+			",",
+		)}) VALUES (${placeholders})`;
 		const result = await db.run(sql, values);
 		const newIdeaId = result.lastID;
 

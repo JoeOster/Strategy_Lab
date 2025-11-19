@@ -193,21 +193,21 @@ This keeps each piece of logic small, isolated, and highly maintainable.
 To mitigate potential LLM issues and ensure precise execution, the following
 workflow clarifications are in effect:
 
-1.  **High-Level Plans in `Strategy_Lab_V2_Plan.md`:** This document
+1. **High-Level Plans in `Strategy_Lab_V2_Plan.md`:** This document
     (`Strategy_Lab_V2_Plan.md`) will contain only high-level task definitions
     and architectural plans. It will _not_ contain granular, step-by-step
     instructions for implementation.
-2.  **Granular Steps in `docs/CURRENT_TASK_LOG.md`:** All detailed, step-by-step
+2. **Granular Steps in `docs/CURRENT_TASK_LOG.md`:** All detailed, step-by-step
     instructions for an active task will reside exclusively in
     `docs/CURRENT_TASK_LOG.md`. Each step will be represented as a checklist
     item (`- [ ]` or `- [x]`).
-3.  **Explicit Approval for Execution:** The agent (GCA/Servant) **must**
+3. **Explicit Approval for Execution:** The agent (GCA/Servant) **must**
     present the next granular step from `docs/CURRENT_TASK_LOG.md` and await
     explicit user approval before executing _any_ command that modifies the file
     system or codebase.
-4.  **Atomic Execution and Check-off:** Upon receiving approval, the agent will
+4. **Atomic Execution and Check-off:** Upon receiving approval, the agent will
     execute _only_ the approved step, and then immediately mark that step as
     complete (`- [x]`) in `docs/CURRENT_TASK_LOG.md`.
-5.  **No Unilateral Code Generation:** The agent will _never_ proceed with code
+5. **No Unilateral Code Generation:** The agent will _never_ proceed with code
     generation, file creation, or modification without explicit, step-by-step
     approval from the user, even if a plan has been established.

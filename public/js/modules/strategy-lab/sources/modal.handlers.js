@@ -15,7 +15,7 @@ import {
 	pct_renderTradesTable,
 	renderOpenTradesForSource,
 	renderPaperTradesForSource,
-	tct_renderTradesTable
+	tct_renderTradesTable,
 } from "../../transactions/render.js";
 import { handleDeletePaperTradeClick } from "../paper-trades/handlers.js";
 import * as watchedListHandlers from "../watched-list/handlers.js";
@@ -25,7 +25,7 @@ import {
 	getOpenTradesForSource,
 	getPaperTradesForSource,
 	getStrategiesForSource, // TCT: Import the new API function
-	tct_getTradesForSource
+	tct_getTradesForSource,
 } from "./api.js";
 import { handleShowIdeaForm } from "./idea-form.handlers.js";
 import {
@@ -74,7 +74,16 @@ export async function pct_loadTrades(sourceId) {
 				const pnl = (sellTrade.price - buyTrade.price) * buyTrade.quantity;
 				const return_pct = (pnl / (buyTrade.price * buyTrade.quantity)) * 100;
 
-				return { id: buyTrade.id, ticker: buyTrade.ticker, entry_date: buyTrade.transaction_date, exit_date: sellTrade.transaction_date, entry_price: buyTrade.price, exit_price: sellTrade.price, pnl, return_pct };
+				return {
+					id: buyTrade.id,
+					ticker: buyTrade.ticker,
+					entry_date: buyTrade.transaction_date,
+					exit_date: sellTrade.transaction_date,
+					entry_price: buyTrade.price,
+					exit_price: sellTrade.price,
+					pnl,
+					return_pct,
+				};
 			})
 			.filter(Boolean);
 
@@ -114,7 +123,8 @@ export async function openSourceDetailModal(sourceId) {
 		ideasPlaceholder.innerHTML = "<h3>Open Ideas</h3><p>Loading...</p>";
 	}
 	if (openTradesPlaceholder) {
-		openTradesPlaceholder.innerHTML = "<h3>Retail Trades - Open</h3><p>Loading...</p>";
+		openTradesPlaceholder.innerHTML =
+			"<h3>Retail Trades - Open</h3><p>Loading...</p>";
 	}
 	if (testClosedTradesPlaceholder) {
 		testClosedTradesPlaceholder.innerHTML =
@@ -341,7 +351,6 @@ export function closeSourceDetailModal() {
 		);
 		if (testClosedTrades) testClosedTrades.innerHTML = "";
 
-
 		// Remove event listener for the modal body
 		const modalBody = modal.querySelector(".modal-body");
 		if (modalBody) {
@@ -474,7 +483,12 @@ export async function loadOpenTradesForSource(sourceId) {
 	const containerId = "open-trades-table-placeholder";
 	try {
 		const trades = await getOpenTradesForSource(sourceId);
-		renderOpenTradesForSource(trades, containerId, null, "Retail Trades - Open");
+		renderOpenTradesForSource(
+			trades,
+			containerId,
+			null,
+			"Retail Trades - Open",
+		);
 	} catch (err) {
 		console.error(`Failed to load open trades for source ${sourceId}:`, err);
 		const error = err instanceof Error ? err : new Error(String(err));

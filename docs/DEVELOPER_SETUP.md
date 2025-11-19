@@ -11,10 +11,10 @@ directory must exist in the project root.
 
 **If you encounter `SQLITE_CANTOPEN: unable to open database file` errors:**
 
-1.  **Ensure the `db` directory exists:**
+1. **Ensure the `db` directory exists:**
     - Navigate to the project root directory in your terminal.
     - Run the command: `mkdir db`
-2.  **Check file permissions:** Ensure that the application process has read and
+2. **Check file permissions:** Ensure that the application process has read and
     write permissions to the `db` directory and the `strategy_lab.db` file (once
     created).
 
@@ -52,18 +52,18 @@ the time the script runs, or the selector used to find the element is incorrect.
 
 **Resolution:**
 
-1.  **Inspect the Error Location:** The console error will provide a file and
+1. **Inspect the Error Location:** The console error will provide a file and
     line number (e.g., `index.js:39`). Open this file and identify the
     JavaScript line causing the error.
-2.  **Identify the Target Element:** Determine which HTML element the JavaScript
+2. **Identify the Target Element:** Determine which HTML element the JavaScript
     is trying to interact with (e.g.,
     `document.getElementById('save-settings-button')` means it's looking for an
     element with `id="save-settings-button"`).
-3.  **Verify HTML:** Open `public/index.html` (or the relevant HTML partial,
+3. **Verify HTML:** Open `public/index.html` (or the relevant HTML partial,
     e.g., `public/_settings.html` if applicable) and confirm that the element
     exists and its `id` or `class` attribute exactly matches what the JavaScript
     is looking for.
-4.  **Check for Typos:** Double-check for any typos in the element's `id` or
+4. **Check for Typos:** Double-check for any typos in the element's `id` or
     `class` in both the HTML and JavaScript.
 
 By following these steps, you can effectively set up your development

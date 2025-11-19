@@ -52,24 +52,32 @@ async function fetchSinglePrice(ticker, apiKey) {
 		if (!apiKey) throw new Error("API key not provided for this request.");
 		const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
 		console.log(
-			`[${getTimestamp()}] [Price Service] Submitting request for ${ticker} using key ending in ${apiKey.slice(-4)}`,
+			`[${getTimestamp()}] [Price Service] Submitting request for ${ticker} using key ending in ${apiKey.slice(
+				-4,
+			)}`,
 		);
 		const apiRes = await fetch(url);
 		if (apiRes.ok) {
 			const data = await apiRes.json();
 			console.log(
-				`[${getTimestamp()}] [Price Service] Received data for ${ticker}: ${JSON.stringify(data)}`,
+				`[${getTimestamp()}] [Price Service] Received data for ${ticker}: ${JSON.stringify(
+					data,
+				)}`,
 			);
 			if (data && typeof data.c === "number" && data.c > 0) {
 				return data.c;
 			}
 			console.warn(
-				`[${getTimestamp()}] [Price Service Warning] Ticker '${ticker}' returned invalid price data: ${JSON.stringify(data)}`,
+				`[${getTimestamp()}] [Price Service Warning] Ticker '${ticker}' returned invalid price data: ${JSON.stringify(
+					data,
+				)}`,
 			);
 			return "invalid";
 		}
 		console.error(
-			`[${getTimestamp()}] [Price Service Error] API call for ${ticker} failed with status: ${apiRes.status}`,
+			`[${getTimestamp()}] [Price Service Error] API call for ${ticker} failed with status: ${
+				apiRes.status
+			}`,
 		);
 		return "invalid";
 	} catch (error) {

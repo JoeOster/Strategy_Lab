@@ -11,19 +11,19 @@ controls within the Source Details modal.
   classes. The user previously mentioned wanting "buttons inheriting default CSS
   except for size" and a `.small-btn` class.
 - **Proposed Solution:**
-  1.  **Define a `.small-btn` class:** Create a CSS class `.small-btn` in
+  1. **Define a `.small-btn` class:** Create a CSS class `.small-btn` in
       `public/css/components.css` (or `modals.css` if more specific) to control
       button size. This class will set `padding`, `font-size`, and potentially
       `min-width`/`height` to achieve a smaller button appearance while
       inheriting other default button styles.
-  2.  **Apply `.small-btn`:** Add the `.small-btn` class to all action buttons
+  2. **Apply `.small-btn`:** Add the `.small-btn` class to all action buttons
       within the tables rendered by `renderStrategiesTable`,
       `renderTradeIdeasTable`, and `renderOpenIdeasForSource`.
-  3.  **Review existing button classes:** Ensure that `btn` is always present
+  3. **Review existing button classes:** Ensure that `btn` is always present
       for default styling, and `btn-secondary`/`btn-danger` are used
       appropriately for semantic meaning (e.g., primary action, destructive
       action). Remove redundant or conflicting styling.
-  4.  **Standardize button order:** For consistency, establish a standard order
+  4. **Standardize button order:** For consistency, establish a standard order
       for action buttons (e.g., primary action first, then secondary, then
       destructive).
 
@@ -33,14 +33,14 @@ controls within the Source Details modal.
   Idea", "Edit", and "Delete" buttons. The layout and spacing might be
   inconsistent.
 - **Proposed Solution:**
-  1.  **Review `strategy-table` CSS:** Inspect `public/css/strategy-lab.css` (or
+  1. **Review `strategy-table` CSS:** Inspect `public/css/strategy-lab.css` (or
       other relevant CSS files) for `strategy-table` to ensure proper padding,
       alignment, and responsiveness.
-  2.  **Standardize "Actions" column width:** Ensure the "Actions" column has a
+  2. **Standardize "Actions" column width:** Ensure the "Actions" column has a
       consistent and appropriate width across all tables to prevent wrapping or
       excessive spacing. This might involve setting a `min-width` or `width` on
       the `<th>` and `<td>` elements for the actions column.
-  3.  **Button Grouping (Optional but Recommended):** Consider wrapping action
+  3. **Button Grouping (Optional but Recommended):** Consider wrapping action
       buttons in a container (e.g., a `div` with a class like `table-actions`)
       to allow for more controlled layout (e.g., using flexbox for spacing and
       alignment within the cell).

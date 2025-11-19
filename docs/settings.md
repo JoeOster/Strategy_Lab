@@ -22,16 +22,18 @@ to the `db` directory. A common diagnostic step is to grant "Full Control" to
 "Everyone" for the `db` directory. **Note:** For production environments, it is
 recommended to apply more granular permissions.
 
-1.  **Open PowerShell as Administrator.**
-2.  **Execute the following command:**
+1. **Open PowerShell as Administrator.**
+2. **Execute the following command:**
+
     ```powershell
     $acl = Get-Acl "d:\Code Projects\Strategy_lab\db"; $permission = "Everyone","FullControl","Allow"; $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission; $acl.AddAccessRule($accessRule); Set-Acl "d:\Code Projects\Strategy_lab\db" $acl
     ```
+
     This command retrieves the current Access Control List (ACL) for the `db`
     directory, creates a new access rule granting "FullControl" to "Everyone",
     adds this rule to the ACL, and then applies the modified ACL back to the
     `db` directory.
-3.  **Restart the Node.js server process.**
+3. **Restart the Node.js server process.**
 
 After executing these steps, the server should be able to open and write to the
 `strategy_lab.db` file without the `SQLITE_CANTOPEN` error.
@@ -56,22 +58,22 @@ re-declaration within the file itself but rather:
 
 **Debugging Steps:**
 
-1.  **Verify Module Loading:** Ensure that
+1. **Verify Module Loading:** Ensure that
     `public/js/modules/settings/handlers.js` is imported only once in
     `public/js/modules/settings/index.js` (using
     `import * as handlers from './handlers.js';`) and that
     `initializeSettingsModule()` (which uses these handlers) is called only once
     in `public/js/app-main.js`.
-2.  **Check for Global Collisions:** Although less common with ES modules,
+2. **Check for Global Collisions:** Although less common with ES modules,
     temporarily rename the problematic function (`handleFontChange`) to see if
     the error changes or moves.
-3.  **Isolate the Function Logic:** If the error persists and module loading
+3. **Isolate the Function Logic:** If the error persists and module loading
     seems correct, temporarily comment out the entire body of the problematic
     function and replace it with a simple `console.log`. If the error
     disappears, the issue lies within the function's original implementation. If
     it persists, the problem is more fundamental to the file's parsing or
     loading.
-4.  **Review HTML Includes:** Confirm that the main JavaScript files
+4. **Review HTML Includes:** Confirm that the main JavaScript files
     (`app-main.js`) are not included multiple times in `public/index.html`.
 
 **Resolution:** In the specific case encountered, the module loading was

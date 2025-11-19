@@ -164,8 +164,12 @@ export function renderTradeIdeasTable(ideas) {
 			const row = document.createElement("tr");
 			row.innerHTML = `
         <td>${item.ticker || ""}</td>
-        <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(item.buy_price_high)}</td>
-        <td>${formatCurrency(item.take_profit_low)} / ${formatCurrency(item.take_profit_high)}</td>
+        <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(
+					item.buy_price_high,
+				)}</td>
+        <td>${formatCurrency(item.take_profit_low)} / ${formatCurrency(
+					item.take_profit_high,
+				)}</td>
         <td>${formatCurrency(item.escape_price)}</td>
         <td>${item.status || "WATCHING"}</td>
         <td class="actions-column">
@@ -236,7 +240,9 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 					(item) => `
         <tr data-id="${item.id}">
           <td>${item.ticker || ""}</td>
-          <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(item.buy_price_high)}</td>
+          <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(
+						item.buy_price_high,
+					)}</td>
           <td>${formatCurrency(item.take_profit_low)} / ${formatCurrency(
 						item.take_profit_high,
 					)}</td>

@@ -22,9 +22,11 @@ to understand and manage file permissions.
     help confirm if permissions are the root cause. Remember to refine
     permissions for production environments.
   - **Example PowerShell Command for Permissions:**
+
     ```powershell
     $acl = Get-Acl "d:\Code Projects\Strategy_lab\db"; $permission = "Everyone","FullControl","Allow"; $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission; $acl.AddAccessRule($accessRule); Set-Acl "d:\Code Projects\Strategy_lab\db" $acl
     ```
+
     Always restart the server process after modifying file permissions.
 
 ## Debugging JavaScript `SyntaxError` in Modules
@@ -103,7 +105,7 @@ by JavaScript.
 
 Here's the step-by-step flow:
 
-1.  **`public/index.html` (The Application Shell):**
+1. **`public/index.html` (The Application Shell):**
     - This is the initial HTML file loaded by the browser.
     - It provides the basic page structure: `<head>`, `<body>`, the main
       navigation (`.main-nav`), and a single empty content area
@@ -113,7 +115,7 @@ Here's the step-by-step flow:
     - **Key Role:** Acts as a static container that JavaScript will dynamically
       populate.
 
-2.  **`public/js/app-main.js` (The Application Entry Point):**
+2. **`public/js/app-main.js` (The Application Entry Point):**
     - This script executes once the DOM is fully loaded (`DOMContentLoaded`
       event).
     - It imports and calls initialization functions for core application
@@ -122,7 +124,7 @@ Here's the step-by-step flow:
     - **Key Role:** Orchestrates the initial setup and module loading for the
       entire application.
 
-3.  **`public/js/modules/navigation/index.js` (Main Navigation Conductor):**
+3. **`public/js/modules/navigation/index.js` (Main Navigation Conductor):**
     - The `initializeNavigation()` function (called from `app-main.js`) sets up
       the primary tab switching mechanism.
     - It attaches click event listeners to all main navigation buttons
@@ -152,7 +154,7 @@ Here's the step-by-step flow:
     - **Key Role:** Manages dynamic loading of HTML content and associated
       JavaScript for each main application tab.
 
-4.  **`public/_<tab-name>.html` (e.g., `public/_strategy-lab.html`):**
+4. **`public/_<tab-name>.html` (e.g., `public/_strategy-lab.html`):**
     - These are partial HTML files, each containing the specific UI structure
       for a given main application tab.
     - For example, `public/_strategy-lab.html` contains the
@@ -161,7 +163,7 @@ Here's the step-by-step flow:
     - **Key Role:** Provides the HTML template for a specific main tab, loaded
       on demand.
 
-5.  **`public/js/modules/<tab-name>/index.js` (e.g.,
+5. **`public/js/modules/<tab-name>/index.js` (e.g.,
     `public/js/modules/strategy-lab/index.js`):**
     - This script is dynamically loaded by `loadPageContent()` after its
       corresponding HTML (`public/_<tab-name>.html`) has been injected into the
@@ -173,7 +175,7 @@ Here's the step-by-step flow:
     - **Key Role:** Acts as the conductor for a specific main tab, initializing
       its functionality and sub-modules.
 
-6.  **`public/js/modules/<tab-name>/handlers.js` (e.g.,
+6. **`public/js/modules/<tab-name>/handlers.js` (e.g.,
     `public/js/modules/strategy-lab/handlers.js`):**
     - Contains event handler functions specific to the interactions within that
       main tab or its sub-tabs.
@@ -183,7 +185,7 @@ Here's the step-by-step flow:
     - **Key Role:** Implements the interactive behavior for a specific tab's UI
       elements.
 
-7.  **`public/css/main.css` (The Styling Layer):**
+7. **`public/css/main.css` (The Styling Layer):**
     - Contains the CSS rules that define the visual presentation of all UI
       elements.
     - Crucially, it includes rules like `.sub-tab-content { display: none; }`

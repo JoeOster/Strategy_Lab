@@ -80,8 +80,12 @@ function renderTradesTable(container, title, trades, error, isPaper) {
         <th class="${title === "Closed Trades" ? "hidden" : ""}">Current Price</th>
         <th class="${title === "Closed Trades" ? "hidden" : ""}">Unrealized P/L $</th>
         <th class="${title === "Closed Trades" ? "hidden" : ""}">Unrealized P/L %</th>
-        <th class="${title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""}">Realized P/L $</th>
-        <th class="${title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""}">Realized P/L %</th>
+        <th class="${
+					title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""
+				}">Realized P/L $</th>
+        <th class="${
+					title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""
+				}">Realized P/L %</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -138,15 +142,25 @@ function renderTradeRow(trade, isPaper, title) {
       <td>${trade.quantity}</td>
       <td>${entryDate ? entryDate.split("T")[0] : "N/A"}</td>
       <td>${entryPrice}</td>
-      <td class="${title === "Closed Trades" ? "hidden" : ""}">${trade.current_price || "N/A"}</td>
-      <td class="${title === "Closed Trades" ? "hidden" : ""}">${unrealizedPl !== null ? unrealizedPl.toFixed(2) : "N/A"}</td>
-      <td class="${title === "Closed Trades" ? "hidden" : ""}">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
-      <td class="${title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""}">${
+      <td class="${title === "Closed Trades" ? "hidden" : ""}">${
+				trade.current_price || "N/A"
+			}</td>
+      <td class="${title === "Closed Trades" ? "hidden" : ""}">${
+				unrealizedPl !== null ? unrealizedPl.toFixed(2) : "N/A"
+			}</td>
+      <td class="${title === "Closed Trades" ? "hidden" : ""}">${
+				unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"
+			}</td>
+      <td class="${
+				title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""
+			}">${
 				(isPaper || title === "Closed Trades") && trade.pnl
 					? trade.pnl.toFixed(2)
 					: "N/A"
 			}</td>
-      <td class="${title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""}">${
+      <td class="${
+				title === "Open Trades" || title === "Paper Trades" ? "hidden" : ""
+			}">${
 				(isPaper || title === "Closed Trades") && trade.return_pct
 					? `${trade.return_pct.toFixed(2)}%`
 					: "N/A"
