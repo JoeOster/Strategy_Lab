@@ -4,6 +4,7 @@
 /** @typedef {import('../../types.js').Transaction} Transaction */
 /** @typedef {import('../../types.js').TransactionWithPrice} TransactionWithPrice */
 /** @typedef {import('../../types.js').Transaction} Transaction */
+import { formatCurrency } from '../../utils/formatters.js';
 
 /**
  * Renders the table of "Paper Trades" for a source.
@@ -65,19 +66,46 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
 
   const table = document.createElement('table');
   table.className = 'strategy-table';
+
+  let tableHeaders = '';
+  if (title === 'Open Trades') {
+    tableHeaders = `
+      <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
+      <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
+      <th class="text-center sortable" title="Quantity Remaining" data-sort-key="qtyRemaining">Qty R.</th>
+      <th class="text-center sortable" title="Entry Price" data-sort-key="price">E. Price</th>
+      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar and Percentage" data-sort-key="unrealizedCombined">U. P/L $/ %</th>
+      <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
+      <th class="text-center">Actions</th>
+    `;
+  } else if (title === 'Closed Trades') {
+    tableHeaders = `
+      <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
+      <th class="text-center sortable" title="Entry Date" data-sort-key="entry_date">Entry Date</th>
+      <th class="text-center sortable" title="Entry Price" data-sort-key="entry_price">E. Price</th>
+      <th class="text-center sortable" title="Exit Date" data-sort-key="exit_date">Exit Date</th>
+      <th class="text-center sortable" title="Exit Price" data-sort-key="exit_price">Exit Price</th>
+      <th class="text-center sortable" title="Profit/Loss" data-sort-key="pnl">P&L</th>
+      <th class="text-center sortable" title="Return Percentage" data-sort-key="return_pct">Return %</th>
+      <th class="text-center">Actions</th>
+    `;
+  } else { // Paper Trades
+    tableHeaders = `
+      <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
+      <th class="text-center sortable" title="Quantity" data-sort-key="quantity">Qty</th>
+      <th class="text-center sortable" title="Entry Date" data-sort-key="entry_date">Entry Date</th>
+      <th class="text-center sortable" title="Entry Price" data-sort-key="entry_price">E. Price</th>
+      <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
+      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
+      <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
+      <th class="text-center">Actions</th>
+    `;
+  }
+
   table.innerHTML = `
     <thead>
       <tr>
-        <th>Ticker</th>
-        <th>Qty</th>
-        <th>Entry Date</th>
-        <th>Entry Price</th>
-        <th>Current Price</th>
-        <th>Unrealized P/L $</th>
-        <th>Unrealized P/L %</th>
-        <th class="${title === 'Open Trades' ? 'hidden' : ''}">Realized P/L $</th>
-        <th class="${title === 'Open Trades' ? 'hidden' : ''}">Realized P/L %</th>
-        <th>Actions</th>
+        ${tableHeaders}
       </tr>
     </thead>
     <tbody>
@@ -95,7 +123,6 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
  * @returns {string} The HTML string for the table row.
  */
 function renderTradeRow(trade, isPaper, title) {
-  // For Open Trades, use the direct properties. For Paper and Closed, use the summary/joined properties.
   const entryPrice =
     isPaper || title === 'Closed Trades' ? trade.entry_price : trade.price;
   const entryDate =
@@ -110,40 +137,69 @@ function renderTradeRow(trade, isPaper, title) {
     ? ((trade.current_price - entryPrice) / entryPrice) * 100
     : null;
 
-  // Closed trades have the same actions as paper trades (Details/Delete)
-  const actions =
-    isPaper || title === 'Closed Trades'
-      ? `
-    <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
-    <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
-  `
-      : `
-    <button class="btn table-action-btn btn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
-    <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
-  `;
+  const qtyRemaining = trade.quantity - (trade.sold_quantity || 0);
+  const unrealizedCombined = `${unrealizedPl !== null ? formatCurrency(unrealizedPl) : 'N/A'} / ${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}`;
 
-  return `
-    <tr data-id="${trade.id}">
-      <td>${trade.ticker}</td>
-      <td>${trade.quantity}</td>
-      <td>${entryDate ? entryDate.split('T')[0] : 'N/A'}</td>
-      <td>${entryPrice}</td>
-      <td>${trade.current_price || 'N/A'}</td>
-      <td>${unrealizedPl !== null ? unrealizedPl.toFixed(2) : 'N/A'}</td>
-      <td>${
-        unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'
-      }</td>
-      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
-        (isPaper || title === 'Closed Trades') && trade.pnl
-          ? trade.pnl.toFixed(2)
-          : 'N/A'
-      }</td>
-      <td class="${title === 'Open Trades' ? 'hidden' : ''}">${
-        (isPaper || title === 'Closed Trades') && trade.return_pct
-          ? `${trade.return_pct.toFixed(2)}%`
-          : 'N/A'
-      }</td>
-      <td>${actions}</td>
-    </tr>
-  `;
+  let rowContent = '';
+  let actions = '';
+
+  if (title === 'Open Trades') {
+    actions = `
+      <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
+    `;
+    rowContent = `
+      <td class="text-center">${trade.ticker || ''}</td>
+      <td class="text-center">${trade.quantity || ''}</td>
+      <td class="text-center">${qtyRemaining}</td>
+      <td class="text-center">${formatCurrency(trade.price)}</td>
+      <td class="text-center">${unrealizedCombined}</td>
+      <td class="text-center">${formatCurrency(trade.current_price)}</td>
+      <td class="actions-column text-center">
+        <div class="table-actions">
+          ${actions}
+        </div>
+      </td>
+    `;
+  } else if (title === 'Closed Trades') {
+    actions = `
+      <button class="btn table-action-btn btn-secondary small-btn closed-trade-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-danger small-btn closed-trade-delete-btn" data-id="${trade.id}">Delete</button>
+    `;
+    rowContent = `
+      <td class="text-center">${trade.ticker || ''}</td>
+      <td class="text-center">${entryDate ? entryDate.split('T')[0] : 'N/A'}</td>
+      <td class="text-center">${formatCurrency(entryPrice)}</td>
+      <td class="text-center">${trade.exit_date ? trade.exit_date.split('T')[0] : 'N/A'}</td>
+      <td class="text-center">${formatCurrency(trade.exit_price)}</td>
+      <td class="text-center">${formatCurrency(trade.pnl)}</td>
+      <td class="text-center">${trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A'}</td>
+      <td class="actions-column text-center">
+        <div class="table-actions">
+          ${actions}
+        </div>
+      </td>
+    `;
+  } else { // Paper Trades
+    actions = `
+      <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
+    `;
+    rowContent = `
+      <td class="text-center">${trade.ticker}</td>
+      <td class="text-center">${trade.quantity}</td>
+      <td class="text-center">${entryDate ? entryDate.split('T')[0] : 'N/A'}</td>
+      <td class="text-center">${formatCurrency(entryPrice)}</td>
+      <td class="text-center">${formatCurrency(trade.current_price)}</td>
+      <td class="text-center">${formatCurrency(unrealizedPl)}</td>
+      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}</td>
+      <td class="actions-column text-center">
+        <div class="table-actions">
+          ${actions}
+        </div>
+      </td>
+    `;
+  }
+
+  return `<tr data-id="${trade.id}">${rowContent}</tr>`;
 }

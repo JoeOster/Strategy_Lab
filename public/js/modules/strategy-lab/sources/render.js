@@ -4,6 +4,7 @@
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
+import { formatCurrency } from '../../../utils/formatters.js';
 
 /**
  * Renders the list of advice sources as cards in the grid.
@@ -157,9 +158,9 @@ export function renderTradeIdeasTable(ideas) {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${item.ticker || ''}</td>
-        <td>${item.buy_price_low || ''} - ${item.buy_price_high || ''}</td>
-        <td>${item.take_profit_low || ''} / ${item.take_profit_high || ''}</td>
-        <td>${item.escape_price || ''}</td>
+        <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(item.buy_price_high)}</td>
+        <td>${formatCurrency(item.take_profit_low)} / ${formatCurrency(item.take_profit_high)}</td>
+        <td>${formatCurrency(item.escape_price)}</td>
         <td>${item.status || 'WATCHING'}</td>
         <td class="actions-column">
           <div class="table-actions">
@@ -225,11 +226,11 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
           (item) => `
         <tr data-id="${item.id}">
           <td>${item.ticker || ''}</td>
-          <td>${item.buy_price_low || ''} - ${item.buy_price_high || ''}</td>
-          <td>${item.take_profit_low || ''} / ${
-            item.take_profit_high || ''
+          <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(item.buy_price_high)}</td>
+          <td>${formatCurrency(item.take_profit_low)} / ${
+            formatCurrency(item.take_profit_high)
           }</td>
-          <td>${item.escape_price || ''}</td>
+          <td>${formatCurrency(item.escape_price)}</td>
           <td>${item.status || 'WATCHING'}</td>
           <td>${item.notes || ''}</td>
           <td class="actions-column">
@@ -293,7 +294,7 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
         <th>Ticker</th>
         <th>Qty Purchased</th>
         <th>Qty Remaining</th>
-        <th>Entry Price</th>
+        <th>Entry $</th>
         <th>Unrealized $/ %</th>
         <th>Current Price</th>
         <th class="actions-column">Actions</th>
@@ -386,10 +387,10 @@ export function renderClosedTradesTable(
         <tr data-id="${trade.id}">
           <td>${trade.ticker || ''}</td>
           <td>${trade.entry_date ? trade.entry_date.split('T')[0] : 'N/A'}</td>
-          <td>${trade.entry_price || 'N/A'}</td>
+          <td>${formatCurrency(trade.entry_price)}</td>
           <td>${trade.exit_date ? trade.exit_date.split('T')[0] : 'N/A'}</td>
-          <td>${trade.exit_price || 'N/A'}</td>
-          <td>${trade.pnl !== null ? trade.pnl.toFixed(2) : 'N/A'}</td>
+          <td>${formatCurrency(trade.exit_price)}</td>
+          <td>${formatCurrency(trade.pnl)}</td>
           <td>${trade.return_pct !== null ? `${trade.return_pct.toFixed(2)}%` : 'N/A'}</td>
           <td class="actions-column">
             <div class="table-actions">
