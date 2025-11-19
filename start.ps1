@@ -122,6 +122,14 @@ function Stop-ProcessesOnPort($port) {
         }
 
         Start-Sleep -Seconds $retryDelaySeconds
+
+        # Re-check if the port is free after attempting to kill processes
+        $netstatCheck = netstat -ano | Select-String ":$port"
+        if ($netstatCheck.Count -eq 0) {
+            Write-Log "Successfully verified that all processes on port $port have been stopped."
+            return # Exit the function since the job is done
+        }
+        Write-Log "Processes still found on port $port. Retrying..." -Level "WARN"
     }
     Write-Log "Failed to stop all processes on port $port after $maxRetries attempts. Some processes may still be running." -Level "ERROR"
 }

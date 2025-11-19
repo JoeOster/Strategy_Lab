@@ -39,22 +39,32 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 		return;
 	}
 
-	const tickerInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("ticker"));
-	const exchangeSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem("exchange"));
-	const limitLowInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("limit_low"));
-	const limitHighInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("limit_high"));
-	const quantityInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("quantity"));
+	const tickerInput = /** @type {HTMLInputElement} */ (
+		form.elements.namedItem("ticker")
+	);
+	const exchangeSelect = /** @type {HTMLSelectElement} */ (
+		form.elements.namedItem("exchange")
+	);
+	const limitLowInput = /** @type {HTMLInputElement} */ (
+		form.elements.namedItem("limit_low")
+	);
+	const limitHighInput = /** @type {HTMLInputElement} */ (
+		form.elements.namedItem("limit_high")
+	);
+	const quantityInput = /** @type {HTMLInputElement} */ (
+		form.elements.namedItem("quantity")
+	);
 
 	// Get references to labels
-	const exchangeLabel = /** @type {HTMLLabelElement | null} */ (document.querySelector(
-		'label[for="edit-trade-exchange"]',
-	));
-	const limitLowLabel = /** @type {HTMLLabelElement | null} */ (document.querySelector(
-		'label[for="edit-trade-limit-low"]',
-	));
-	const limitHighLabel = /** @type {HTMLLabelElement | null} */ (document.querySelector(
-		'label[for="edit-trade-limit-high"]',
-	));
+	const exchangeLabel = /** @type {HTMLLabelElement | null} */ (
+		document.querySelector('label[for="edit-trade-exchange"]')
+	);
+	const limitLowLabel = /** @type {HTMLLabelElement | null} */ (
+		document.querySelector('label[for="edit-trade-limit-low"]')
+	);
+	const limitHighLabel = /** @type {HTMLLabelElement | null} */ (
+		document.querySelector('label[for="edit-trade-limit-high"]')
+	);
 
 	// Reset form and ticker state
 	form.reset();
@@ -69,7 +79,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 		limitLowLabel,
 		limitHighLabel,
 	]) {
-		if (el) (/** @type {HTMLElement} */ (el)).style.display = "";
+		if (el) /** @type {HTMLElement} */ (el).style.display = "";
 	}
 	quantityInput.removeAttribute("max"); // Clear any previous max attribute
 
@@ -93,11 +103,16 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 				modalTitle.textContent = "Sell Trade";
 				submitButton.textContent = "Confirm Sell";
 				submitButton.dataset.action = "sell"; // Set action for the handler
-				(/** @type {HTMLInputElement} */ (form.elements.namedItem("id"))).value = String(trade.id);
-				(/** @type {HTMLInputElement} */ (form.elements.namedItem("source_id"))).value = String(trade.source_id); // Pass source_id for refresh
+				/** @type {HTMLInputElement} */ (form.elements.namedItem("id")).value =
+					String(trade.id);
+				/** @type {HTMLInputElement} */ (
+					form.elements.namedItem("source_id")
+				).value = String(trade.source_id); // Pass source_id for refresh
 				tickerInput.value = trade.ticker; // Pre-fill with current price if available
 				tickerInput.readOnly = true;
-				(/** @type {HTMLInputElement} */ (form.elements.namedItem("price"))).value = String(trade.current_price || "");
+				/** @type {HTMLInputElement} */ (
+					form.elements.namedItem("price")
+				).value = String(trade.current_price || "");
 				exchangeSelect.value = trade.exchange_id || ""; // Pre-select exchange
 
 				// Fetch sold quantity and calculate available quantity
@@ -115,7 +130,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 					limitLowLabel,
 					limitHighLabel,
 				]) {
-					if (el) (/** @type {HTMLElement} */ (el)).style.display = "none";
+					if (el) /** @type {HTMLElement} */ (el).style.display = "none";
 				}
 				exchangeSelect.removeAttribute("required");
 			} else {
@@ -123,11 +138,14 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 				modalTitle.textContent = "Edit Trade";
 				submitButton.textContent = "Save Changes";
 				submitButton.dataset.action = "save"; // Set action for the handler
-				(/** @type {HTMLInputElement} */ (form.elements.namedItem("id"))).value = String(trade.id);
+				/** @type {HTMLInputElement} */ (form.elements.namedItem("id")).value =
+					String(trade.id);
 				tickerInput.value = trade.ticker;
 				tickerInput.readOnly = true; // Lock ticker when editing
 				quantityInput.value = String(trade.quantity);
-				(/** @type {HTMLInputElement} */ (form.elements.namedItem("price"))).value = String(trade.price);
+				/** @type {HTMLInputElement} */ (
+					form.elements.namedItem("price")
+				).value = String(trade.price);
 				exchangeSelect.value = trade.exchange_id || ""; // Pre-select exchange
 				exchangeSelect.setAttribute("required", "required");
 			}
@@ -141,10 +159,17 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 			if (!idea) {
 				throw new Error(`Could not find idea with ID: ${ideaId}`);
 			}
-			(/** @type {HTMLInputElement} */ (form.elements.namedItem("id"))).value = ""; // No trade ID yet
-			(/** @type {HTMLInputElement} */ (form.elements.namedItem("idea_id"))).value = String(idea.id); // Store idea ID
-			(/** @type {HTMLInputElement} */ (form.elements.namedItem("source_id"))).value = String(idea.source_id); // Store source ID
-			(/** @type {HTMLInputElement} */ (form.elements.namedItem("is_paper"))).value = String(isPaper);
+			/** @type {HTMLInputElement} */ (form.elements.namedItem("id")).value =
+				""; // No trade ID yet
+			/** @type {HTMLInputElement} */ (
+				form.elements.namedItem("idea_id")
+			).value = String(idea.id); // Store idea ID
+			/** @type {HTMLInputElement} */ (
+				form.elements.namedItem("source_id")
+			).value = String(idea.source_id); // Store source ID
+			/** @type {HTMLInputElement} */ (
+				form.elements.namedItem("is_paper")
+			).value = String(isPaper);
 			tickerInput.value = idea.ticker;
 			tickerInput.readOnly = true; // Lock ticker when creating from idea
 			exchangeSelect.setAttribute("required", "required");
@@ -173,20 +198,32 @@ export function closeEditTradeModal() {
 	const modal = document.getElementById("edit-trade-modal");
 	if (modal) {
 		modal.style.display = "none";
-		const form = /** @type {HTMLFormElement | null} */ (document.getElementById("edit-trade-form"));
+		const form = /** @type {HTMLFormElement | null} */ (
+			document.getElementById("edit-trade-form")
+		);
 
 		if (!form) return;
-		const tickerInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("ticker"));
-		const exchangeSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem("exchange"));
-		const limitLowInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("limit_low"));
-		const limitHighInput = /** @type {HTMLInputElement} */ (form.elements.namedItem("limit_high"));
-		const exchangeLabel = /** @type {HTMLLabelElement | null} */ (document.querySelector(
-			'label[for="edit-trade-exchange"]',
-		));
-		const limitLowLabel = /** @type {HTMLLabelElement | null} */ (document.querySelector(
-			'label[for="edit-trade-limit-low"]',
-		));
-		const limitHighLabel = document.querySelector('label[for="edit-trade-limit-high"]');
+		const tickerInput = /** @type {HTMLInputElement} */ (
+			form.elements.namedItem("ticker")
+		);
+		const exchangeSelect = /** @type {HTMLSelectElement} */ (
+			form.elements.namedItem("exchange")
+		);
+		const limitLowInput = /** @type {HTMLInputElement} */ (
+			form.elements.namedItem("limit_low")
+		);
+		const limitHighInput = /** @type {HTMLInputElement} */ (
+			form.elements.namedItem("limit_high")
+		);
+		const exchangeLabel = /** @type {HTMLLabelElement | null} */ (
+			document.querySelector('label[for="edit-trade-exchange"]')
+		);
+		const limitLowLabel = /** @type {HTMLLabelElement | null} */ (
+			document.querySelector('label[for="edit-trade-limit-low"]')
+		);
+		const limitHighLabel = document.querySelector(
+			'label[for="edit-trade-limit-high"]',
+		);
 		form.removeEventListener("submit", handleEditTradeSubmit);
 		tickerInput.readOnly = false; // Always reset readonly state
 		form.reset();
@@ -200,7 +237,7 @@ export function closeEditTradeModal() {
 			limitLowLabel,
 			limitHighLabel,
 		]) {
-			if (el) (/** @type {HTMLElement} */ (el)).style.display = "";
+			if (el) /** @type {HTMLElement} */ (el).style.display = "";
 		}
 		exchangeSelect.setAttribute("required", "required");
 
@@ -208,7 +245,8 @@ export function closeEditTradeModal() {
 		const submitButton = /** @type {HTMLButtonElement | null} */ (
 			form.querySelector('button[type="submit"]')
 		);
-		if (submitButton) { // Set action for the handler
+		if (submitButton) {
+			// Set action for the handler
 			submitButton.textContent = "Save Changes";
 			submitButton.dataset.action = "save";
 		}
@@ -231,7 +269,10 @@ async function handleEditTradeSubmit(event) {
 	try {
 		let sourceId;
 		const submitButton = form.querySelector('button[type="submit"]');
-		const action = submitButton instanceof HTMLElement ? submitButton.dataset.action : undefined;
+		const action =
+			submitButton instanceof HTMLElement
+				? submitButton.dataset.action
+				: undefined;
 
 		if (action === "sell") {
 			// --- SELL EXISTING TRADE ---

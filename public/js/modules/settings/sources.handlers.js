@@ -1,9 +1,9 @@
 import {
-  addSource,
-  deleteSource,
-  getSource,
-  getSources,
-  updateSource,
+	addSource,
+	deleteSource,
+	getSource,
+	getSources,
+	updateSource,
 } from "./sources.api.js";
 // public/js/modules/settings/sources.handlers.js
 import { handleFetchIsbnInfo } from "./sources_books.handlers.js";
@@ -174,10 +174,7 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 	if (imgPathWrapper) {
 		if (selectedType) {
 			imgPathWrapper.style.display = "block";
-			updateImagePreview(
-				selectedType,
-				sourceData.image_path || "default.png",
-			);
+			updateImagePreview(selectedType, sourceData.image_path || "default.png");
 		} else {
 			imgPathWrapper.style.display = "none";
 			updateImagePreview(selectedType, null); // Will hide the image

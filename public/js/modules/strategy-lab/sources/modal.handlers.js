@@ -488,7 +488,9 @@ async function handleModalBottomPanelClicks(event) {
 	let movedToPaper = false;
 
 	// Set the trade type for the idea form
-	const tradeTypeInput = /** @type {HTMLInputElement | null} */ (document.getElementById("idea-trade-type"));
+	const tradeTypeInput = /** @type {HTMLInputElement | null} */ (
+		document.getElementById("idea-trade-type")
+	);
 
 	// Check for "Open Ideas" buttons
 	if (button.classList.contains("idea-delete-btn")) {
@@ -508,7 +510,7 @@ async function handleModalBottomPanelClicks(event) {
 	// Check for "Paper Trades" buttons
 	if (button.classList.contains("paper-delete-btn")) {
 		// This variable is currently unused, but we'll keep the call
-		 
+
 		shouldRefreshPaperTrades = await handleDeletePaperTradeClick(id);
 	} else if (button.classList.contains("paper-details-btn")) {
 		openPaperTradeDetailsModal(id);

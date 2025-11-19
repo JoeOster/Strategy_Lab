@@ -1,9 +1,9 @@
 // public/js/modules/settings/index.js
 
 import {
-  handleFontChange,
-  handleThemeChange,
-  initializeAppearanceTab,
+	handleFontChange,
+	handleThemeChange,
+	initializeAppearanceTab,
 } from "./appearance.handlers.js";
 import * as exchangesHandlers from "./exchanges.handlers.js";
 import { initializeIdeasHandlers } from "./handlers.js";
@@ -13,10 +13,10 @@ import { handleSaveGeneralSettings } from "./handlers.js";
 // --- END: FIX ---
 import * as handlers from "./handlers.js";
 import {
-  handleDeleteSourceClick,
-  handleSourceTypeChange,
-  initializeSourceSettings,
-  openSourceFormModal,
+	handleDeleteSourceClick,
+	handleSourceTypeChange,
+	initializeSourceSettings,
+	openSourceFormModal,
 } from "./sources.handlers.js";
 import * as usersHandlers from "./users.handlers.js";
 import * as webappsHandlers from "./webapps.handlers.js"; // Import new handlers
@@ -64,7 +64,7 @@ export function initializeModule() {
 		'.settings-tab[data-tab="dashboard-panel"]',
 	);
 	if (defaultTab) {
-		(/** @type {HTMLElement} */ (defaultTab)).click();
+		/** @type {HTMLElement} */ (defaultTab).click();
 	}
 
 	// Sub-tab navigation (using event delegation)

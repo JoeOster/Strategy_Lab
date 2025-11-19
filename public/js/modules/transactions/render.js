@@ -19,16 +19,56 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
  * @param {TransactionWithPrice[] | null} trades - An array of Transaction objects with current price.
  * @param {string} containerId - The ID of the element to render into.
  * @param {Error | null} [error] - An optional error object.
+ * @param {string} [title="Open Trades"] - The title for the table section.
  */
 export function renderOpenTradesForSource(
 	trades,
 	containerId,
 	error = null,
-	title = "Open Trades",
+	title = "Open Trades"
 ) {
 	const container = document.getElementById(containerId);
-	// Use the provided title, defaulting to 'Open Trades'
-	renderTradesTable(container, title, trades, error, false);
+	if (!container) {
+		console.error(`Container for "${title}" not found.`);
+		return;
+	}
+
+	container.innerHTML = `<h3>${title}</h3>`;
+
+	if (error) {
+		container.innerHTML += `<p class="error">Failed to load ${title.toLowerCase()}.</p>`;
+		return;
+	}
+
+	// This is the filter that was being bypassed.
+	const realTrades = trades ? trades.filter((trade) => trade.is_paper_trade != 1) : [];
+
+	if (!realTrades || realTrades.length === 0) {
+		container.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
+		return;
+	}
+
+	const table = document.createElement("table");
+	table.className = "strategy-table";
+
+	const tableHeaders = `
+    <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
+    <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
+    <th class="text-center sortable" title="Quantity Remaining" data-sort-key="qtyRemaining">Qty R.</th>
+    <th class="text-center sortable" title="Entry Price" data-sort-key="price">E. Price</th>
+    <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
+    <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
+    <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
+    <th class="text-center">Actions</th>
+  `;
+
+	table.innerHTML = `
+    <thead><tr>${tableHeaders}</tr></thead>
+    <tbody>
+      ${realTrades.map((trade) => renderTradeRow(trade, false, title)).join("")}
+    </tbody>
+  `;
+	container.appendChild(table);
 }
 
 /**
@@ -262,30 +302,7 @@ function renderTradeRow(trade, isPaper, title) {
 	let rowContent = "";
 	let actions = "";
 
-	if (title === "Open Trades") {
-		actions = `
-      <button class="btn table-action-btn btn-secondary small-btn open-trade-edit-btn" data-id="${trade.id}">Edit</button>
-      <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
-    `;
-		rowContent = `
-      <td class="text-center">${trade.ticker || ""}</td>
-      <td class="text-center">${trade.quantity || ""}</td>
-      <td class="text-center">${qtyRemaining}</td>
-      <td class="text-center">${formatCurrency(trade.price)}</td>
-      <td class="text-center">${trade.stop_loss ? formatCurrency(trade.stop_loss) : "N/A"}</td>
-      <td class="text-center">${trade.tp1 ? formatCurrency(trade.tp1) : "N/A"}</td>
-      <td class="text-center">${trade.tp2 ? formatCurrency(trade.tp2) : "N/A"}</td>
-      <td class="text-center">${formatCurrency(unrealizedPl)}</td>
-      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
-      <td class="text-center">${currentPriceCell}</td>
-      <td class="actions-column text-center">
-        <div class="table-actions">
-          ${actions}
-        </div>
-      </td>
-    `;
-	} else {
-		// Paper Trades and Closed Paper Trades (using the 'Closed Trades' structure)
+	if (isPaper) {
 		actions = `
       <button class="btn table-action-btn btn-secondary paper-edit-btn" data-id="${trade.id}">Edit</button>
       <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
@@ -302,6 +319,26 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${currentPriceCell}</td>
       <td class="text-center">${formatCurrency(unrealizedPl)}</td>
       <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="actions-column text-center">
+        <div class="table-actions">
+          ${actions}
+        </div>
+      </td>
+    `;
+	} else {
+		// Real Trades (Open Trades)
+		actions = `
+      <button class="btn table-action-btn btn-secondary small-btn open-trade-edit-btn" data-id="${trade.id}">Edit</button>
+      <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
+    `;
+		rowContent = `
+      <td class="text-center">${trade.ticker || ""}</td>
+      <td class="text-center">${trade.quantity || ""}</td>
+      <td class="text-center">${qtyRemaining}</td>
+      <td class="text-center">${formatCurrency(trade.price)}</td>
+      <td class="text-center">${formatCurrency(unrealizedPl)}</td>
+      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
           ${actions}

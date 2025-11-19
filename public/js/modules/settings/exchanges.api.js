@@ -1,6 +1,6 @@
 // public/js/modules/settings/exchanges.api.js
 
-import { api } from '../../services/apiFetch.js';
+import { api } from "../../services/apiFetch.js";
 /** @typedef {import('../../types.js').Exchange} Exchange */
 
 /**
@@ -8,7 +8,7 @@ import { api } from '../../services/apiFetch.js';
  * @returns {Promise<Array<Exchange>>} A promise that resolves to an array of exchange objects.
  */
 export async function getExchanges() {
-  return api.get('/api/exchanges');
+	return api.get("/api/exchanges");
 }
 
 /**
@@ -17,7 +17,7 @@ export async function getExchanges() {
  * @returns {Promise<Object>} A promise that resolves to the added exchange object.
  */
 export async function addExchange(name) {
-  return api.post('/api/exchanges', { name });
+	return api.post("/api/exchanges", { name });
 }
 
 /**
@@ -26,5 +26,5 @@ export async function addExchange(name) {
  * @returns {Promise<void>} A promise that resolves when the exchange is deleted.
  */
 export async function deleteExchange(id) {
-  return api.delete(`/api/exchanges/${id}`);
+	return api.delete(`/api/exchanges/${id}`);
 }

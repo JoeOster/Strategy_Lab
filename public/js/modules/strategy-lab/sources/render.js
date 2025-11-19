@@ -236,9 +236,12 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
           <td class="actions-column">
             <div class="table-actions">
             ${
-							item.status === "EXECUTED"
-								? `<button class="btn table-action-btn small-btn" disabled>&#10004; Executed</button>`
-								: `
+							item.status === "EXECUTED" // If the idea has been actioned
+								? item.executed_trade_type === "paper"
+									? `<button class="btn table-action-btn btn-secondary small-btn" disabled>&#10004; Paper</button>` // It became a paper trade
+									: `<button class="btn table-action-btn btn-success small-btn" disabled>&#10004; Bought</button>` // It became a real trade
+								: // Otherwise, show the Buy and Paper buttons
+									`
               <button class="btn table-action-btn small-btn idea-buy-btn" data-id="${item.id}">Buy</button>
               <button class="btn table-action-btn btn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
             `
@@ -281,7 +284,12 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
 		return;
 	}
 
-	if (!openTrades || openTrades.length === 0) {
+	// Filter out paper trades from the open trades list
+	const realTrades = openTrades
+		? openTrades.filter((trade) => trade.is_paper_trade != 1)
+		: [];
+
+	if (realTrades.length === 0) {
 		container.innerHTML += "<p>No open trades from this source.</p>";
 		return;
 	}
@@ -301,13 +309,14 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
       </tr>
     </thead>
     <tbody>
-      ${openTrades
+      ${realTrades
 				.map((trade) => {
 					const qtyRemaining = trade.quantity - (trade.sold_quantity || 0);
 					const unrealizedPL = trade.pnl != null ? trade.pnl.toFixed(2) : "N/A";
-					const unrealizedPLPct = trade.return_pct != null
-						? `${trade.return_pct.toFixed(2)}%`
-						: "N/A";
+					const unrealizedPLPct =
+						trade.return_pct != null
+							? `${trade.return_pct.toFixed(2)}%`
+							: "N/A";
 					const unrealizedCombined = `${unrealizedPL} / ${unrealizedPLPct}`;
 
 					return `
@@ -323,9 +332,7 @@ export function renderOpenTradesTable(openTrades, containerId, error = null) {
                   <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${
 										trade.id
 									}">Details</button>
-                  <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${
-										trade.id
-									}">Sell</button>
+                  <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
                 </div>
               </td>
             </tr>

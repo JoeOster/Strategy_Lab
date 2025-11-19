@@ -234,25 +234,29 @@ router.get("/:id/open-trades", async (req, res) => {
 
 		try {
 			// --- Price fetching logic ---
-			const tickers = [...new Set(trades.map((trade) => trade.ticker))].filter(Boolean); // filter(Boolean) removes null/undefined tickers
+			const tickers = [...new Set(trades.map((trade) => trade.ticker))].filter(
+				Boolean,
+			); // filter(Boolean) removes null/undefined tickers
 			if (tickers.length > 0) {
 				const pricePromises = tickers.map((ticker) => getPriceV2(ticker));
 				const prices = await Promise.all(pricePromises);
 				const priceMap = tickers.reduce(
-					(/** @type {{[key: string]: number | null}} */ acc, ticker, index) => {
+					(
+						/** @type {{[key: string]: number | null}} */ acc,
+						ticker,
+						index,
+					) => {
 						acc[ticker] = prices[index];
 						return acc;
 					},
 					{},
 				);
 
-				tradesWithPrices = trades.map(
-					(/** @type {Transaction} */ trade) => ({
-						...trade,
-						current_price: priceMap[trade.ticker] || null,
-						sold_quantity: trade.sold_quantity, // Ensure sold_quantity is carried over
-					}),
-				);
+				tradesWithPrices = trades.map((/** @type {Transaction} */ trade) => ({
+					...trade,
+					current_price: priceMap[trade.ticker] || null,
+					sold_quantity: trade.sold_quantity, // Ensure sold_quantity is carried over
+				}));
 			}
 		} catch (priceError) {
 			console.error(
@@ -291,9 +295,7 @@ router.get("/:id/paper-trades", async (req, res) => {
 		// Fetch current prices for any trades that are not fully closed
 		const openPaperTickers = [
 			...new Set(
-				trades
-					.filter((t) => !t.exit_date)
-					.map((trade) => trade.ticker),
+				trades.filter((t) => !t.exit_date).map((trade) => trade.ticker),
 			),
 		];
 		const pricePromises = openPaperTickers.map((ticker) => getPriceV2(ticker));
