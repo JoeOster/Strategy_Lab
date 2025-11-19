@@ -84,6 +84,8 @@
  * @property {number | null} [current_price] - (Added by API)
  * @property {string | null} [exchange_id] - (From database)
  * @property {string | null} [exit_date] - (For paper trades)
+ * @property {number | null} [limit_low]
+ * @property {number | null} [limit_high]
  * @property {string} created_date
  * @property {string} updated_date
  */

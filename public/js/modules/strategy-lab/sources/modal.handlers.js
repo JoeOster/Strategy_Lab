@@ -13,8 +13,8 @@ import { getSource } from "../../settings/sources.api.js";
 import { openSourceFormModal } from "../../settings/sources.handlers.js";
 import {
 	pct_renderTradesTable,
-	renderPaperTradesForSource,
 	renderOpenTradesForSource,
+	renderPaperTradesForSource,
 	tct_renderTradesTable
 } from "../../transactions/render.js";
 import { handleDeletePaperTradeClick } from "../paper-trades/handlers.js";
@@ -114,7 +114,7 @@ export async function openSourceDetailModal(sourceId) {
 		ideasPlaceholder.innerHTML = "<h3>Open Ideas</h3><p>Loading...</p>";
 	}
 	if (openTradesPlaceholder) {
-		openTradesPlaceholder.innerHTML = "<h3>Open Trades</h3><p>Loading...</p>";
+		openTradesPlaceholder.innerHTML = "<h3>Retail Trades - Open</h3><p>Loading...</p>";
 	}
 	if (testClosedTradesPlaceholder) {
 		testClosedTradesPlaceholder.innerHTML =
@@ -474,7 +474,7 @@ export async function loadOpenTradesForSource(sourceId) {
 	const containerId = "open-trades-table-placeholder";
 	try {
 		const trades = await getOpenTradesForSource(sourceId);
-		renderOpenTradesForSource(trades, containerId, null, "Open Trades");
+		renderOpenTradesForSource(trades, containerId, null, "Retail Trades - Open");
 	} catch (err) {
 		console.error(`Failed to load open trades for source ${sourceId}:`, err);
 		const error = err instanceof Error ? err : new Error(String(err));

@@ -5,7 +5,7 @@ import { formatCurrency } from "../../utils/formatters.js";
 
 /**
  * Renders the table of "Paper Trades" for a source.
- * @param {PaperTradeSummary[] | null} trades - An array of PaperTradeSummary objects.
+ * @param {TransactionWithPrice[] | null} trades - An array of Transaction objects.
  * @param {string} containerId - The ID of the element to render into.
  * @param {Error | null} [error] - An optional error object.
  */
@@ -16,7 +16,10 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 		return;
 	}
 
-	container.innerHTML = "<h3>Paper Trades</h3>";
+	// Create a wrapper div for the card content
+	const cardWrapper = document.createElement("div");
+	cardWrapper.className = "modal-section-card";
+	cardWrapper.innerHTML = "<h3>Paper Trades - Open</h3>";
 
 	if (error) {
 		container.innerHTML += `<p class="error">Failed to load paper trades.</p>`;
@@ -24,7 +27,7 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 	}
 
 	if (!trades || trades.length === 0) {
-		container.innerHTML += "<p>No open paper trades from this source.</p>";
+		cardWrapper.innerHTML += "<p>No open paper trades from this source.</p>";
 		return;
 	}
 
@@ -33,12 +36,14 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 
 	const tableHeaders = `
     <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
-    <th class="text-center sortable" title="Quantity" data-sort-key="quantity">Qty</th>
-    <th class="text-center sortable" title="Entry Date" data-sort-key="entry_date">Entry Date</th>
+    <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
+    <th class="text-center sortable" title="Quantity Remaining">Qty R.</th>
     <th class="text-center sortable" title="Entry Price" data-sort-key="entry_price">E. Price</th>
-    <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
+    <th class="text-center sortable" title="Limit High" data-sort-key="limit_high">L. High</th>
+    <th class="text-center sortable" title="Limit Low" data-sort-key="limit_low">L. Low</th>
     <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
     <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
+    <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
     <th class="text-center">Actions</th>
   `;
 
@@ -48,7 +53,10 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
       ${trades.map((trade) => renderTradeRow(trade, true, "Paper Trades")).join("")}
     </tbody>
   `;
-	container.appendChild(table);
+	// Append the table to the card wrapper, then the wrapper to the container
+	cardWrapper.appendChild(table);
+	container.innerHTML = ""; // Clear loading message
+	container.appendChild(cardWrapper);
 }
 
 /**
@@ -64,16 +72,18 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
 		return;
 	}
 
-	container.innerHTML = "<h3>Test Closed Paper Trades</h3>";
+	const cardWrapper = document.createElement("div");
+	cardWrapper.className = "modal-section-card";
+	cardWrapper.innerHTML = "<h3>Paper Trades - Closed</h3>";
 
 	if (error) {
-		container.innerHTML +=
+		cardWrapper.innerHTML +=
 			'<p class="error">Failed to load test closed paper trades.</p>';
 		return;
 	}
 
 	if (!trades || trades.length === 0) {
-		container.innerHTML += "<p>No test closed paper trades found.</p>";
+		cardWrapper.innerHTML += "<p>No test closed paper trades found.</p>";
 		return;
 	}
 
@@ -94,7 +104,9 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
     <tbody>
       ${trades.map((trade) => renderClosedPaperTradeRow(trade)).join("")}
     </tbody>`;
-	container.appendChild(table);
+	cardWrapper.appendChild(table);
+	container.innerHTML = "";
+	container.appendChild(cardWrapper);
 }
 
 /**
@@ -116,7 +128,9 @@ export function renderOpenTradesForSource(
 		return;
 	}
 
-	container.innerHTML = `<h3>${title}</h3>`;
+	const cardWrapper = document.createElement("div");
+	cardWrapper.className = "modal-section-card";
+	cardWrapper.innerHTML = `<h3>${title}</h3>`;
 
 	if (error) {
 		container.innerHTML += `<p class="error">Failed to load ${title.toLowerCase()}.</p>`;
@@ -129,7 +143,7 @@ export function renderOpenTradesForSource(
 		: [];
 
 	if (!realTrades || realTrades.length === 0) {
-		container.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
+		cardWrapper.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
 		return;
 	}
 
@@ -141,6 +155,8 @@ export function renderOpenTradesForSource(
     <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
     <th class="text-center sortable" title="Quantity Remaining" data-sort-key="qtyRemaining">Qty R.</th>
     <th class="text-center sortable" title="Entry Price" data-sort-key="price">E. Price</th>
+    <th class="text-center sortable" title="Limit High" data-sort-key="limit_high">L. High</th>
+    <th class="text-center sortable" title="Limit Low" data-sort-key="limit_low">L. Low</th>
     <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
     <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
     <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
@@ -153,7 +169,9 @@ export function renderOpenTradesForSource(
       ${realTrades.map((trade) => renderTradeRow(trade, false, title)).join("")}
     </tbody>
   `;
-	container.appendChild(table);
+	cardWrapper.appendChild(table);
+	container.innerHTML = "";
+	container.appendChild(cardWrapper);
 }
 
 /**
@@ -170,10 +188,14 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 		return;
 	}
 
-	container.innerHTML = "<h3>Test Closed Trades</h3>";
+	const cardWrapper = document.createElement("div");
+	cardWrapper.className = "modal-section-card";
+	cardWrapper.innerHTML = "<h3>Retail Trades - Closed</h3>";
 
 	if (error) {
-		container.innerHTML += '<p class="error">Failed to load test trades.</p>';
+		cardWrapper.innerHTML += '<p class="error">Failed to load test trades.</p>';
+		container.innerHTML = "";
+		container.appendChild(cardWrapper);
 		return;
 	}
 
@@ -182,7 +204,9 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 		? trades.filter((trade) => trade.is_paper_trade != 1)
 		: [];
 	if (!realTrades || realTrades.length === 0) {
-		container.innerHTML += "<p>No test trades found.</p>";
+		cardWrapper.innerHTML += "<p>No test trades found.</p>";
+		container.innerHTML = "";
+		container.appendChild(cardWrapper);
 		return;
 	}
 
@@ -225,85 +249,9 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
     <thead><tr>${tableHeaders}</tr></thead>
     <tbody>${rowsHtml}</tbody>
   `;
-	container.appendChild(table);
-}
-/**
- * A generic function to render a table of trades.
- * @param {HTMLElement | null} container - The container element to render into.
- * @param {string} title - The title for the table section.
- * @param {any[] | null} trades - An array of trade objects.
- * @param {Error | null} error - An optional error object.
- * @param {boolean} isPaper - True if rendering paper trades, false for real trades.
- */
-export function renderTradesTable(container, title, trades, error, isPaper) {
-	if (!container) {
-		console.error(`Container for "${title}" not found.`);
-		return;
-	}
-
-	container.innerHTML = `<h3>${title}</h3>`;
-
-	if (error) {
-		container.innerHTML += `<p class="error">Failed to load ${title.toLowerCase()}.</p>`;
-		return;
-	}
-
-	// Filter trades based on whether they are open or closed.
-	// For paper trades, an open trade does not have an exit_date.
-	const openTrades = isPaper ? trades.filter((trade) => !trade.exit_date) : []; // This function is now only for paper trades, so real trades are an empty array.
-
-	if (!openTrades || openTrades.length === 0) {
-		container.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
-		return;
-	}
-
-	const table = document.createElement("table");
-	table.className = "strategy-table";
-
-	let tableHeaders = "";
-	if (title === "Open Trades") {
-		tableHeaders = `
-      <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
-      <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
-      <th class="text-center sortable" title="Quantity Remaining" data-sort-key="qtyRemaining">Qty R.</th>
-      <th class="text-center sortable" title="Entry Price" data-sort-key="price">E. Price</th>
-      <th class="text-center sortable" title="Stop Loss" data-sort-key="stop_loss">SL</th>
-      <th class="text-center sortable" title="Take Profit 1" data-sort-key="tp1">TP1</th>
-      <th class="text-center sortable" title="Take Profit 2" data-sort-key="tp2">TP2</th>
-      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
-      <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
-      <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
-      <th class="text-center">Actions</th>
-    `;
-	} else {
-		// Paper Trades (Open Paper Trades)
-		// UPDATED: Added SL, TP1, and TP2 to match Open Trades structure
-		tableHeaders = `
-      <th class="text-center sortable" title="Stock Ticker" data-sort-key="ticker">Ticker</th>
-      <th class="text-center sortable" title="Quantity" data-sort-key="quantity">Qty</th>
-      <th class="text-center sortable" title="Entry Date" data-sort-key="entry_date">Entry Date</th>
-      <th class="text-center sortable" title="Entry Price" data-sort-key="entry_price">E. Price</th>
-      <th class="text-center sortable" title="Stop Loss" data-sort-key="stop_loss">SL</th>
-      <th class="text-center sortable" title="Take Profit 1" data-sort-key="tp1">TP1</th>
-      <th class="text-center sortable" title="Take Profit 2" data-sort-key="tp2">TP2</th>
-      <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
-      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
-      <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
-      <th class="text-center">Actions</th>
-    `;
-	}
-
-	table.innerHTML = `
-    <thead>
-      <tr>
-        ${tableHeaders}
-      </tr>
-    </thead>
-    <tbody>
-      ${openTrades.map((trade) => renderTradeRow(trade, isPaper, title)).join("")}
-    </tbody>
-  `;
-	container.appendChild(table);
+	cardWrapper.appendChild(table);
+	container.innerHTML = "";
+	container.appendChild(cardWrapper);
 }
 
 /**
@@ -314,8 +262,8 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
  * @returns {string} The HTML string for the table row.
  */
 function renderTradeRow(trade, isPaper, title) {
-	const entryPrice = isPaper ? trade.entry_price : trade.price;
-	const entryDate = isPaper ? trade.entry_date : trade.transaction_date;
+	const entryPrice = isPaper ? trade.price : trade.price;
+	const entryDate = isPaper ? trade.transaction_date : trade.transaction_date;
 
 	const unrealizedPl = trade.current_price
 		? (trade.current_price - entryPrice) * trade.quantity
@@ -345,14 +293,13 @@ function renderTradeRow(trade, isPaper, title) {
 		rowContent = `
       <td class="text-center">${trade.ticker}</td>
       <td class="text-center">${trade.quantity}</td>
-      <td class="text-center">${entryDate ? entryDate.split("T")[0] : "N/A"}</td>
+      <td class="text-center">-</td>
       <td class="text-center">${formatCurrency(entryPrice)}</td>
-      <td class="text-center">${trade.stop_loss ? formatCurrency(trade.stop_loss) : "N/A"}</td>
-      <td class="text-center">${trade.tp1 ? formatCurrency(trade.tp1) : "N/A"}</td>
-      <td class="text-center">${trade.tp2 ? formatCurrency(trade.tp2) : "N/A"}</td>
-      <td class="text-center">${currentPriceCell}</td>
+      <td class="text-center">${trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"}</td>
+      <td class="text-center">${trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"}</td>
       <td class="text-center">${unrealizedPl !== null ? formatCurrency(unrealizedPl) : "N/A"}</td>
       <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
           ${actions}
@@ -370,8 +317,11 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${trade.quantity || ""}</td>
       <td class="text-center">${qtyRemaining}</td>
       <td class="text-center">${formatCurrency(trade.price)}</td>
+      <td class="text-center">${trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"}</td>
+      <td class="text-center">${trade.limit_low ? formatCurrency(trade.limit_low) : "N/A"}</td>
       <td class="text-center">${formatCurrency(unrealizedPl)}</td>
       <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : "N/A"}</td>
+      <td class="text-center">${currentPriceCell}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
           ${actions}

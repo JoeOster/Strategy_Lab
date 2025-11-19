@@ -59,35 +59,6 @@ body #sources-panel #source-cards-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr; /* Two columns, equal width */
 	gap: 20px; /* Space between grid items */
-	/* Define grid areas for explicit placement */
-	grid-template-areas:
-		"profile strategies"
-		"profile ideas" /* Profile spans two rows, ideas is in second row, second column */
-		"open-trades paper-trades"
-		"closed-trades closed-paper-trades";
-}
-
-/* Assign grid areas to specific items */
-#source-profile-container {
-	grid-area: profile;
-}
-#logged-strategies-container {
-	grid-area: strategies;
-}
-#open-ideas-table-placeholder {
-	grid-area: ideas;
-}
-#open-trades-table-placeholder {
-	grid-area: open-trades;
-}
-#new-paper-trades-table {
-	grid-area: paper-trades;
-}
-#new-closed-trades-table {
-	grid-area: closed-trades;
-}
-#new-paper-trades-closed-table {
-	grid-area: closed-paper-trades;
 }
 
 /* Media query for single column layout on smaller screens or zoomed in */
@@ -95,14 +66,6 @@ body #sources-panel #source-cards-grid {
 	/* Adjust this breakpoint as needed */
 	.source-detail-grid {
 		grid-template-columns: 1fr; /* Single column */
-		grid-template-areas:
-			"profile"
-			"strategies"
-			"ideas"
-			"open-trades"
-			"paper-trades"
-			"closed-trades"
-			"closed-paper-trades";
 	}
 }
 

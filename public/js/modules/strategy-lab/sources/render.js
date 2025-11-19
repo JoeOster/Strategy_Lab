@@ -193,16 +193,19 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 		return;
 	}
 
-	// Clear placeholder and add title
-	container.innerHTML = "<h3>Open Ideas</h3>";
+	const cardWrapper = document.createElement("div");
+	cardWrapper.className = "modal-section-card";
+	cardWrapper.innerHTML = "<h3>Open Ideas</h3>";
 
 	if (error) {
-		container.innerHTML += '<p class="error">Failed to load open ideas.</p>';
+		cardWrapper.innerHTML += '<p class="error">Failed to load open ideas.</p>';
+		container.innerHTML = "";
+		container.appendChild(cardWrapper);
 		return;
 	}
 
 	if (!ideas || ideas.length === 0) {
-		container.innerHTML += "<p>No open ideas from this source.</p>";
+		cardWrapper.innerHTML += "<p>No open ideas from this source.</p>";
 		return;
 	}
 
@@ -260,86 +263,7 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 				.join("")}
     </tbody>
   `;
-	container.appendChild(table);
-}
-
-/**
- * Renders the table of "Open Trades" for a source.
- * @param {import('../../../types.js').TransactionWithPrice[] | null} openTrades - An array of TransactionWithPrice objects.
- * @param {string} containerId - The ID of the element to render into.
- * @param {Error | null} [error] - An optional error object.
- */
-export function renderOpenTradesTable(openTrades, containerId, error = null) {
-	const container = document.getElementById(containerId);
-	if (!container) {
-		console.error(`Container not found: ${containerId}`);
-		return;
-	}
-
-	// Clear placeholder and add title
-	container.innerHTML = "<h3>Open Trades</h3>";
-
-	if (error) {
-		container.innerHTML += '<p class="error">Failed to load open trades.</p>';
-		return;
-	}
-
-	// Filter out paper trades from the open trades list
-	const realTrades = openTrades
-		? openTrades.filter((trade) => trade.is_paper_trade !== 1)
-		: [];
-
-	if (realTrades.length === 0) {
-		container.innerHTML += "<p>No open trades from this source.</p>";
-		return;
-	}
-
-	const table = document.createElement("table");
-	table.className = "strategy-table"; // Re-use the existing table style
-	table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Ticker</th>
-        <th>Qty Purchased</th>
-        <th>Qty Remaining</th>
-        <th>Entry $</th>
-        <th>Unrealized $/ %</th>
-        <th>Current Price</th>
-        <th class="actions-column">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${realTrades
-				.map((trade) => {
-					const qtyRemaining = trade.quantity - (trade.sold_quantity || 0);
-					const unrealizedPL = trade.pnl != null ? trade.pnl.toFixed(2) : "N/A";
-					const unrealizedPLPct =
-						trade.return_pct != null
-							? `${trade.return_pct.toFixed(2)}%`
-							: "N/A";
-					const unrealizedCombined = `${unrealizedPL} / ${unrealizedPLPct}`;
-
-					return `
-            <tr data-id="${trade.id}">
-              <td>${trade.ticker || ""}</td>
-              <td>${trade.quantity || ""}</td>
-              <td>${qtyRemaining}</td>
-              <td>${trade.price || "N/A"}</td>
-              <td>${unrealizedCombined}</td>
-              <td>${trade.current_price || "N/A"}</td>
-              <td class="actions-column">
-                <div class="table-actions">
-                  <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${
-										trade.id
-									}">Details</button>
-                  <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
-                </div>
-              </td>
-            </tr>
-          `;
-				})
-				.join("")}
-    </tbody>
-  `;
-	container.appendChild(table);
+	cardWrapper.appendChild(table);
+	container.innerHTML = "";
+	container.appendChild(cardWrapper);
 }
