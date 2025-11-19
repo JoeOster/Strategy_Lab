@@ -1,5 +1,3 @@
-// Suggested change for public/js/modules/transactions/render.js
-
 /** @typedef {import('../../types.js').PaperTradeSummary} PaperTradeSummary */
 /** @typedef {import('../../types.js').Transaction} Transaction */
 /** @typedef {import('../../types.js').TransactionWithPrice} TransactionWithPrice */
@@ -74,7 +72,8 @@ export function renderTradesTable(container, title, trades, error, isPaper) {
       <th class="text-center sortable" title="Quantity Purchased" data-sort-key="quantity">Qty P.</th>
       <th class="text-center sortable" title="Quantity Remaining" data-sort-key="qtyRemaining">Qty R.</th>
       <th class="text-center sortable" title="Entry Price" data-sort-key="price">E. Price</th>
-      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar and Percentage" data-sort-key="unrealizedCombined">U. P/L $/ %</th>
+      <th class="text-center sortable" title="Unrealized Profit/Loss Dollar" data-sort-key="unrealizedPl">U. P/L $</th>
+      <th class="text-center sortable" title="Unrealized Profit/Loss Percentage" data-sort-key="unrealizedPlPct">U. P/L %</th>
       <th class="text-center sortable" title="Current Price" data-sort-key="current_price">C. Price</th>
       <th class="text-center">Actions</th>
     `;
@@ -138,14 +137,13 @@ function renderTradeRow(trade, isPaper, title) {
     : null;
 
   const qtyRemaining = trade.quantity - (trade.sold_quantity || 0);
-  const unrealizedCombined = `${unrealizedPl !== null ? formatCurrency(unrealizedPl) : 'N/A'} / ${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}`;
 
   let rowContent = '';
   let actions = '';
 
   if (title === 'Open Trades') {
     actions = `
-      <button class="btn table-action-btn btn-secondary small-btn open-trade-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-secondary small-btn open-trade-edit-btn" data-id="${trade.id}">Edit</button>
       <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
     `;
     rowContent = `
@@ -153,7 +151,8 @@ function renderTradeRow(trade, isPaper, title) {
       <td class="text-center">${trade.quantity || ''}</td>
       <td class="text-center">${qtyRemaining}</td>
       <td class="text-center">${formatCurrency(trade.price)}</td>
-      <td class="text-center">${unrealizedCombined}</td>
+      <td class="text-center">${formatCurrency(unrealizedPl)}</td>
+      <td class="text-center">${unrealizedPlPct !== null ? `${unrealizedPlPct.toFixed(2)}%` : 'N/A'}</td>
       <td class="text-center">${formatCurrency(trade.current_price)}</td>
       <td class="actions-column text-center">
         <div class="table-actions">
@@ -163,7 +162,7 @@ function renderTradeRow(trade, isPaper, title) {
     `;
   } else if (title === 'Closed Trades') {
     actions = `
-      <button class="btn table-action-btn btn-secondary small-btn closed-trade-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-secondary small-btn closed-trade-edit-btn" data-id="${trade.id}">Edit</button>
       <button class="btn table-action-btn btn-danger small-btn closed-trade-delete-btn" data-id="${trade.id}">Delete</button>
     `;
     rowContent = `
@@ -182,7 +181,7 @@ function renderTradeRow(trade, isPaper, title) {
     `;
   } else { // Paper Trades
     actions = `
-      <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn table-action-btn btn-secondary paper-edit-btn" data-id="${trade.id}">Edit</button>
       <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
     `;
     rowContent = `
@@ -201,5 +200,6 @@ function renderTradeRow(trade, isPaper, title) {
     `;
   }
 
-  return `<tr data-id="${trade.id}">${rowContent}</tr>`;
+  // Added class and data attribute for the future modal handler to capture row click
+  return `<tr data-id="${trade.id}" class="clickable-trade-row" data-trade-type="${title.toLowerCase().replace(' ', '-')}">${rowContent}</tr>`;
 }
