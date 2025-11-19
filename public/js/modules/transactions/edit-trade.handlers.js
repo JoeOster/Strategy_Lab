@@ -278,7 +278,6 @@ export function initializeEditTradeHandlers() {
 		// Check for Edit Trade buttons using event delegation
 		if (
 			target?.classList.contains("open-trade-edit-btn") ||
-			target?.classList.contains("closed-trade-edit-btn") ||
 			target?.classList.contains("paper-edit-btn")
 		) {
 			const tradeId = target?.dataset.id;

@@ -33,8 +33,9 @@ export async function sellTransaction(sellData) {
 }
 
 /**
- * Fetches all available exchanges.
- * @returns {Promise<Array<Object>>} A promise that resolves to an array of exchange objects.
+ * Fetches all available exchanges from the backend.
+ * @typedef {import('../../types.js').Exchange} Exchange
+ * @returns {Promise<Exchange[]>} A promise that resolves to an array of exchange objects.
  */
 export async function getExchanges() {
 	return api.get("/api/exchanges");

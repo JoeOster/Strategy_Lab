@@ -14,29 +14,29 @@ import { getSource } from "../../settings/sources.api.js";
 import { openSourceFormModal } from "../../settings/sources.handlers.js";
 // --- END: MODIFICATION ---
 import {
-  renderOpenTradesForSource,
-  renderPaperTradesForSource,
-  tct_renderTradesTable,
+	renderOpenTradesForSource,
+	renderPaperTradesForSource,
+	tct_renderTradesTable,
 } from "../../transactions/render.js";
 import { handleDeletePaperTradeClick } from "../paper-trades/handlers.js";
 import * as watchedListHandlers from "../watched-list/handlers.js";
 import {
-  deleteStrategy,
-  getOpenIdeasForSource,
-  getOpenTradesForSource,
-  getPaperTradesForSource,
-  getStrategiesForSource, // TCT: Import the new API function
-  tct_getTradesForSource,
+	deleteStrategy,
+	getOpenIdeasForSource,
+	getOpenTradesForSource,
+	getPaperTradesForSource,
+	getStrategiesForSource, // TCT: Import the new API function
+	tct_getTradesForSource,
 } from "./api.js";
 import { handleShowIdeaForm } from "./idea-form.handlers.js";
 import {
-  renderOpenIdeasForSource,
-  renderStrategiesTable,
-  renderTradeIdeasTable,
+	renderOpenIdeasForSource,
+	renderStrategiesTable,
+	renderTradeIdeasTable,
 } from "./render.js";
 import {
-  handleShowEditStrategyForm,
-  handleShowStrategyForm,
+	handleShowEditStrategyForm,
+	handleShowStrategyForm,
 } from "./strategy-form.handlers.js";
 
 /** @type {EventListener | null} */
@@ -287,11 +287,6 @@ export function closeSourceDetailModal() {
 		const openTrades = document.getElementById("open-trades-table-placeholder");
 		if (openTrades) openTrades.innerHTML = "";
 
-		const closedTrades = document.getElementById(
-			"closed-trades-table-placeholder",
-		);
-		if (closedTrades) closedTrades.innerHTML = "";
-
 		// Remove event listener for the modal body
 		const modalBody = modal.querySelector(".modal-body");
 		if (modalBody) {
@@ -524,11 +519,6 @@ async function handleModalBottomPanelClicks(event) {
 		openEditTradeModal({ tradeId: id, isSell: true });
 	} else if (button.classList.contains("real-edit-btn")) {
 		openEditTradeModal({ tradeId: id });
-	}
-
-	// Check for "Closed Trades" buttons
-	if (button.classList.contains("closed-trade-edit-btn")) {
-		openEditTradeModal({ tradeId: id, isSell: false });
 	}
 
 	// @ts-ignore

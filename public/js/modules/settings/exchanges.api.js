@@ -5,7 +5,7 @@ import { api } from '../../services/apiFetch.js';
 
 /**
  * Fetches the list of exchanges from the backend.
- * @returns {Promise<Exchange[]>} A promise that resolves to an array of exchange objects.
+ * @returns {Promise<Array<Exchange>>} A promise that resolves to an array of exchange objects.
  */
 export async function getExchanges() {
   return api.get('/api/exchanges');
