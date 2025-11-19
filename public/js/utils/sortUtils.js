@@ -38,45 +38,50 @@ export function sortData(data, key, direction) {
  * @param {HTMLTableElement} table - The table element to make sortable.
  */
 export function makeTableSortable(table) {
-    const headers = table.querySelectorAll('th.sortable');
-    headers.forEach(header => {
-        header.addEventListener('click', () => {
-            const tableBody = table.querySelector('tbody');
-            if (!tableBody) return;
-            const rows = Array.from(tableBody.querySelectorAll('tr'));
-            const sortDirection = header.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
+	const headers = table.querySelectorAll("th.sortable");
+	for (const header of headers) {
+		header.addEventListener("click", () => {
+			const tableBody = table.querySelector("tbody");
+			if (!tableBody) return;
+			const rows = Array.from(tableBody.querySelectorAll("tr"));
+			const sortDirection =
+				header.dataset.sortDirection === "asc" ? "desc" : "asc";
 
-            // Reset sort direction for other headers
-            headers.forEach(h => {
-                if (h !== header) {
-                    h.removeAttribute('data-sort-direction');
-                }
-            });
-            header.dataset.sortDirection = sortDirection;
+			// Reset sort direction for other headers
+			for (const h of headers) {
+				if (h !== header) {
+					h.removeAttribute("data-sort-direction");
+				}
+			}
+			header.dataset.sortDirection = sortDirection;
 
-            const headerIndex = Array.from(header.parentNode.children).indexOf(header);
+			const headerIndex = Array.from(header.parentNode.children).indexOf(
+				header,
+			);
 
-            rows.sort((a, b) => {
-                const aText = a.children[headerIndex]?.textContent.trim() || '';
-                const bText = b.children[headerIndex]?.textContent.trim() || '';
+			rows.sort((a, b) => {
+				const aText = a.children[headerIndex]?.textContent.trim() || "";
+				const bText = b.children[headerIndex]?.textContent.trim() || "";
 
-                // Attempt to parse numbers, removing currency symbols, commas, and percentages
-                const aNum = parseFloat(aText.replace(/[$%,]/g, ''));
-                const bNum = parseFloat(bText.replace(/[$%,]/g, ''));
+				// Attempt to parse numbers, removing currency symbols, commas, and percentages
+				const aNum = Number.parseFloat(aText.replace(/[$%,]/g, ""));
+				const bNum = Number.parseFloat(bText.replace(/[$%,]/g, ""));
 
-                const aValue = !isNaN(aNum) ? aNum : aText.toLowerCase();
-                const bValue = !isNaN(bNum) ? bNum : bText.toLowerCase();
+				const aValue = !Number.isNaN(aNum) ? aNum : aText.toLowerCase();
+				const bValue = !Number.isNaN(bNum) ? bNum : bText.toLowerCase();
 
-                if (aValue < bValue) {
-                    return sortDirection === 'asc' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortDirection === 'asc' ? 1 : -1;
-                }
-                return 0;
-            });
+				if (aValue < bValue) {
+					return sortDirection === "asc" ? -1 : 1;
+				}
+				if (aValue > bValue) {
+					return sortDirection === "asc" ? 1 : -1;
+				}
+				return 0;
+			});
 
-            rows.forEach(row => tableBody.appendChild(row));
-        });
-    });
+			for (const row of rows) {
+				tableBody.appendChild(row);
+			}
+		});
+	}
 }

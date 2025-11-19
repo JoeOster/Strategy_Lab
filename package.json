@@ -5,14 +5,15 @@
 		"start": "cross-env NODE_ENV=development node server.js",
 		"check": "npm run check:biome && npm run check:md",
 		"check:biome": "biome check --config-path ./biome.json .",
-		"check:md": "markdownlint . --ignore node_modules",
+		"check:md": "markdownlint . --ignore node_modules docs playwright-report",
 		"fix": "npm run fix:biome && npm run fix:md",
-		"fix:biome": "biome check --write --unsafe --config-path ./biome.json .",
-		"fix:md": "markdownlint . --fix --ignore node_modules"
+		"fix:biome": "biome check --apply-unsafe --config-path ./biome.json .",
+		"fix:md": "markdownlint . --fix --ignore node_modules docs playwright-report"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.5",
 		"express": "^4.19.2",
+		"node-fetch": "^3.3.2",
 		"sqlite": "^5.1.1",
 		"sqlite3": "^5.1.7"
 	},
@@ -21,6 +22,7 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^9.3.0",
 		"globals": "^15.3.0",
+		"markdownlint": "^0.39.0",
 		"markdownlint-cli": "^0.41.0",
 		"nodemon": "^3.1.0"
 	},

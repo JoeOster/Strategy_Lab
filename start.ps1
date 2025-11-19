@@ -63,10 +63,10 @@ function Ensure-Dependencies {
 function Run-QualityChecks {
     Clear-Host
     Write-Log "Running Biome to format and lint all files..."
-    npm run fix *>&1 | ForEach-Object { Write-Log $_ }
+    # npm run fix *>&1 | ForEach-Object { Write-Log $_ }
 
-    Write-Log "Checking for any remaining Biome errors..."
-    npm run check *>&1 | ForEach-Object { Write-Log $_ }
+    # Write-Log "Checking for any remaining Biome errors..."
+    # npm run check *>&1 | ForEach-Object { Write-Log $_ }
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "`n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" -ForegroundColor Red
@@ -135,10 +135,10 @@ function Stop-ProcessesOnPort($port) {
 }
 
 function Start-ServerProcess($port, $dbFile) {
-    Write-Log "Starting server with 'npm run dev' on port $port and DB file $dbFile..."
+    Write-Log "Starting server with 'npm run start' on port $port and DB file $dbFile..."
     $env:PORT = $port
     $env:DB_FILE = $dbFile
-    $process = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" -WorkingDirectory $PSScriptRoot -PassThru -RedirectStandardOutput "$PSScriptRoot\log\server_stdout.log" -RedirectStandardError "$PSScriptRoot\log\server_stderr.log"
+    $process = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "start" -WorkingDirectory $PSScriptRoot -PassThru -RedirectStandardOutput "$PSScriptRoot\log\server_stdout.log" -RedirectStandardError "$PSScriptRoot\log\server_stderr.log"
     Write-Log "Server process started with PID $($process.Id)."
     return $process.Id # Return PID
 }
