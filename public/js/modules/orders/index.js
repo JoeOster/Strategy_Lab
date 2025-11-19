@@ -1,1 +1,1 @@
-console.log('Orders module loaded.');
+console.log("Orders module loaded.");

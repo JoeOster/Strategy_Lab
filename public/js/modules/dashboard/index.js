@@ -1,1 +1,1 @@
-console.log('Dashboard module loaded.');
+console.log("Dashboard module loaded.");

@@ -1,48 +1,28 @@
 {
-  "name": "strategy_lab",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "test": "npm run test:e2e >log/npm_e2e.log",
-    "test:e2e": "playwright test",
-    "check:biome": "biome check .",
-    "check:md": "prettier --check \"**/*.md\"",
-    "check": "npm run check:biome && npm run check:md",
-    "fix:biome": "biome check --write .",
-    "fix:md": "prettier --write \"**/*.md\"",
-    "fix": "npm run fix:biome && npm run fix:md"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
-    "@eslint/markdown": "^6.0.0",
-    "@playwright/test": "^1.56.1",
-    "@types/node": "^24.10.0",
-    "cross-env": "^7.0.3",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.5.0",
-    "live-server": "^1.2.0",
-    "playwright": "^1.56.1",
-    "prettier": "^3.6.2",
-    "wait-on": "^7.2.0"
-  },
-  "dependencies": {
-    "@tanstack/query-core": "^5.51.1",
-    "bottleneck": "^2.19.5",
-    "dotenv": "^16.4.5",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "node-fetch": "^3.3.2",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
-    "zustand": "^4.5.4"
-  }
+	"name": "strategy_lab",
+	"version": "1.0.0",
+	"scripts": {
+		"start": "cross-env NODE_ENV=development node server.js",
+		"check": "npm run check:biome && npm run check:md",
+		"check:biome": "biome check --config-path ./biome.json .",
+		"check:md": "markdownlint . --ignore node_modules",
+		"fix": "npm run fix:biome && npm run fix:md",
+		"fix:biome": "biome check --write --unsafe --config-path ./biome.json .",
+		"fix:md": "markdownlint . --fix --ignore node_modules"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"express": "^4.19.2",
+		"sqlite": "^5.1.1",
+		"sqlite3": "^5.1.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.7.3",
+		"cross-env": "^7.0.3",
+		"eslint": "^9.3.0",
+		"globals": "^15.3.0",
+		"markdownlint-cli": "^0.41.0",
+		"nodemon": "^3.1.0"
+	},
+	"type": "module"
 }

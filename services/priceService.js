@@ -1,21 +1,21 @@
 // --- FIX: Refined JSDoc import for Bottleneck CommonJS constructor ---
 /** @type {typeof import('bottleneck')} */
-import Bottleneck from 'bottleneck';
+import Bottleneck from "bottleneck";
 // services/priceService.js
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 // --- Read both API keys ---
 const API_KEYS = [
-  process.env.FINNHUB_API_KEY,
-  process.env.FINNHUB_API_KEY_2,
+	process.env.FINNHUB_API_KEY,
+	process.env.FINNHUB_API_KEY_2,
 ].filter(Boolean);
 let currentKeyIndex = 0;
 
 // --- Adjust API Calls per Minute ---
 const TOTAL_API_CALLS_PER_MINUTE =
-  API_KEYS.length > 1 && Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
-    ? Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
-    : 60;
+	API_KEYS.length > 1 && Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
+		? Number.parseInt(process.env.API_CALLS_PER_MINUTE, 10)
+		: 60;
 
 // --- FIX: Cache expiration updated to 130 seconds ---
 // This ensures the cache is still valid for the 120-second high-priority cron job.
@@ -26,11 +26,11 @@ const getTimestamp = () => new Date().toISOString();
 
 // Initialize the rate limiter directly using the imported constructor
 const limiter = new Bottleneck({
-  // <-- This line will now be correct
-  reservoir: TOTAL_API_CALLS_PER_MINUTE,
-  reservoirRefreshAmount: TOTAL_API_CALLS_PER_MINUTE,
-  reservoirRefreshInterval: 60 * 1000,
-  maxConcurrent: API_KEYS.length > 1 ? 4 : 2,
+	// <-- This line will now be correct
+	reservoir: TOTAL_API_CALLS_PER_MINUTE,
+	reservoirRefreshAmount: TOTAL_API_CALLS_PER_MINUTE,
+	reservoirRefreshInterval: 60 * 1000,
+	maxConcurrent: API_KEYS.length > 1 ? 4 : 2,
 });
 
 /**
@@ -38,7 +38,7 @@ const limiter = new Bottleneck({
  * @returns {Promise<void>}
  */
 const disconnect = async () => {
-  await limiter.disconnect();
+	await limiter.disconnect();
 };
 
 /**
@@ -48,38 +48,38 @@ const disconnect = async () => {
  * @returns {Promise<number|'invalid'|null>} The price, 'invalid', or null on error.
  */
 async function fetchSinglePrice(ticker, apiKey) {
-  try {
-    if (!apiKey) throw new Error('API key not provided for this request.');
-    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
-    console.log(
-      `[${getTimestamp()}] [Price Service] Submitting request for ${ticker} using key ending in ${apiKey.slice(-4)}`
-    );
-    const apiRes = await fetch(url);
-    if (apiRes.ok) {
-      const data = await apiRes.json();
-      console.log(
-        `[${getTimestamp()}] [Price Service] Received data for ${ticker}: ${JSON.stringify(data)}`
-      );
-      if (data && typeof data.c === 'number' && data.c > 0) {
-        return data.c;
-      }
-      console.warn(
-        `[${getTimestamp()}] [Price Service Warning] Ticker '${ticker}' returned invalid price data: ${JSON.stringify(data)}`
-      );
-      return 'invalid';
-    }
-    console.error(
-      `[${getTimestamp()}] [Price Service Error] API call for ${ticker} failed with status: ${apiRes.status}`
-    );
-    return 'invalid';
-  } catch (error) {
-    // @ts-ignore
-    console.error(
-      `[${getTimestamp()}] [Price Service Error] Error fetching price for ${ticker}:`,
-      error.message
-    );
-    return null;
-  }
+	try {
+		if (!apiKey) throw new Error("API key not provided for this request.");
+		const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+		console.log(
+			`[${getTimestamp()}] [Price Service] Submitting request for ${ticker} using key ending in ${apiKey.slice(-4)}`,
+		);
+		const apiRes = await fetch(url);
+		if (apiRes.ok) {
+			const data = await apiRes.json();
+			console.log(
+				`[${getTimestamp()}] [Price Service] Received data for ${ticker}: ${JSON.stringify(data)}`,
+			);
+			if (data && typeof data.c === "number" && data.c > 0) {
+				return data.c;
+			}
+			console.warn(
+				`[${getTimestamp()}] [Price Service Warning] Ticker '${ticker}' returned invalid price data: ${JSON.stringify(data)}`,
+			);
+			return "invalid";
+		}
+		console.error(
+			`[${getTimestamp()}] [Price Service Error] API call for ${ticker} failed with status: ${apiRes.status}`,
+		);
+		return "invalid";
+	} catch (error) {
+		// @ts-ignore
+		console.error(
+			`[${getTimestamp()}] [Price Service Error] Error fetching price for ${ticker}:`,
+			error.message,
+		);
+		return null;
+	}
 }
 
 /**
@@ -95,61 +95,61 @@ async function fetchSinglePrice(ticker, apiKey) {
  * @returns {Promise<{[ticker: string]: PriceData}>} A map of tickers to PriceData objects.
  */
 async function getPrices(tickers, priority = 5) {
-  if (API_KEYS.length === 0) {
-    console.error(
-      `[${getTimestamp()}] [Price Service Error] No API keys configured.`
-    );
-    /** @type {{[ticker: string]: PriceData}} */
-    const results = {};
-    for (const ticker of tickers) {
-      results[ticker] = { price: null, timestamp: Date.now() };
-    }
-    return results;
-  }
+	if (API_KEYS.length === 0) {
+		console.error(
+			`[${getTimestamp()}] [Price Service Error] No API keys configured.`,
+		);
+		/** @type {{[ticker: string]: PriceData}} */
+		const results = {};
+		for (const ticker of tickers) {
+			results[ticker] = { price: null, timestamp: Date.now() };
+		}
+		return results;
+	}
 
-  const uniqueTickers = [...new Set(tickers)];
-  /** @type {{[ticker: string]: PriceData}} */
-  const results = {};
-  const tickersToFetch = [];
-  const now = Date.now();
+	const uniqueTickers = [...new Set(tickers)];
+	/** @type {{[ticker: string]: PriceData}} */
+	const results = {};
+	const tickersToFetch = [];
+	const now = Date.now();
 
-  // Check cache first
-  for (const ticker of uniqueTickers) {
-    if (priceCache.has(ticker)) {
-      const cached = priceCache.get(ticker);
-      if (now - cached.timestamp < CACHE_EXPIRATION_MS) {
-        results[ticker] = cached;
-      } else {
-        tickersToFetch.push(ticker);
-      }
-    } else {
-      tickersToFetch.push(ticker);
-    }
-  }
+	// Check cache first
+	for (const ticker of uniqueTickers) {
+		if (priceCache.has(ticker)) {
+			const cached = priceCache.get(ticker);
+			if (now - cached.timestamp < CACHE_EXPIRATION_MS) {
+				results[ticker] = cached;
+			} else {
+				tickersToFetch.push(ticker);
+			}
+		} else {
+			tickersToFetch.push(ticker);
+		}
+	}
 
-  // Fetch prices for tickers not found in valid cache
-  if (tickersToFetch.length > 0) {
-    const newCacheTimestamp = Date.now();
-    const fetchPromises = tickersToFetch.map((ticker) => {
-      const keyToUse = API_KEYS[currentKeyIndex];
-      currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
-      return limiter.schedule({ priority }, () =>
-        fetchSinglePrice(ticker, keyToUse)
-      );
-    });
+	// Fetch prices for tickers not found in valid cache
+	if (tickersToFetch.length > 0) {
+		const newCacheTimestamp = Date.now();
+		const fetchPromises = tickersToFetch.map((ticker) => {
+			const keyToUse = API_KEYS[currentKeyIndex];
+			currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+			return limiter.schedule({ priority }, () =>
+				fetchSinglePrice(ticker, keyToUse),
+			);
+		});
 
-    const prices = await Promise.all(fetchPromises);
+		const prices = await Promise.all(fetchPromises);
 
-    for (const [index, ticker] of tickersToFetch.entries()) {
-      const price = prices[index];
-      /** @type {PriceData} */
-      const cacheEntry = { price: price, timestamp: newCacheTimestamp };
-      priceCache.set(ticker, cacheEntry);
-      results[ticker] = cacheEntry;
-    }
-  }
+		for (const [index, ticker] of tickersToFetch.entries()) {
+			const price = prices[index];
+			/** @type {PriceData} */
+			const cacheEntry = { price: price, timestamp: newCacheTimestamp };
+			priceCache.set(ticker, cacheEntry);
+			results[ticker] = cacheEntry;
+		}
+	}
 
-  return results;
+	return results;
 }
 
 export { getPrices, disconnect };

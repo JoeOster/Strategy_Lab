@@ -6,27 +6,27 @@
  * @param {Error | null} [error] - An optional error object.
  */
 export function renderWatchedList(watchedList, error = null) {
-  const container = document.getElementById('watched-list-table');
-  if (!container) {
-    console.error('Watched list container not found.');
-    return;
-  }
+	const container = document.getElementById("watched-list-table");
+	if (!container) {
+		console.error("Watched list container not found.");
+		return;
+	}
 
-  if (error) {
-    container.innerHTML = '<p class="error">Failed to load watched list.</p>';
-    return;
-  }
+	if (error) {
+		container.innerHTML = '<p class="error">Failed to load watched list.</p>';
+		return;
+	}
 
-  if (!watchedList || watchedList.length === 0) {
-    container.innerHTML = '<p>No items in your watched list.</p>';
-    return;
-  }
+	if (!watchedList || watchedList.length === 0) {
+		container.innerHTML = "<p>No items in your watched list.</p>";
+		return;
+	}
 
-  const table = document.createElement('table');
-  table.className = 'strategy-table'; // Re-use the existing table style
+	const table = document.createElement("table");
+	table.className = "strategy-table"; // Re-use the existing table style
 
-  // Columns now match the 'watched_items' table schema for "Ideas"
-  table.innerHTML = `
+	// Columns now match the 'watched_items' table schema for "Ideas"
+	table.innerHTML = `
     <thead>
       <tr>
         <th>Ticker</th>
@@ -42,38 +42,38 @@ export function renderWatchedList(watchedList, error = null) {
     </thead>
     <tbody>
       ${watchedList
-        .map(
-          (item) => `
+				.map(
+					(item) => `
         <tr data-id="${item.id}">
-          <td>${item.ticker || ''}</td>
-          <td>${item.buy_price_high || ''}</td>
-          <td>${item.buy_price_low || ''}</td>
-          <td>${item.take_profit_high || ''}</td>
-          <td>${item.take_profit_low || ''}</td>
-          <td>${item.escape_price || ''}</td>
-          <td>${item.status || 'WATCHING'}</td>
-          <td>${item.notes || ''}</td>
+          <td>${item.ticker || ""}</td>
+          <td>${item.buy_price_high || ""}</td>
+          <td>${item.buy_price_low || ""}</td>
+          <td>${item.take_profit_high || ""}</td>
+          <td>${item.take_profit_low || ""}</td>
+          <td>${item.escape_price || ""}</td>
+          <td>${item.status || "WATCHING"}</td>
+          <td>${item.notes || ""}</td>
           <td>
             <button class="btn table-action-btn idea-buy-btn" data-id="${
-              item.id
-            }">Buy</button>
+							item.id
+						}">Buy</button>
             <button class="btn table-action-btn btn-secondary idea-paper-btn" data-id="${
-              item.id
-            }">Paper</button>
+							item.id
+						}">Paper</button>
             <button class="btn table-action-btn btn-secondary idea-edit-btn" data-id="${
-              item.id
-            }">Edit</button>
+							item.id
+						}">Edit</button>
             <button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${
-              item.id
-            }">Delete</button>
+							item.id
+						}">Delete</button>
           </td>
         </tr>
-      `
-        )
-        .join('')}
+      `,
+				)
+				.join("")}
     </tbody>
   `;
 
-  container.innerHTML = ''; // Clear previous content
-  container.appendChild(table);
+	container.innerHTML = ""; // Clear previous content
+	container.appendChild(table);
 }

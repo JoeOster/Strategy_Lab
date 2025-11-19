@@ -37,6 +37,7 @@
  * @property {number} id
  * @property {number} source_id
  * @property {string} title
+ * @property {string | null} [ticker]
  * @property {string | null} [chapter]
  * @property {number | null} [page_number]
  * @property {string | null} [description]
@@ -79,13 +80,21 @@
  * @property {number} quantity
  * @property {number} price
  * @property {number | null} [quantity_remaining]
+ * @property {number | null} [sold_quantity] - (Calculated by API)
+ * @property {number | null} [current_price] - (Added by API)
+ * @property {string | null} [exchange_id] - (From database)
+ * @property {string | null} [exit_date] - (For paper trades)
  * @property {string} created_date
  * @property {string} updated_date
  */
 
 /**
  * Represents a Transaction with current price information added by the API.
- * @typedef {Transaction & { current_price: number | null }} TransactionWithPrice
+ * @typedef {Transaction & {
+ *   current_price: number | null,
+ *   pnl?: number | null,
+ *   return_pct?: number | null
+ * }} TransactionWithPrice
  */
 
 /**
@@ -117,6 +126,13 @@
  * @property {number | null} [current_price] - (Added by the API)
  */
 // --- END: NEW TYPE ---
+
+/**
+ * Represents an Exchange from the 'exchanges' table.
+ * @typedef {object} Exchange
+ * @property {number} id
+ * @property {string} name
+ */
 
 // This export is necessary to make this file a module that can be imported
 // by JSDoc/TypeScript.

@@ -1,74 +1,74 @@
 /* Existing CSS content starts here */
 .settings-tabs,
 .settings-sub-tabs {
-  display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--container-border);
+	display: flex;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--container-border);
 }
 
 .settings-tabs button,
 .settings-sub-tabs button {
-  background-color: var(--container-bg);
-  color: var(--text-color);
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-  border-radius: 5px 5px 0 0;
-  margin-right: 5px;
-  border-bottom: 1px solid var(--container-border);
+	background-color: var(--container-bg);
+	color: var(--text-color);
+	border: none;
+	padding: 10px 15px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background-color 0.3s;
+	border-radius: 5px 5px 0 0;
+	margin-right: 5px;
+	border-bottom: 1px solid var(--container-border);
 }
 
 .settings-tabs button:hover,
 .settings-sub-tabs button:hover {
-  background-color: var(--info-panel-bg);
+	background-color: var(--info-panel-bg);
 }
 
 .settings-tabs button.active,
 .settings-sub-tabs button.active {
-  background-color: var(--info-panel-bg);
-  color: var(--heading-color);
-  border-bottom: 1px solid var(--info-panel-bg);
+	background-color: var(--info-panel-bg);
+	color: var(--heading-color);
+	border-bottom: 1px solid var(--info-panel-bg);
 }
 
 /* Settings Panels */
 .settings-panel,
 .sub-panel,
 .sub-tab-content {
-  display: none; /* Hidden by default */
-  padding: 15px 0;
-  border-top: 1px solid var(--container-border);
-  position: absolute; /* Position inactive panels absolutely */
-  top: 0;
-  left: 0;
-  width: 100%;
+	display: none; /* Hidden by default */
+	padding: 15px 0;
+	border-top: 1px solid var(--container-border);
+	position: absolute; /* Position inactive panels absolutely */
+	top: 0;
+	left: 0;
+	width: 100%;
 }
 
 .settings-panel.active,
 .sub-panel.active,
 .sub-tab-content.active {
-  display: block; /* Show active panel */
-  position: relative; /* Bring active panel back into document flow */
-  min-height: 100px; /* Ensure active panel has some height */
+	display: block; /* Show active panel */
+	position: relative; /* Bring active panel back into document flow */
+	min-height: 100px; /* Ensure active panel has some height */
 }
 
 /* Add position relative to modal-content to serve as positioning context */
 .modal-content {
-  position: relative;
-  overflow: hidden; /* Hide overflowing content from absolutely positioned children */
+	position: relative;
+	overflow: hidden; /* Hide overflowing content from absolutely positioned children */
 }
 
 /* --- START: NEW PREVIEW STYLE --- */
 .source-form-image-preview {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%; /* Makes it a circle */
-  object-fit: cover; /* Prevents stretching */
-  border: 2px solid var(--container-border);
-  margin-bottom: 15px;
-  display: none; /* Hidden by default, JS will show it */
-  margin-left: auto;
-  margin-right: auto;
+	width: 100px;
+	height: 100px;
+	border-radius: 50%; /* Makes it a circle */
+	object-fit: cover; /* Prevents stretching */
+	border: 2px solid var(--container-border);
+	margin-bottom: 15px;
+	display: none; /* Hidden by default, JS will show it */
+	margin-left: auto;
+	margin-right: auto;
 }
 /* --- END: NEW PREVIEW STYLE --- */

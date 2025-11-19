@@ -1,6 +1,6 @@
 // public/js/modules/settings/sources.api.js
 
-import { api } from '../../services/apiFetch.js';
+import { api } from "../../services/apiFetch.js";
 /** @unused @typedef {import('../../types.js').Source} Source */
 
 /**
@@ -8,7 +8,7 @@ import { api } from '../../services/apiFetch.js';
  * @returns {Promise<Source[]>} A promise that resolves to an array of source objects.
  */
 export async function getSources() {
-  return api.get('/api/sources');
+	return api.get("/api/sources");
 }
 
 /**
@@ -17,7 +17,7 @@ export async function getSources() {
  * @returns {Promise<Source>} A promise that resolves to the source object.
  */
 export async function getSource(id) {
-  return api.get(`/api/sources/${id}`);
+	return api.get(`/api/sources/${id}`);
 }
 
 /**
@@ -26,7 +26,7 @@ export async function getSource(id) {
  * @returns {Promise<Source>} A promise that resolves to the added source object.
  */
 export async function addSource(source) {
-  return api.post('/api/sources', source);
+	return api.post("/api/sources", source);
 }
 
 /**
@@ -35,7 +35,7 @@ export async function addSource(source) {
  * @returns {Promise<void>} A promise that resolves when the source is deleted.
  */
 export async function deleteSource(id) {
-  return api.delete(`/api/sources/${id}`);
+	return api.delete(`/api/sources/${id}`);
 }
 
 /**
@@ -45,5 +45,5 @@ export async function deleteSource(id) {
  * @returns {Promise<Source>} A promise that resolves to the updated source object.
  */
 export async function updateSource(id, source) {
-  return api.put(`/api/sources/${id}`, source);
+	return api.put(`/api/sources/${id}`, source);
 }

@@ -1,1 +1,1 @@
-console.log('Settings module loaded.');
+console.log("Settings module loaded.");

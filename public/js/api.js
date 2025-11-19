@@ -10,25 +10,25 @@
  * @returns {Promise<WatchedItem>} The newly created watched item from the server.
  */
 export async function createWatchedItem(ideaData) {
-  const response = await fetch('/api/watched-items/ideas', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ideaData),
-  });
+	const response = await fetch("/api/watched-items/ideas", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(ideaData),
+	});
 
-  if (!response.ok) {
-    let errorDetails = 'An unknown error occurred';
-    try {
-      const errorData = await response.json();
-      errorDetails =
-        errorData.details || errorData.error || response.statusText;
-    } catch (e) {
-      errorDetails = response.statusText;
-    }
-    throw new Error(`Failed to create watched item: ${errorDetails}`);
-  }
+	if (!response.ok) {
+		let errorDetails = "An unknown error occurred";
+		try {
+			const errorData = await response.json();
+			errorDetails =
+				errorData.details || errorData.error || response.statusText;
+		} catch (e) {
+			errorDetails = response.statusText;
+		}
+		throw new Error(`Failed to create watched item: ${errorDetails}`);
+	}
 
-  return response.json();
+	return response.json();
 }
 
 /**
@@ -37,18 +37,18 @@ export async function createWatchedItem(ideaData) {
  * @returns {Promise<WatchedItem>} The watched item data.
  */
 export async function getWatchedItem(id) {
-  const response = await fetch(`/api/watched-items/${id}`, {
-    cache: 'no-cache',
-  });
+	const response = await fetch(`/api/watched-items/${id}`, {
+		cache: "no-cache",
+	});
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to fetch watched item: ${errorData.details || 'Not Found'}`
-    );
-  }
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(
+			`Failed to fetch watched item: ${errorData.details || "Not Found"}`,
+		);
+	}
 
-  return response.json();
+	return response.json();
 }
 
 /**
@@ -58,20 +58,20 @@ export async function getWatchedItem(id) {
  * @returns {Promise<WatchedItem>} The updated watched item.
  */
 export async function updateWatchedItem(id, ideaData) {
-  const response = await fetch(`/api/watched-items/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ideaData),
-  });
+	const response = await fetch(`/api/watched-items/${id}`, {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(ideaData),
+	});
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to update watched item: ${errorData.details || response.statusText}`
-    );
-  }
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(
+			`Failed to update watched item: ${errorData.details || response.statusText}`,
+		);
+	}
 
-  return response.json();
+	return response.json();
 }
 
 /**
@@ -80,16 +80,16 @@ export async function updateWatchedItem(id, ideaData) {
  * @returns {Promise<void>}
  */
 export async function deleteWatchedItem(id) {
-  const response = await fetch(`/api/watched-items/${id}`, {
-    method: 'DELETE',
-  });
+	const response = await fetch(`/api/watched-items/${id}`, {
+		method: "DELETE",
+	});
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to delete watched item: ${errorData.details || 'Not Found'}`
-    );
-  }
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(
+			`Failed to delete watched item: ${errorData.details || "Not Found"}`,
+		);
+	}
 }
 
 /**
@@ -98,15 +98,15 @@ export async function deleteWatchedItem(id) {
  * @returns {Promise<WatchedItem[]>} A list of trade ideas.
  */
 export async function getTradeIdeas() {
-  const response = await fetch('/api/watched-items/ideas', {
-    cache: 'no-cache',
-  });
+	const response = await fetch("/api/watched-items/ideas", {
+		cache: "no-cache",
+	});
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch trade ideas');
-  }
+	if (!response.ok) {
+		throw new Error("Failed to fetch trade ideas");
+	}
 
-  return response.json();
+	return response.json();
 }
 
 /**
@@ -116,20 +116,20 @@ export async function getTradeIdeas() {
  * @returns {Promise<any>}
  */
 export async function moveIdeaToRealTrade(ideaId, tradeData) {
-  const response = await fetch(`/api/watched-items/${ideaId}/to-real`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(tradeData),
-  });
+	const response = await fetch(`/api/watched-items/${ideaId}/to-real`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(tradeData),
+	});
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to move idea to real trade: ${errorData.details || response.statusText}`
-    );
-  }
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(
+			`Failed to move idea to real trade: ${errorData.details || response.statusText}`,
+		);
+	}
 
-  return response.json();
+	return response.json();
 }
 
 /**
@@ -139,18 +139,18 @@ export async function moveIdeaToRealTrade(ideaId, tradeData) {
  * @returns {Promise<any>}
  */
 export async function moveIdeaToPaperTrade(ideaId, tradeData) {
-  const response = await fetch(`/api/watched-items/${ideaId}/to-paper`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(tradeData),
-  });
+	const response = await fetch(`/api/watched-items/${ideaId}/to-paper`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(tradeData),
+	});
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to move idea to paper trade: ${errorData.details || response.statusText}`
-    );
-  }
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(
+			`Failed to move idea to paper trade: ${errorData.details || response.statusText}`,
+		);
+	}
 
-  return response.json();
+	return response.json();
 }

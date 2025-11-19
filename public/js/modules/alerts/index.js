@@ -1,41 +1,41 @@
 // public/js/modules/alerts/index.js
 
-import { loadHtmlPartial } from '../../utils/loadHtmlPartial.js';
+import { loadHtmlPartial } from "../../utils/loadHtmlPartial.js";
 
 function initializeSubTabs() {
-  const subTabButtons = document.querySelectorAll('.sub-nav-btn');
-  const subContentContainer = document.getElementById('alerts-content');
+	const subTabButtons = document.querySelectorAll(".sub-nav-btn");
+	const subContentContainer = document.getElementById("alerts-content");
 
-  if (!subContentContainer) {
-    console.error('Sub-content container #alerts-content not found.');
-    return;
-  }
+	if (!subContentContainer) {
+		console.error("Sub-content container #alerts-content not found.");
+		return;
+	}
 
-  for (const button of subTabButtons) {
-    button.addEventListener('click', async (event) => {
-      const subtab = event.target.dataset.subtab;
+	for (const button of subTabButtons) {
+		button.addEventListener("click", async (event) => {
+			const subtab = event.target.dataset.subtab;
 
-      // Deactivate other buttons
-      for (const btn of subTabButtons) {
-        btn.classList.remove('active');
-      }
-      // Activate clicked button
-      event.target.classList.add('active');
+			// Deactivate other buttons
+			for (const btn of subTabButtons) {
+				btn.classList.remove("active");
+			}
+			// Activate clicked button
+			event.target.classList.add("active");
 
-      if (subtab) {
-        await loadHtmlPartial(`/_alerts-${subtab}.html`, 'alerts-content');
-      }
-    });
-  }
+			if (subtab) {
+				await loadHtmlPartial(`/_alerts-${subtab}.html`, "alerts-content");
+			}
+		});
+	}
 
-  // Load default sub-tab
-  const defaultSubTab = document.querySelector('.sub-nav-btn');
-  if (defaultSubTab) {
-    defaultSubTab.click();
-  }
+	// Load default sub-tab
+	const defaultSubTab = document.querySelector(".sub-nav-btn");
+	if (defaultSubTab) {
+		defaultSubTab.click();
+	}
 }
 
 export function initializeModule() {
-  console.log('Alerts module initialized.');
-  initializeSubTabs();
+	console.log("Alerts module initialized.");
+	initializeSubTabs();
 }

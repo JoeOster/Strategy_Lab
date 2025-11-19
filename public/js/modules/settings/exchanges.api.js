@@ -1,10 +1,11 @@
 // public/js/modules/settings/exchanges.api.js
 
 import { api } from '../../services/apiFetch.js';
+/** @typedef {import('../../types.js').Exchange} Exchange */
 
 /**
  * Fetches the list of exchanges from the backend.
- * @returns {Promise<Array>} A promise that resolves to an array of exchange objects.
+ * @returns {Promise<Exchange[]>} A promise that resolves to an array of exchange objects.
  */
 export async function getExchanges() {
   return api.get('/api/exchanges');

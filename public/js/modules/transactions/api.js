@@ -1,6 +1,6 @@
 // public/js/modules/transactions/api.js
 
-import { api } from '../../services/apiFetch.js';
+import { api } from "../../services/apiFetch.js";
 
 /** @typedef {import('../../types.js').Transaction} Transaction */
 
@@ -10,7 +10,7 @@ import { api } from '../../services/apiFetch.js';
  * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
  */
 export async function getTransaction(transactionId) {
-  return api.get(`/api/transactions/single/${transactionId}`);
+	return api.get(`/api/transactions/single/${transactionId}`);
 }
 
 /**
@@ -20,7 +20,7 @@ export async function getTransaction(transactionId) {
  * @returns {Promise<Transaction>} A promise that resolves to the updated transaction object.
  */
 export async function updateTransaction(transactionId, transactionData) {
-  return api.put(`/api/transactions/${transactionId}`, transactionData);
+	return api.put(`/api/transactions/${transactionId}`, transactionData);
 }
 
 /**
@@ -29,7 +29,7 @@ export async function updateTransaction(transactionId, transactionData) {
  * @returns {Promise<any>}
  */
 export async function sellTransaction(sellData) {
-  return api.post('/api/transactions/sell', sellData);
+	return api.post("/api/transactions/sell", sellData);
 }
 
 /**
@@ -37,7 +37,7 @@ export async function sellTransaction(sellData) {
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of exchange objects.
  */
 export async function getExchanges() {
-  return api.get('/api/exchanges');
+	return api.get("/api/exchanges");
 }
 
 /**
@@ -46,5 +46,5 @@ export async function getExchanges() {
  * @returns {Promise<{sold_quantity: number}>} A promise that resolves to an object containing the sold quantity.
  */
 export async function getSoldQuantity(transactionId) {
-  return api.get(`/api/transactions/sold-quantity/${transactionId}`);
+	return api.get(`/api/transactions/sold-quantity/${transactionId}`);
 }

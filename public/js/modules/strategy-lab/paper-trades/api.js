@@ -2,16 +2,16 @@
 
 /** @typedef {import('../../../types.js').Transaction} Transaction */
 
-import { api } from '../../../services/apiFetch.js';
+import { api } from "../../../services/apiFetch.js";
 
 /**
  * Fetches the list of all paper trades.
  * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of paper trades.
  */
 export async function getPaperTrades() {
-  // --- FIX: Call the real API endpoint ---
-  return api.get('/api/transactions/paper-trades');
-  // --- END FIX ---
+	// --- FIX: Call the real API endpoint ---
+	return api.get("/api/transactions/paper-trades");
+	// --- END FIX ---
 }
 
 /**
@@ -20,7 +20,7 @@ export async function getPaperTrades() {
  * @returns {Promise<Transaction>} A promise that resolves to a single trade object.
  */
 export async function getTradeById(tradeId) {
-  return api.get(`/api/transactions/${tradeId}`);
+	return api.get(`/api/transactions/${tradeId}`);
 }
 
 /**
@@ -29,7 +29,7 @@ export async function getTradeById(tradeId) {
  * @returns {Promise<any>}
  */
 export async function deletePaperTrade(id) {
-  return api.delete(`/api/transactions/${id}`);
+	return api.delete(`/api/transactions/${id}`);
 }
 
 /**
@@ -40,5 +40,5 @@ export async function deletePaperTrade(id) {
  * @returns {Promise<any>}
  */
 export async function sellTrade(tradeId, quantity, price) {
-  return api.post('/api/transactions/sell', { tradeId, quantity, price });
+	return api.post("/api/transactions/sell", { tradeId, quantity, price });
 }

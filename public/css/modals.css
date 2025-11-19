@@ -2,54 +2,54 @@
 
 /* General Modal Styles */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  /* This is a theme-agnostic backdrop, which is safe */
-  background-color: rgba(0, 0, 0, 0.4);
-  justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1000; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	/* This is a theme-agnostic backdrop, which is safe */
+	background-color: rgba(0, 0, 0, 0.4);
+	justify-content: center; /* Center content horizontally */
+	align-items: center; /* Center content vertically */
 }
 
 .modal-content {
-  /* --- START: FIX --- */
-  /* Use the correct theme variables for a "card" */
-  background-color: var(--container-bg);
-  color: var(--text-color);
-  border: 1px solid var(--container-border);
-  /* --- END: FIX --- */
-  margin: 5% auto; /* 5% from top, not 15% */
-  padding: 20px;
-  width: 80%; /* Could be more or less, depending on screen size */
-  box-shadow: 0 4px 8px 0 var(--shadow-color), 0 6px 20px 0 var(--shadow-color);
-  border-radius: 8px;
-  position: relative; /* For absolute positioning of close button */
+	/* --- START: FIX --- */
+	/* Use the correct theme variables for a "card" */
+	background-color: var(--container-bg);
+	color: var(--text-color);
+	border: 1px solid var(--container-border);
+	/* --- END: FIX --- */
+	margin: 5% auto; /* 5% from top, not 15% */
+	padding: 20px;
+	width: 80%; /* Could be more or less, depending on screen size */
+	box-shadow: 0 4px 8px 0 var(--shadow-color), 0 6px 20px 0 var(--shadow-color);
+	border-radius: 8px;
+	position: relative; /* For absolute positioning of close button */
 }
 
 .close-button {
-  /* --- START: FIX --- */
-  /* Use theme variable for muted text */
-  color: var(--text-muted-color);
-  /* --- END: FIX --- */
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
+	/* --- START: FIX --- */
+	/* Use theme variable for muted text */
+	color: var(--text-muted-color);
+	/* --- END: FIX --- */
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 .close-button:hover,
 .close-button:focus {
-  /* --- START: FIX --- */
-  /* Use theme variable for primary heading/text */
-  color: var(--heading-color);
-  /* --- END: FIX --- */
-  text-decoration: none;
-  cursor: pointer;
+	/* --- START: FIX --- */
+	/* Use theme variable for primary heading/text */
+	color: var(--heading-color);
+	/* --- END: FIX --- */
+	text-decoration: none;
+	cursor: pointer;
 }
 
 /* --- START: z-index FIX --- */
@@ -58,24 +58,24 @@
 /* --- START: MODIFICATION --- */
 #source-form-modal,
 /* --- END: MODIFICATION --- */
-  #add-strategy-modal,
+	#add-strategy-modal,
 #add-idea-modal {
-  z-index: 1010;
+	z-index: 1010;
 }
 /* --- END: z-index FIX --- */
 
 .modal-content label {
-  color: var(--text-color);
+	color: var(--text-color);
 }
 
 .modal-content input[type="text"],
 .modal-content input[type="number"],
 .modal-content textarea {
-  background-color: var(--input-bg);
-  color: var(--text-color);
-  border: 1px solid var(--container-border);
-  padding: 8px;
-  border-radius: 4px;
-  width: calc(100% - 18px); /* Account for padding and border */
-  margin-bottom: 10px;
+	background-color: var(--input-bg);
+	color: var(--text-color);
+	border: 1px solid var(--container-border);
+	padding: 8px;
+	border-radius: 4px;
+	width: calc(100% - 18px); /* Account for padding and border */
+	margin-bottom: 10px;
 }

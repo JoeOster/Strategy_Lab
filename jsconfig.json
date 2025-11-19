@@ -1,36 +1,36 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./*"]
-    },
-    "checkJs": true,
-    "jsx": "react",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ESNext",
-    "allowJs": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "**/*.js",
-    "**/*.jsx",
-    "**/*.ts",
-    "**/*.tsx",
-    "api/exchanges.js",
-    "api/settings.js",
-    "api/sources.js",
-    "api/strategies.js",
-    "api/transactions.js",
-    "api/watched-items.js",
-    "api/utils.js",
-    "api/webapps.js",
-    "api/users.js",
-    "api/index.js"
-  ],
-  "exclude": ["node_modules", "**/node_modules/*"]
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./*"]
+		},
+		"checkJs": true,
+		"jsx": "react",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"target": "ESNext",
+		"allowJs": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true
+	},
+	"include": [
+		"**/*.js",
+		"**/*.jsx",
+		"**/*.ts",
+		"**/*.tsx",
+		"api/exchanges.js",
+		"api/settings.js",
+		"api/sources.js",
+		"api/strategies.js",
+		"api/transactions.js",
+		"api/watched-items.js",
+		"api/utils.js",
+		"api/webapps.js",
+		"api/users.js",
+		"api/index.js"
+	],
+	"exclude": ["node_modules", "**/node_modules/*"]
 }

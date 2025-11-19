@@ -1,1 +1,1 @@
-console.log('Strategy Lab module loaded.');
+console.log("Strategy Lab module loaded.");

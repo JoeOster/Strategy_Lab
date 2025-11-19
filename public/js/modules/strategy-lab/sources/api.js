@@ -1,5 +1,5 @@
 // public/js/modules/strategy-lab/sources/api.js
-import { api } from '../../../services/apiFetch.js';
+import { api } from "../../../services/apiFetch.js";
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
@@ -9,7 +9,7 @@ import { api } from '../../../services/apiFetch.js';
 
 // Re-export functions from the settings module.
 // The types are already defined in the original file.
-export { getSource, getSources } from '../../settings/sources.api.js';
+export { getSource, getSources } from "../../settings/sources.api.js";
 
 /**
  * Adds a new strategy to the database.
@@ -17,7 +17,7 @@ export { getSource, getSources } from '../../settings/sources.api.js';
  * @returns {Promise<Strategy>} A promise that resolves to the new strategy object.
  */
 export async function addStrategy(strategyData) {
-  return api.post('/api/strategies', strategyData);
+	return api.post("/api/strategies", strategyData);
 }
 
 /**
@@ -26,9 +26,7 @@ export async function addStrategy(strategyData) {
  * @returns {Promise<Strategy[]>} A promise that resolves to an array of strategies.
  */
 export async function getStrategiesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/strategies`, {
-    cache: 'no-cache',
-  });
+	return api.get(`/api/sources/${sourceId}/strategies`);
 }
 
 /**
@@ -37,7 +35,7 @@ export async function getStrategiesForSource(sourceId) {
  * @returns {Promise<Strategy>}
  */
 export async function getStrategy(strategyId) {
-  return api.get(`/api/strategies/${strategyId}`, { cache: 'no-cache' });
+	return api.get(`/api/strategies/${strategyId}`);
 }
 
 // --- START: NEW SOURCE-SPECIFIC API FUNCTIONS ---
@@ -48,16 +46,16 @@ export async function getStrategy(strategyId) {
  * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of WatchedItems.
  */
 export async function getOpenIdeasForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/open-ideas`, { cache: 'no-cache' });
+	return api.get(`/api/sources/${sourceId}/open-ideas`);
 }
 
 /**
  * Fetches all "Open Trades" (real money) for a specific source ID.
  * @param {string|number} sourceId - The ID of the source.
- * @returns {Promise<Transaction[]>} A promise that resolves to an array of Transactions.
+ * @returns {Promise<import('../../../types.js').TransactionWithPrice[]>} A promise that resolves to an array of Transactions with prices.
  */
 export async function getOpenTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/open-trades`, { cache: 'no-cache' });
+	return api.get(`/api/sources/${sourceId}/open-trades`);
 }
 
 /**
@@ -66,20 +64,16 @@ export async function getOpenTradesForSource(sourceId) {
  * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of Transactions.
  */
 export async function getPaperTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/paper-trades`, {
-    cache: 'no-cache',
-  });
+	return api.get(`/api/sources/${sourceId}/paper-trades`);
 }
 
 /**
- * Fetches all "Closed Trades" for a specific source ID.
+ * TCT: Fetches trades for the test table.
  * @param {string|number} sourceId - The ID of the source.
- * @returns {Promise<PaperTradeSummary[]>} A promise that resolves to an array of closed trades.
+ * @returns {Promise<Transaction[]>} A promise that resolves to an array of Transactions.
  */
-export async function getClosedTradesForSource(sourceId) {
-  return api.get(`/api/sources/${sourceId}/closed-trades`, {
-    cache: 'no-cache',
-  });
+export async function tct_getTradesForSource(sourceId) {
+	return api.get(`/api/sources/${sourceId}/test-closed-trades`);
 }
 
 /**
@@ -88,7 +82,7 @@ export async function getClosedTradesForSource(sourceId) {
  * @returns {Promise<any>}
  */
 export async function deleteStrategy(strategyId) {
-  return api.delete(`/api/strategies/${strategyId}`);
+	return api.delete(`/api/strategies/${strategyId}`);
 }
 
 /**
@@ -98,6 +92,6 @@ export async function deleteStrategy(strategyId) {
  * @returns {Promise<Strategy>}
  */
 export async function updateStrategy(strategyId, strategyData) {
-  return api.put(`/api/strategies/${strategyId}`, strategyData);
+	return api.put(`/api/strategies/${strategyId}`, strategyData);
 }
 // --- END: NEW SOURCE-SPECIFIC API FUNCTIONS ---

@@ -2,15 +2,15 @@
 
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 
-import { api } from '../../../services/apiFetch.js';
+import { api } from "../../../services/apiFetch.js";
 
 /**
  * Fetches the list of watched items (Trade Ideas) from the real API.
  * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of watched items with live prices.
  */
 export async function getWatchedList() {
-  // This now calls the real server endpoint
-  return api.get('/api/watched-items/ideas');
+	// This now calls the real server endpoint
+	return api.get("/api/watched-items/ideas");
 }
 
 /**
@@ -19,7 +19,7 @@ export async function getWatchedList() {
  * @returns {Promise<any>}
  */
 export async function deleteIdea(id) {
-  return api.delete(`/api/watched-items/${id}`);
+	return api.delete(`/api/watched-items/${id}`);
 }
 
 /**
@@ -28,8 +28,8 @@ export async function deleteIdea(id) {
  * @returns {Promise<any>}
  */
 export async function moveIdeaToPaper(id, ideaData) {
-  // This calls the new endpoint that creates a transaction and updates the idea
-  return api.post(`/api/watched-items/${id}/to-paper`, ideaData);
+	// This calls the new endpoint that creates a transaction and updates the idea
+	return api.post(`/api/watched-items/${id}/to-paper`, ideaData);
 }
 
 /**
@@ -38,7 +38,7 @@ export async function moveIdeaToPaper(id, ideaData) {
  * @returns {Promise<WatchedItem | undefined>}
  */
 export async function getIdeaForPrefill(id) {
-  return api.get(`/api/watched-items/${id}`);
+	return api.get(`/api/watched-items/${id}`);
 }
 // public/js/modules/strategy-lab/watched-list/api.js
 
@@ -50,7 +50,7 @@ export async function getIdeaForPrefill(id) {
  * @returns {Promise<WatchedItem>} A promise that resolves to the new idea object.
  */
 export async function addIdea(ideaData) {
-  return api.post('/api/watched-items/ideas', ideaData);
+	return api.post("/api/watched-items/ideas", ideaData);
 }
 
 /**
@@ -60,7 +60,7 @@ export async function addIdea(ideaData) {
  * @returns {Promise<WatchedItem>} A promise that resolves to the updated idea object.
  */
 export async function updateIdea(ideaId, ideaData) {
-  return api.put(`/api/watched-items/${ideaId}`, ideaData);
+	return api.put(`/api/watched-items/${ideaId}`, ideaData);
 }
 
 /**
@@ -70,5 +70,5 @@ export async function updateIdea(ideaId, ideaData) {
  * @returns {Promise<any>}
  */
 export async function moveIdeaToRealTrade(id, ideaData) {
-  return api.post(`/api/watched-items/${id}/to-real`, ideaData);
+	return api.post(`/api/watched-items/${id}/to-real`, ideaData);
 }

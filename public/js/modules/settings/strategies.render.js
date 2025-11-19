@@ -8,18 +8,18 @@
  * @param {string} containerId - The ID of the element to render into.
  */
 export function renderStrategiesTable(strategies, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error(`Container with ID "${containerId}" not found.`);
-    return;
-  }
+	const container = document.getElementById(containerId);
+	if (!container) {
+		console.error(`Container with ID "${containerId}" not found.`);
+		return;
+	}
 
-  if (strategies.length === 0) {
-    container.innerHTML = '<p>No strategies found for this source.</p>';
-    return;
-  }
+	if (strategies.length === 0) {
+		container.innerHTML = "<p>No strategies found for this source.</p>";
+		return;
+	}
 
-  let tableHtml = `
+	let tableHtml = `
     <table class="strategies-table">
       <thead>
         <tr>
@@ -34,30 +34,30 @@ export function renderStrategiesTable(strategies, containerId) {
       <tbody>
   `;
 
-  for (const strategy of strategies) {
-    tableHtml += `
+	for (const strategy of strategies) {
+		tableHtml += `
       <tr>
         <td>${strategy.title}</td>
-        <td>${strategy.chapter || ''}</td>
-        <td>${strategy.page_number || ''}</td>
-        <td>${strategy.description || ''}</td>
-        <td>${strategy.pdf_path || ''}</td>
+        <td>${strategy.chapter || ""}</td>
+        <td>${strategy.page_number || ""}</td>
+        <td>${strategy.description || ""}</td>
+        <td>${strategy.pdf_path || ""}</td>
         <td>
           <button class="edit-strategy-btn table-action-btn btn-secondary" data-id="${
-            strategy.id
-          }">Edit</button>
+						strategy.id
+					}">Edit</button>
           <button class="delete-strategy-btn table-action-btn btn-danger" data-id="${
-            strategy.id
-          }">Delete</button>
+						strategy.id
+					}">Delete</button>
         </td>
       </tr>
     `;
-  }
+	}
 
-  tableHtml += `
+	tableHtml += `
       </tbody>
     </table>
   `;
 
-  container.innerHTML = tableHtml;
+	container.innerHTML = tableHtml;
 }

@@ -1,125 +1,125 @@
 body #sources-panel #source-cards-grid {
-  grid-template-columns: repeat(4, 1fr); /* 4-column layout */
-  gap: 20px;
+	grid-template-columns: repeat(4, 1fr); /* 4-column layout */
+	gap: 20px;
 }
 
 /* Default hidden state for grid and detail views */
 #sources-panel #source-cards-grid,
 #source-detail-container {
-  display: none;
+	display: none;
 }
 
 /* Active state for grid and detail views */
 #sources-panel #source-cards-grid.active {
-  display: grid;
+	display: grid;
 }
 
 #source-detail-container.active {
-  display: block;
+	display: block;
 }
 
 /* --- FIX: Added styles for Strategy Lab cards --- */
 .source-card {
-  background-color: var(--container-bg);
-  border: 1px solid var(--container-border);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  transition: box-shadow 0.3s, transform 0.3s;
-  cursor: pointer;
+	background-color: var(--container-bg);
+	border: 1px solid var(--container-border);
+	border-radius: 8px;
+	padding: 20px;
+	box-shadow: 0 2px 4px var(--shadow-color);
+	transition: box-shadow 0.3s, transform 0.3s;
+	cursor: pointer;
 }
 
 .source-card:hover {
-  box-shadow: 0 4px 8px var(--shadow-color);
-  transform: translateY(-2px);
+	box-shadow: 0 4px 8px var(--shadow-color);
+	transform: translateY(-2px);
 }
 
 .source-card-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: var(--heading-color);
-  margin-bottom: 8px;
+	font-size: 1.25rem;
+	font-weight: bold;
+	color: var(--heading-color);
+	margin-bottom: 8px;
 }
 
 .source-card-type {
-  font-size: 0.9rem;
-  font-style: italic;
-  color: var(--text-muted-color);
-  margin-bottom: 15px;
+	font-size: 0.9rem;
+	font-style: italic;
+	color: var(--text-muted-color);
+	margin-bottom: 15px;
 }
 
 .source-card-description {
-  font-size: 1rem;
-  color: var(--text-color);
+	font-size: 1rem;
+	color: var(--text-color);
 }
 /* --- END FIX --- */
 
 /* Styles for source detail grid layout */
 .source-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Two columns, equal width */
-  gap: 20px; /* Space between grid items */
-  /* Define grid areas for explicit placement */
-  grid-template-areas:
-    "profile strategies"
-    "profile ideas" /* Profile spans two rows, ideas is in second row, second column */
-    "open-trades paper-trades"
-    "closed-trades closed-paper-trades";
+	display: grid;
+	grid-template-columns: 1fr 1fr; /* Two columns, equal width */
+	gap: 20px; /* Space between grid items */
+	/* Define grid areas for explicit placement */
+	grid-template-areas:
+		"profile strategies"
+		"profile ideas" /* Profile spans two rows, ideas is in second row, second column */
+		"open-trades paper-trades"
+		"closed-trades closed-paper-trades";
 }
 
 /* Assign grid areas to specific items */
 #source-profile-container {
-  grid-area: profile;
+	grid-area: profile;
 }
 #logged-strategies-container {
-  grid-area: strategies;
+	grid-area: strategies;
 }
 #open-ideas-table-placeholder {
-  grid-area: ideas;
+	grid-area: ideas;
 }
 #open-trades-table-placeholder {
-  grid-area: open-trades;
+	grid-area: open-trades;
 }
 #new-paper-trades-table {
-  grid-area: paper-trades;
+	grid-area: paper-trades;
 }
 #new-closed-trades-table {
-  grid-area: closed-trades;
+	grid-area: closed-trades;
 }
 #new-paper-trades-closed-table {
-  grid-area: closed-paper-trades;
+	grid-area: closed-paper-trades;
 }
 
 /* Media query for single column layout on smaller screens or zoomed in */
 @media (max-width: 768px) {
-  /* Adjust this breakpoint as needed */
-  .source-detail-grid {
-    grid-template-columns: 1fr; /* Single column */
-    grid-template-areas:
-      "profile"
-      "strategies"
-      "ideas"
-      "open-trades"
-      "paper-trades"
-      "closed-trades"
-      "closed-paper-trades";
-  }
+	/* Adjust this breakpoint as needed */
+	.source-detail-grid {
+		grid-template-columns: 1fr; /* Single column */
+		grid-template-areas:
+			"profile"
+			"strategies"
+			"ideas"
+			"open-trades"
+			"paper-trades"
+			"closed-trades"
+			"closed-paper-trades";
+	}
 }
 
 /* Styles for profile image thumbnail */
 .source-profile-thumbnail {
-  max-width: 100px; /* Thumbnail size */
-  height: auto;
-  border-radius: 8px; /* Slightly rounded corners */
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+	max-width: 100px; /* Thumbnail size */
+	height: auto;
+	border-radius: 8px; /* Slightly rounded corners */
+	cursor: pointer;
+	transition: transform 0.2s ease-in-out;
 }
 
 .source-profile-thumbnail:hover {
-  transform: scale(1.05); /* Slightly enlarge on hover */
+	transform: scale(1.05); /* Slightly enlarge on hover */
 }
 
 .source-profile-image-link {
-  display: inline-block; /* Allows for proper scaling and margin */
-  margin-bottom: 15px; /* Space below the thumbnail */
+	display: inline-block; /* Allows for proper scaling and margin */
+	margin-bottom: 15px; /* Space below the thumbnail */
 }
