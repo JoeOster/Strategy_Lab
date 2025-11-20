@@ -1,44 +1,145 @@
 // public/js/modules/strategy-lab/paper-trades/handlers.js
 
-import { deletePaperTrade, getPaperTrades } from "./api.js";
-import { renderPaperTrades } from "./new-render.js"; // Assuming this is the correct path to the render function
+import { error, log } from "../../../utils/logger.js";
+import {
+	pct_renderTradesTable,
+	renderPaperTradesForSource,
+} from "../../transactions/render.js";
+import { deletePaperTrade, getAllPaperTrades } from "./api.js";
 
 /**
- * Fetches and renders the content for the "Paper Trades" sub-tab.
+ * Loads and renders all paper trades for the "Paper Trades" sub-tab.
  */
 export async function loadPaperTradesContent() {
-	console.log("Loading Paper Trades content...");
+	log("Loading Paper Trades content...");
+	const container = document.getElementById("paper-trades-table");
+	if (!container) {
+		error("Paper Trades container not found.");
+		return;
+	}
+
+	container.innerHTML = "<p>Loading all paper trades...</p>";
+
 	try {
-		const paperTrades = await getPaperTrades();
-		const newPaperTradesContainer = document.getElementById(
-			"new-paper-trades-table",
+		const allPaperTransactions = await getAllPaperTrades();
+
+		// Separate open and closed paper trades
+
+		const closedTradeIds = new Set(
+			allPaperTransactions
+
+				.filter((t) => t.transaction_type === "sell")
+
+				.map((t) => t.original_transaction_id),
 		);
-		if (newPaperTradesContainer) {
-			renderPaperTrades(paperTrades, newPaperTradesContainer);
-		}
-	} catch (err) {
-		console.error("Failed to load paper trades:", err);
-		// Cast unknown 'err' to 'Error'
-		const error = err instanceof Error ? err : new Error(String(err));
-		renderPaperTrades(null, "new-paper-trades-table", error);
+
+		const openPaperTrades = allPaperTransactions.filter(
+			(t) => t.transaction_type === "BUY" && !closedTradeIds.has(t.id),
+		);
+
+		const closedPaperTrades = allPaperTransactions
+
+			.filter((t) => t.transaction_type === "sell")
+
+			.map((sellTrade) => {
+				const buyTrade = allPaperTransactions.find(
+					(t) => t.id === sellTrade.original_transaction_id,
+				);
+
+				if (!buyTrade) return null;
+
+				const pnl = (sellTrade.price - buyTrade.price) * buyTrade.quantity;
+
+				const return_pct = (pnl / (buyTrade.price * buyTrade.quantity)) * 100;
+
+				return {
+					id: buyTrade.id,
+
+					ticker: buyTrade.ticker,
+
+					entry_date: buyTrade.transaction_date,
+
+					exit_date: sellTrade.transaction_date,
+
+					entry_price: buyTrade.price,
+
+					exit_price: sellTrade.price,
+
+					pnl,
+
+					return_pct,
+				};
+			})
+
+			.filter(Boolean);
+
+		// Clear the loading message
+
+		container.innerHTML = "";
+
+		// Create separate containers for open and closed trades within the main paper-trades-table div
+
+		const openTradesContainer = document.createElement("div");
+
+		openTradesContainer.id = "all-open-paper-trades-container";
+
+		container.appendChild(openTradesContainer);
+
+		const closedTradesContainer = document.createElement("div");
+
+		closedTradesContainer.id = "all-closed-paper-trades-container";
+
+		container.appendChild(closedTradesContainer);
+
+		renderPaperTradesForSource(
+			openPaperTrades,
+			"all-open-paper-trades-container",
+		);
+
+		pct_renderTradesTable(
+			closedPaperTrades,
+			"all-closed-paper-trades-container",
+		);
+	} catch (error) {
+		error("Failed to load all paper trades:", error);
+
+		container.innerHTML =
+			'<p class="error">Failed to load all paper trades.</p>';
 	}
 }
 
 /**
- * Handles the click to delete a "Paper Trade".
- * @param {string} id - The ID of the transaction.
- * @returns {Promise<boolean>} True if the list should be refreshed.
+
+ * Handles the click event for deleting a paper trade.
+
+ * @param {string} tradeId - The ID of the paper trade to delete.
+
+ * @returns {Promise<boolean>} - True if the paper trades list should be refreshed, false otherwise.
+
  */
-export async function handleDeletePaperTradeClick(id) {
-	if (confirm("Are you sure you want to delete this paper trade?")) {
-		try {
-			await deletePaperTrade(id);
-			return true; // Request refresh
-		} catch (error) {
-			console.error("Failed to delete paper trade:", error);
-			alert("Failed to delete paper trade. See console for details.");
-			return false;
-		}
+
+export async function handleDeletePaperTradeClick(tradeId) {
+	if (
+		!confirm(
+			"Are you sure you want to delete this paper trade? This will remove all associated buy and sell transactions.",
+		)
+	) {
+		return false;
 	}
-	return false;
+
+	try {
+		await deletePaperTrade(tradeId);
+
+		alert("Paper trade deleted successfully.");
+
+		loadPaperTradesContent(); // Refresh the list
+
+		return true;
+	} catch (error) {
+		error("Failed to delete paper trade:", error);
+
+		alert("Error deleting paper trade. See console for details.");
+
+		return false;
+	}
 }

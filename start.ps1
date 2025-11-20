@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param (
     [switch]$rm,
-    [switch]$skipChecks
+    [switch]$skipChecks,
+    [switch]$EnableLogging
 )
 
 function Write-Log($Message, $Level = "INFO") {
@@ -180,7 +181,16 @@ function Main {
     $port = 8080
     $dbDir = "$PSScriptRoot\db"
     $dbFile = "$dbDir\strategy_lab.db"
-    Write-Log "Script started with parameters: -rm:$rm -skipChecks:$skipChecks"
+    Write-Log "Script started with parameters: -rm:$rm -skipChecks:$skipChecks -EnableLogging:$EnableLogging"
+
+    # Set NODE_ENV based on EnableLogging switch
+    if ($EnableLogging) {
+        $env:NODE_ENV = "development"
+        Write-Log "NODE_ENV set to 'development'. Logging enabled."
+    } else {
+        $env:NODE_ENV = "production"
+        Write-Log "NODE_ENV set to 'production'. Logging disabled."
+    }
 
     # 2. Prerequisites
     Stop-ProcessesOnPort -port $port # Moved up

@@ -1,6 +1,8 @@
 // public/js/services/apiFetch.js
 // (Content is identical to the old utils/apiFetch.js)
 
+import { error } from "../utils/logger.js";
+
 /**
  * Custom Error class for API fetch errors.
  * @extends {Error}
@@ -56,7 +58,7 @@ async function apiFetch(url, options = {}) {
 	try {
 		response = await fetch(url, config);
 	} catch (networkError) {
-		console.error("API Fetch Error (Network):", networkError);
+		error("API Fetch Error (Network):", networkError);
 		throw new ApiFetchError(
 			"Network error, please check connection.",
 			0,
@@ -78,7 +80,7 @@ async function apiFetch(url, options = {}) {
 			// If not JSON, use the raw text
 			errorData = errorText;
 		}
-		console.error(
+		error(
 			`API Fetch Error: ${response.status} ${response.statusText}`,
 			errorData,
 		);
@@ -98,7 +100,7 @@ async function apiFetch(url, options = {}) {
 	try {
 		return await response.json();
 	} catch (jsonError) {
-		console.error("API Fetch Error (JSON Parse):", jsonError);
+		error("API Fetch Error (JSON Parse):", jsonError);
 		throw new ApiFetchError(
 			"Failed to parse JSON response.",
 			response.status,

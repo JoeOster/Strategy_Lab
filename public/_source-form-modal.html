@@ -1,191 +1,444 @@
 <div id="source-form-modal" class="modal">
   <div class="modal-content">
-    <span class="close-button">&times;</span>
-    <h2 id="source-form-title">Add New Source</h2>
-    <form id="source-form-form" class="modal-form">
-      <input type="hidden" id="source-form-id" name="id" />
+    <div class="modal-header">
+      <h3 id="source-form-title" class="modal-title">Add New Source</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="source-form-form" class="modal-form">
+        <input type="hidden" id="source-form-id" name="id" />
 
-      <img
-        id="source-form-image-preview"
-        class="source-form-image-preview"
-        src="images/contacts/default.png"
-        alt="Source Image Preview"
-      />
-
-      <div class="form-group">
-        <label for="source-form-type">Type:</label>
-        <select id="source-form-type" name="type" required>
-          <option value="">Select a type...</option>
-          <option value="person">Person</option>
-          <option value="group">Group</option>
-          <option value="website">Website</option>
-          <option value="book">Book</option>
-        </select>
-      </div>
-
-      <div id="source-form-fields-container" style="display: none">
-        <div class="form-group">
-          <label for="source-form-name">Name:</label>
-          <input type="text" id="source-form-name" name="name" required />
-        </div>
-
-        <div class="form-group" id="source-form-url-wrapper">
-          <label for="source-form-url">URL:</label>
-          <input type="url" id="source-form-url" name="url" />
-        </div>
-
-        <div class="form-group">
-          <label for="source-form-description">Description:</label>
-          <textarea
-            id="source-form-description"
-            name="description"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div class="form-group" id="source-form-image-path-wrapper">
-          <label for="source-form-image-path">Image Filename:</label>
-          <input
-            type="text"
-            id="source-form-image-path"
-            name="image_path"
-            placeholder="e.g., default.png"
+        <div style="text-align: center; margin-bottom: 1rem">
+          <img
+            id="source-form-image-preview"
+            class="source-form-image-preview"
+            src="images/contacts/default.png"
+            alt="Source Image Preview"
+            style="max-width: 100px; border-radius: 4px"
           />
         </div>
 
-        <div id="source-form-panel-person" class="source-type-panel">
-          <hr />
-          <h4>Person Details</h4>
-          <div class="form-group">
-            <label for="source-form-person-email">Email:</label>
-            <input
-              type="email"
-              id="source-form-person-email"
-              name="person_email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="source-form-person-phone">Phone:</label>
-            <input
-              type="tel"
-              id="source-form-person-phone"
-              name="person_phone"
-            />
-          </div>
-          <div class="form-group">
-            <label for="source-form-person-app-type">App:</label>
-            <select id="source-form-person-app-type" name="person_app_type">
-              <option value="">Select App...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="source-form-person-app-handle">Handle:</label>
-            <input
-              type="text"
-              id="source-form-person-app-handle"
-              name="person_app_handle"
-            />
-          </div>
-        </div>
-
-        <div id="source-form-panel-group" class="source-type-panel">
-          <hr />
-          <h4>Group Details</h4>
-          <div class="form-group">
-            <label for="source-form-group-primary-contact"
-              >Primary Contact:</label
+        <div
+          class="form-row"
+          style="display: flex; gap: 1rem; align-items: flex-start"
+        >
+          <div class="form-group" style="flex: 1">
+            <label for="source-form-type">Type:</label>
+            <select
+              id="source-form-type"
+              name="type"
+              required
+              style="width: 100%"
             >
-            <input
-              type="text"
-              id="source-form-group-primary-contact"
-              name="group_primary_contact"
-            />
-          </div>
-          <div class="form-group">
-            <label for="source-form-group-email">Group Email:</label>
-            <input
-              type="email"
-              id="source-form-group-email"
-              name="group_email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="source-form-group-phone">Group Phone:</label>
-            <input type="tel" id="source-form-group-phone" name="group_phone" />
-          </div>
-          <div class="form-group">
-            <label for="source-form-group-app-type">App:</label>
-            <select id="source-form-group-app-type" name="group_app_type">
-              <option value="">Select App...</option>
+              <option value="">Select a type...</option>
+              <option value="person">Person</option>
+              <option value="group">Group</option>
+              <option value="website">Website</option>
+              <option value="book">Book</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="source-form-group-app-handle">Handle:</label>
-            <input
-              type="text"
-              id="source-form-group-app-handle"
-              name="group_app_handle"
-            />
-          </div>
-        </div>
 
-        <div id="source-form-panel-website" class="source-type-panel">
-          <hr />
-          <h4>Website Details</h4>
-          <div class="form-group">
-            <label for="source-form-website-websites">Website URLs:</label>
-            <textarea
-              id="source-form-website-websites"
-              name="website_websites"
-              rows="3"
-              placeholder="Enter one URL per line"
-            ></textarea>
-          </div>
-        </div>
-
-        <div id="source-form-panel-book" class="source-type-panel">
-          <hr />
-          <h4>Book Details</h4>
-          <div class="form-group">
-            <label for="source-form-book-author">Author:</label>
-            <input
-              type="text"
-              id="source-form-book-author"
-              name="book_author"
-            />
-          </div>
-          <div class="form-group">
+          <div
+            id="source-form-isbn-container"
+            class="form-group"
+            style="flex: 1; display: none"
+          >
             <label for="source-form-book-isbn">ISBN:</label>
-            <div class="form-group-inline">
+            <div class="form-group-inline" style="display: flex; gap: 5px">
               <input
                 type="text"
                 id="source-form-book-isbn"
                 name="book_isbn"
                 placeholder="Enter ISBN..."
+                style="flex-grow: 1"
               />
               <button
                 type="button"
                 id="fetch-isbn-btn"
                 class="btn btn-secondary"
               >
-                Fetch Info
+                Fetch
               </button>
             </div>
           </div>
         </div>
-      </div>
-      <div class="form-actions">
-        <button
-          type="button"
-          id="source-form-clear-btn"
-          class="btn btn-secondary"
+
+        <div id="source-form-fields-container" style="display: none">
+          <div class="form-group">
+            <label for="source-form-name" id="source-form-name-label"
+              >Name:</label
+            >
+            <input type="text" id="source-form-name" name="name" required />
+          </div>
+
+          <div id="source-form-panel-book" class="source-type-panel">
+            <div class="form-group">
+              <label for="source-form-book-author">Author:</label>
+              <input
+                type="text"
+                id="source-form-book-author"
+                name="book_author"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" id="source-form-url-wrapper">
+            <label for="source-form-url">URL:</label>
+            <input type="url" id="source-form-url" name="url" />
+          </div>
+
+          <div class="form-group">
+            <label for="source-form-description">Description:</label>
+            <textarea
+              id="source-form-description"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group" id="source-form-image-path-wrapper">
+            <label for="source-form-image-path">Image Filename:</label>
+            <input
+              type="text"
+              id="source-form-image-path"
+              name="image_path"
+              placeholder="e.g., default.png"
+            />
+          </div>
+
+          <div id="source-form-panel-person" class="source-type-panel">
+            <hr />
+            <h4>Person Details</h4>
+            <div class="form-group">
+              <label for="source-form-person-email">Email:</label>
+              <input
+                type="email"
+                id="source-form-person-email"
+                name="person_email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-phone">Phone:</label>
+              <input
+                type="tel"
+                id="source-form-person-phone"
+                name="person_phone"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-app-type">App:</label>
+              <select id="source-form-person-app-type" name="person_app_type">
+                <option value="">Select App...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-app-handle">Handle:</label>
+              <input
+                type="text"
+                id="source-form-person-app-handle"
+                name="person_app_handle"
+              />
+            </div>
+          </div>
+
+          <div id="source-form-panel-group" class="source-type-panel">
+            <hr />
+            <h4>Group Details</h4>
+            <div class="form-group">
+              <label for="source-form-group-primary-contact"
+                >Primary Contact:</label
+              >
+              <input
+                type="text"
+                id="source-form-group-primary-contact"
+                name="group_primary_contact"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-email">Group Email:</label>
+              <input
+                type="email"
+                id="source-form-group-email"
+                name="group_email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-phone">Group Phone:</label>
+              <input
+                type="tel"
+                id="source-form-group-phone"
+                name="group_phone"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-app-type">App:</label>
+              <select id="source-form-group-app-type" name="group_app_type">
+                <option value="">Select App...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-app-handle">Handle:</label>
+              <input
+                type="text"
+                id="source-form-group-app-handle"
+                name="group_app_handle"
+              />
+            </div>
+          </div>
+
+          <div id="source-form-panel-website" class="source-type-panel">
+            <hr />
+            <h4>Website Details</h4>
+            <div class="form-group">
+              <label for="source-form-website-websites">Website URLs:</label>
+              <textarea
+                id="source-form-website-websites"
+                name="website_websites"
+                rows="3"
+                placeholder="Enter one URL per line"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            id="source-form-clear-btn"
+            class="btn btn-secondary"
+          >
+            Clear
+          </button>
+          <button type="submit" id="source-form-submit-btn" class="btn">
+            Save Source
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div id="source-form-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="source-form-title" class="modal-title">Add New Source</h3>
+      <span class="close-button">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="source-form-form" class="modal-form">
+        <input type="hidden" id="source-form-id" name="id" />
+
+        <div style="text-align: center; margin-bottom: 1rem">
+          <img
+            id="source-form-image-preview"
+            class="source-form-image-preview"
+            src="images/contacts/default.png"
+            alt="Source Image Preview"
+            style="max-width: 100px; border-radius: 4px"
+          />
+        </div>
+
+        <div
+          class="form-row-split"
+          style="
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+          "
         >
-          Clear
-        </button>
-        <button type="submit" id="source-form-submit-btn" class="btn">
-          Save Source
-        </button>
-      </div>
-    </form>
+          <div class="form-group" style="flex: 1; margin-bottom: 0">
+            <label for="source-form-type">Type:</label>
+            <select
+              id="source-form-type"
+              name="type"
+              required
+              style="width: 100%"
+            >
+              <option value="">Select a type...</option>
+              <option value="person">Person</option>
+              <option value="group">Group</option>
+              <option value="website">Website</option>
+              <option value="book">Book</option>
+            </select>
+          </div>
+
+          <div
+            id="source-form-isbn-container"
+            class="form-group"
+            style="flex: 1; display: none; margin-bottom: 0"
+          >
+            <label for="source-form-book-isbn">ISBN:</label>
+            <div class="form-group-inline" style="display: flex; gap: 8px">
+              <input
+                type="text"
+                id="source-form-book-isbn"
+                name="book_isbn"
+                placeholder="Enter ISBN..."
+                style="flex-grow: 1"
+              />
+              <button
+                type="button"
+                id="fetch-isbn-btn"
+                class="btn btn-secondary"
+                style="white-space: nowrap"
+              >
+                Fetch
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="source-form-fields-container" style="display: none">
+          <div class="form-group">
+            <label for="source-form-name" id="source-form-name-label"
+              >Name:</label
+            >
+            <input type="text" id="source-form-name" name="name" required />
+          </div>
+
+          <div id="source-form-panel-book" class="source-type-panel">
+            <div class="form-group">
+              <label for="source-form-book-author">Author:</label>
+              <input
+                type="text"
+                id="source-form-book-author"
+                name="book_author"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" id="source-form-url-wrapper">
+            <label for="source-form-url">URL:</label>
+            <input type="url" id="source-form-url" name="url" />
+          </div>
+
+          <div class="form-group">
+            <label for="source-form-description">Description:</label>
+            <textarea
+              id="source-form-description"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group" id="source-form-image-path-wrapper">
+            <label for="source-form-image-path">Image Filename:</label>
+            <input
+              type="text"
+              id="source-form-image-path"
+              name="image_path"
+              placeholder="e.g., default.png"
+            />
+          </div>
+
+          <div id="source-form-panel-person" class="source-type-panel">
+            <hr />
+            <h4>Person Details</h4>
+            <div class="form-group">
+              <label for="source-form-person-email">Email:</label>
+              <input
+                type="email"
+                id="source-form-person-email"
+                name="person_email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-phone">Phone:</label>
+              <input
+                type="tel"
+                id="source-form-person-phone"
+                name="person_phone"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-app-type">App:</label>
+              <select id="source-form-person-app-type" name="person_app_type">
+                <option value="">Select App...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="source-form-person-app-handle">Handle:</label>
+              <input
+                type="text"
+                id="source-form-person-app-handle"
+                name="person_app_handle"
+              />
+            </div>
+          </div>
+
+          <div id="source-form-panel-group" class="source-type-panel">
+            <hr />
+            <h4>Group Details</h4>
+            <div class="form-group">
+              <label for="source-form-group-primary-contact"
+                >Primary Contact:</label
+              >
+              <input
+                type="text"
+                id="source-form-group-primary-contact"
+                name="group_primary_contact"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-email">Group Email:</label>
+              <input
+                type="email"
+                id="source-form-group-email"
+                name="group_email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-phone">Group Phone:</label>
+              <input
+                type="tel"
+                id="source-form-group-phone"
+                name="group_phone"
+              />
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-app-type">App:</label>
+              <select id="source-form-group-app-type" name="group_app_type">
+                <option value="">Select App...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="source-form-group-app-handle">Handle:</label>
+              <input
+                type="text"
+                id="source-form-group-app-handle"
+                name="group_app_handle"
+              />
+            </div>
+          </div>
+
+          <div id="source-form-panel-website" class="source-type-panel">
+            <hr />
+            <h4>Website Details</h4>
+            <div class="form-group">
+              <label for="source-form-website-websites">Website URLs:</label>
+              <textarea
+                id="source-form-website-websites"
+                name="website_websites"
+                rows="3"
+                placeholder="Enter one URL per line"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            id="source-form-clear-btn"
+            class="btn btn-secondary"
+          >
+            Clear
+          </button>
+          <button type="submit" id="source-form-submit-btn" class="btn">
+            Save Source
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

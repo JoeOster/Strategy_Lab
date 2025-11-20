@@ -1,3 +1,4 @@
+import { error, log } from "../../utils/logger.js";
 import {
 	addSource,
 	deleteSource,
@@ -5,21 +6,18 @@ import {
 	getSources,
 	updateSource,
 } from "./sources.api.js";
-// public/js/modules/settings/sources.handlers.js
 import { handleFetchIsbnInfo } from "./sources_books.handlers.js";
 import { getWebApps } from "./webapps.api.js";
 
 /** @typedef {import('../../types.js').Source} Source */
 
-// --- START: ADD CACHE ---
 /** @type {Source[] | null} */
 let cachedSources = null;
-// --- END: ADD CACHE ---
 
 /**
  * Renders the list of sources into the container.
- * @param {Source[]} sources - The array of source objects.
- * @param {HTMLElement} container - The container element to render into.
+ * @param {Source[]} sources
+ * @param {HTMLElement} container
  */
 function renderSourcesList(sources, container) {
 	if (sources.length === 0) {
@@ -27,11 +25,11 @@ function renderSourcesList(sources, container) {
 		return;
 	}
 
-	container.innerHTML = ""; // Clear existing list
+	container.innerHTML = "";
 	for (const source of sources) {
 		const sourceElement = document.createElement("div");
 		sourceElement.className = "advice-source-item";
-		sourceElement.dataset.id = String(source.id); // Ensure ID is string
+		sourceElement.dataset.id = String(source.id);
 
 		const infoSpan = document.createElement("span");
 		infoSpan.classList.add("source-info");
@@ -50,9 +48,9 @@ function renderSourcesList(sources, container) {
 }
 
 /**
- * Updates the image preview in the add/edit source forms.
- * @param {string | undefined | null} type - The source type (e.g., 'person', 'book').
- * @param {string | null} [filename] - The filename from the input field.
+ * Updates the image preview.
+ * @param {string | undefined | null} type
+ * @param {string | null} [filename]
  */
 export function updateImagePreview(type, filename) {
 	const previewImg = /** @type {HTMLImageElement | null} */ (
@@ -78,29 +76,27 @@ export function updateImagePreview(type, filename) {
 			folderPath = "images/url/";
 			break;
 		default:
-			// If no type, hide the image
 			previewImg.style.display = "none";
 			return;
 	}
 
-	// Use 'default.png' if filename is empty or null
 	const file = filename || "default.png";
 	previewImg.src = folderPath + file;
-	previewImg.style.display = "block"; // Show the image
+	previewImg.style.display = "block";
 
 	const genericPlaceholder = "images/contacts/default.png";
 	// @ts-ignore
 	previewImg.onerror = () => {
-		previewImg.onerror = null; // prevent infinite loops
+		previewImg.onerror = null;
 		// @ts-ignore
 		previewImg.src = genericPlaceholder;
 	};
 }
 
 /**
- * Fetches web apps and populates the app type dropdowns.
- * @param {string | null} [personAppType] - The value to pre-select for person.
- * @param {string | null} [groupAppType] - The value to pre-select for group.
+ * Populates the app type dropdowns.
+ * @param {string | null} [personAppType]
+ * @param {string | null} [groupAppType]
  */
 async function populateWebAppDropdowns(
 	personAppType = null,
@@ -115,7 +111,6 @@ async function populateWebAppDropdowns(
 
 	if (!personSelect || !groupSelect) return;
 
-	// Clear existing options (except the first "Select..." option)
 	personSelect.length = 1;
 	groupSelect.length = 1;
 
@@ -126,21 +121,20 @@ async function populateWebAppDropdowns(
 			groupSelect.add(new Option(app.name, app.name));
 		}
 
-		// Pre-select values if provided (for edit mode)
 		if (personAppType) personSelect.value = personAppType;
 		if (groupAppType) groupSelect.value = groupAppType;
 	} catch (error) {
-		console.error("Failed to load web apps for dropdowns:", error);
+		error("Failed to load web apps for dropdowns:", error);
 	}
 }
 
 /**
  * Handles changes to the source type dropdown.
- * @param {string} [selectedType] - The new type, e.g., 'person', 'book'.
- * @param {Partial<import('../../types.js').Source>} [sourceData={}] - Optional source data for pre-filling.
+ * @param {string} [selectedType]
+ * @param {Partial<import('../../types.js').Source>} [sourceData={}]
  */
 export function handleSourceTypeChange(selectedType, sourceData = {}) {
-	// Hide all dynamic panels first
+	// Hide all dynamic panels
 	const panels = document.querySelectorAll(
 		"#source-form-fields-container .source-type-panel",
 	);
@@ -149,7 +143,7 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 		panel.style.display = "none";
 	}
 
-	// Show the selected panel
+	// Show selected panel
 	const selectedPanel = document.getElementById(
 		`source-form-panel-${selectedType}`,
 	);
@@ -158,7 +152,7 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 		selectedPanel.style.display = "block";
 	}
 
-	// Show/hide the fields container
+	// Show/hide main fields container
 	const fieldsContainer = document.getElementById(
 		"source-form-fields-container",
 	);
@@ -167,7 +161,14 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 		fieldsContainer.style.display = selectedType ? "block" : "none";
 	}
 
-	// --- START: Image Preview Logic ---
+	// --- TOGGLE ISBN VISIBILITY (2-Column Layout) ---
+	const isbnContainer = document.getElementById("source-form-isbn-container");
+	if (isbnContainer) {
+		// Only show ISBN input if type is 'book'
+		isbnContainer.style.display = selectedType === "book" ? "block" : "none";
+	}
+
+	// Image Preview Logic
 	const imgPathWrapper = document.getElementById(
 		"source-form-image-path-wrapper",
 	);
@@ -177,12 +178,11 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 			updateImagePreview(selectedType, sourceData.image_path || "default.png");
 		} else {
 			imgPathWrapper.style.display = "none";
-			updateImagePreview(selectedType, null); // Will hide the image
+			updateImagePreview(selectedType, null);
 		}
 	}
-	// --- END: Image Preview Logic ---
 
-	// Handle label changes and URL field visibility
+	// Labels and URL visibility
 	const nameLabel = document.querySelector('label[for="source-form-name"]');
 	const urlWrapper = document.getElementById("source-form-url-wrapper");
 	const urlLabel = document.querySelector('label[for="source-form-url"]');
@@ -206,34 +206,29 @@ export function handleSourceTypeChange(selectedType, sourceData = {}) {
 }
 
 export async function loadSourcesList() {
-	console.log("Handler: loadSourcesList called");
+	log("Handler: loadSourcesList called");
 	const sourcesContainer = document.getElementById("advice-source-list");
 	if (!sourcesContainer) return;
 
-	// --- START: CACHE ---
 	if (cachedSources) {
-		console.log("Loading sources from cache...");
 		renderSourcesList(cachedSources, sourcesContainer);
 		return;
 	}
-	// --- END: CACHE ---
 
-	sourcesContainer.innerHTML = "<p>Loading sources...</p>"; // Placeholder
+	sourcesContainer.innerHTML = "<p>Loading sources...</p>";
 	try {
 		const sources = await getSources();
-		// --- START: CACHE ---
-		cachedSources = sources; // Store in cache
-		// --- END: CACHE ---
+		cachedSources = sources;
 		renderSourcesList(sources, sourcesContainer);
 	} catch (error) {
-		console.error("Error loading sources list:", error);
+		error("Error loading sources list:", error);
 		sourcesContainer.innerHTML = '<p class="error">Failed to load sources.</p>';
 	}
 }
 
 /**
- * Opens the single modal for adding or editing a source.
- * @param {string | null} sourceId - The ID of the source to edit, or null to add.
+ * Opens the modal for adding/editing a source.
+ * @param {string | null} sourceId
  */
 export async function openSourceFormModal(sourceId = null) {
 	const modal = document.getElementById("source-form-modal");
@@ -244,11 +239,10 @@ export async function openSourceFormModal(sourceId = null) {
 	const submitBtn = document.getElementById("source-form-submit-btn");
 
 	if (!modal || !form || !title || !submitBtn) {
-		console.error("Source form modal elements not found.");
+		error("Source form modal elements not found.");
 		return;
 	}
 
-	// --- START: DICTIONARY PATTERN ---
 	const elements = {
 		id: /** @type {HTMLInputElement} */ (form.elements.namedItem("id")),
 		type: /** @type {HTMLSelectElement} */ (form.elements.namedItem("type")),
@@ -291,12 +285,10 @@ export async function openSourceFormModal(sourceId = null) {
 			form.elements.namedItem("website_websites")
 		),
 	};
-	// --- END: DICTIONARY PATTERN ---
 
-	form.reset(); // Clear the form
+	form.reset();
 
 	if (sourceId) {
-		// --- EDIT MODE ---
 		title.textContent = "Edit Source";
 		submitBtn.textContent = "Save Changes";
 		try {
@@ -306,7 +298,6 @@ export async function openSourceFormModal(sourceId = null) {
 				return;
 			}
 
-			// Populate common fields
 			elements.id.value = source.id.toString();
 			elements.type.value = source.type;
 			elements.name.value = source.name;
@@ -314,59 +305,46 @@ export async function openSourceFormModal(sourceId = null) {
 			elements.description.value = source.description || "";
 			elements.image_path.value = source.image_path || "";
 
-			// Populate person fields
 			elements.person_email.value = source.person_email || "";
 			elements.person_phone.value = source.person_phone || "";
 			elements.person_app_handle.value = source.person_app_handle || "";
 
-			// Populate group fields
 			elements.group_primary_contact.value = source.group_primary_contact || "";
 			elements.group_email.value = source.group_email || "";
 			elements.group_phone.value = source.group_phone || "";
 			elements.group_app_handle.value = source.group_app_handle || "";
 
-			// Populate book/website fields (add as needed)
 			if (elements.book_author)
 				elements.book_author.value = source.book_author || "";
 			if (elements.book_isbn) elements.book_isbn.value = source.book_isbn || "";
 			if (elements.website_websites)
 				elements.website_websites.value = source.website_websites || "";
 
-			// Populate dropdowns AND pre-select values
 			await populateWebAppDropdowns(
 				source.person_app_type,
 				source.group_app_type,
 			);
-
-			// Trigger change handler to show panels and image
 			handleSourceTypeChange(elements.type.value, source);
 		} catch (error) {
-			console.error("Error fetching source for editing:", error);
+			error("Error fetching source for editing:", error);
 			return;
 		}
 	} else {
-		// --- ADD MODE ---
 		title.textContent = "Add New Source";
 		submitBtn.textContent = "Save Source";
-		elements.id.value = ""; // Ensure ID is empty
-
-		// Populate dropdowns with no pre-selection
+		elements.id.value = "";
 		await populateWebAppDropdowns();
-		// Trigger change handler to reset/hide panels
 		handleSourceTypeChange(elements.type.value);
 	}
 
-	// This logic is unchanged, but it now calls the imported function
 	const fetchBtn = document.getElementById("fetch-isbn-btn");
 	if (fetchBtn) {
-		// Remove old listener if it exists, to prevent memory leaks
 		const newFetchBtn = fetchBtn.cloneNode(true);
 		fetchBtn.replaceWith(newFetchBtn);
-		// Add the new one
+		// @ts-ignore
 		newFetchBtn.addEventListener("click", handleFetchIsbnInfo);
 	}
 
-	// Attach close button listener
 	const closeButton = modal.querySelector(".close-button");
 	if (closeButton) {
 		// @ts-ignore
@@ -374,17 +352,14 @@ export async function openSourceFormModal(sourceId = null) {
 	}
 
 	// @ts-ignore
-	modal.style.display = "block"; // Show the modal
+	modal.style.display = "block";
 }
 
 /**
- * Handles the submission of the "Add New Source" form.
- * @param {Event} event - The form submission event.
+ * Handles the submission of the form.
  */
 export async function handleSourceFormSubmit(event) {
 	event.preventDefault();
-	console.log("Handler: handleSourceFormSubmit called");
-
 	const form = /** @type {HTMLFormElement} */ (event.target);
 	const formData = new FormData(form);
 	const sourceData = Object.fromEntries(formData.entries());
@@ -392,49 +367,36 @@ export async function handleSourceFormSubmit(event) {
 
 	try {
 		if (sourceId) {
-			// --- UPDATE (EDIT) ---
 			await updateSource(/** @type {string} */ (sourceData.id), sourceData);
-			console.log("Source updated:", sourceId);
+			log("Source updated:", sourceId);
 		} else {
-			// --- CREATE (ADD) ---
 			await addSource(sourceData);
-			console.log("Source added");
+			log("Source added");
 		}
-		// --- START: CACHE ---
-		cachedSources = null; // Invalidate cache
-		// --- END: CACHE ---
-		loadSourcesList(); // Refresh the list
-		closeSourceFormModal(); // Hide the modal
+		cachedSources = null;
+		loadSourcesList();
+		closeSourceFormModal();
 	} catch (error) {
-		console.error("Error saving source:", error);
+		error("Error saving source:", error);
 		alert("Error saving source. See console for details.");
 	}
 }
 
-/**
- * @param {string} sourceId
- */
 export function handleDeleteSourceClick(sourceId) {
-	console.log("Handler: handleDeleteSourceClick called", sourceId);
 	if (confirm("Are you sure you want to delete this source?")) {
 		deleteSource(sourceId)
 			.then(() => {
-				console.log("Source deleted:", sourceId);
-				// --- START: CACHE ---
-				cachedSources = null; // Invalidate cache
-				// --- END: CACHE ---
-				loadSourcesList(); // Refresh the list
+				log("Source deleted:", sourceId);
+				cachedSources = null;
+				loadSourcesList();
 			})
 			.catch((error) => {
-				console.error("Error deleting source:", error);
+				error("Error deleting source:", error);
 				alert("Error deleting source. See console for details.");
 			});
 	}
 }
 
-/**
- * Closes the edit source modal.
- */
 export function closeSourceFormModal() {
 	const modal = document.getElementById("source-form-modal");
 	const form = /** @type {HTMLFormElement} */ (
@@ -443,8 +405,7 @@ export function closeSourceFormModal() {
 	if (modal && form) {
 		// @ts-ignore
 		modal.style.display = "none";
-		form.reset(); // Clear form fields
-		// Manually trigger type change to hide all panels
+		form.reset();
 		const typeSelect = /** @type {HTMLSelectElement | null} */ (
 			document.getElementById("source-form-type")
 		);
@@ -455,29 +416,20 @@ export function closeSourceFormModal() {
 	}
 }
 
-/**
- * Initializes the source settings event listeners.
- */
 export function initializeSourceSettings() {
-	// Remove the unneeded "Clear" button from the source form modal
 	const clearBtn = document.getElementById("clear-source-form-btn");
-	if (clearBtn) {
-		clearBtn.remove();
-	}
+	if (clearBtn) clearBtn.remove();
 
-	// Attach listener to the main "Add New Source" button in the settings panel
 	const addSourceBtn = document.getElementById("open-add-source-btn");
 	if (addSourceBtn) {
 		addSourceBtn.addEventListener("click", () => openSourceFormModal(null));
 	}
 
-	// Attach form submission handler
 	const form = document.getElementById("source-form-form");
 	if (form) {
 		form.addEventListener("submit", handleSourceFormSubmit);
 	}
 
-	// Attach listener to the close button in the modal
 	const modal = document.getElementById("source-form-modal");
 	if (modal) {
 		const closeButton = modal.querySelector(".close-button");
@@ -487,27 +439,22 @@ export function initializeSourceSettings() {
 	}
 }
 
-/**
- * Handles clearing the source form.
- */
 export function handleClearSourceForm() {
 	const form = /** @type {HTMLFormElement | null} */ (
 		document.getElementById("source-form-form")
 	);
 	if (!form) return;
 
-	// --- START: DICTIONARY PATTERN ---
 	const elements = {
 		id: /** @type {HTMLInputElement} */ (form.elements.namedItem("id")),
 		type: /** @type {HTMLSelectElement} */ (form.elements.namedItem("type")),
 	};
-	// --- END: DICTIONARY PATTERN ---
 
 	if (elements.id && elements.type) {
-		const id = elements.id.value; // Preserve ID if editing
+		const id = elements.id.value;
 		form.reset();
-		elements.id.value = id; // Restore ID
-		elements.type.value = ""; // Reset dropdown
-		handleSourceTypeChange(elements.type.value); // Trigger UI reset
+		elements.id.value = id;
+		elements.type.value = "";
+		handleSourceTypeChange(elements.type.value);
 	}
 }

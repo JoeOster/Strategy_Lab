@@ -4,7 +4,11 @@
 /** @typedef {import('../../../types.js').Strategy} Strategy */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 /** @typedef {import('../../../types.js').Transaction} Transaction */
-import { formatCurrency } from "../../../utils/formatters.js";
+import {
+	formatCurrency,
+	formatDescriptionWithReadMore,
+} from "../../../utils/formatters.js";
+import { error, log } from "../../../utils/logger.js";
 import { makeTableSortable } from "../../../utils/sortUtils.js";
 
 /**
@@ -15,7 +19,7 @@ import { makeTableSortable } from "../../../utils/sortUtils.js";
 export function renderSourceCards(sources, error = null) {
 	const grid = document.getElementById("source-cards-grid");
 	if (!grid) {
-		console.error("Source cards grid container not found.");
+		error("Source cards grid container not found.");
 		return;
 	}
 
@@ -38,20 +42,75 @@ export function renderSourceCards(sources, error = null) {
 		card.className = "source-card";
 		card.dataset.sourceId = String(source.id); // Cast to string for dataset
 
+		// --- START: Image Path Logic ---
+		let folderPath = "images/";
+		switch (source.type) {
+			case "person":
+				folderPath = "images/contacts/";
+				break;
+			case "group":
+				folderPath = "images/group/";
+				break;
+			case "book":
+				folderPath = "images/books/";
+				break;
+			case "website":
+				folderPath = "images/url/";
+				break;
+		}
+		const imageFile = source.image_path ? source.image_path : "default.png";
+		const finalImagePath = folderPath + imageFile;
+		const genericPlaceholder = "images/contacts/default.png";
+		// --- END: Image Path Logic ---
+
+		// --- START: Description Truncation Logic ---
+		const descriptionHtml = formatDescriptionWithReadMore(source.description);
+		// --- END: Description Truncation Logic ---
+
 		// Build the card's inner HTML
+		// Added Image at the top-left or top-center
 		card.innerHTML = `
-      <h4 class="source-card-title">${source.name}</h4>
-      <p class="source-card-type">${source.type}</p>
-      ${
-				source.description
-					? `<p class="source-card-description">${source.description}</p>`
-					: ""
-			}
+      <div class="source-card-header">
+          <img
+            src="${finalImagePath}"
+            alt="${source.name}"
+            class="source-card-thumbnail"
+            onerror="this.onerror=null; this.src='${genericPlaceholder}';"
+          >
+          <div class="source-card-info">
+             <h4 class="source-card-title">${source.name}</h4>
+             <p class="source-card-type">${source.type}</p>
+          </div>
+      </div>
+      ${descriptionHtml}
     `;
 		grid.appendChild(card);
 	}
-}
 
+	// Add event listeners for "See more" buttons after all cards are rendered
+	for (const button of grid.querySelectorAll(".read-more-btn")) {
+		button.addEventListener("click", (event) => {
+			const target = /** @type {HTMLElement} */ (event.target);
+			const descriptionContainer = target.closest(".source-card-description");
+			if (descriptionContainer) {
+				const dots = descriptionContainer.querySelector(".dots");
+				const moreText = descriptionContainer.querySelector(".more-text");
+
+				if (dots && moreText) {
+					if (moreText.style.display === "none") {
+						moreText.style.display = "inline";
+						dots.style.display = "none";
+						target.textContent = "See less";
+					} else {
+						moreText.style.display = "none";
+						dots.style.display = "inline";
+						target.textContent = "See more";
+					}
+				}
+			}
+		});
+	}
+}
 /**
  * Renders the table of logged strategies for a source.
  * @param {Strategy[]} strategies - An array of strategy objects.
@@ -59,7 +118,7 @@ export function renderSourceCards(sources, error = null) {
 export function renderStrategiesTable(strategies) {
 	const container = document.getElementById("strategy-table");
 	if (!container) {
-		console.error("Strategy table container not found.");
+		error("Strategy table container not found.");
 		return;
 	}
 
@@ -128,7 +187,7 @@ export function renderStrategiesTable(strategies) {
 export function renderTradeIdeasTable(ideas) {
 	const container = document.getElementById("trade-ideas-table");
 	if (!container) {
-		console.error("Trade ideas table container not found.");
+		error("Trade ideas table container not found.");
 		return;
 	}
 
@@ -200,7 +259,7 @@ export function renderTradeIdeasTable(ideas) {
 export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 	const container = document.getElementById(containerId);
 	if (!container) {
-		console.error(`Container not found: ${containerId}`);
+		error(`Container not found: ${containerId}`);
 		return;
 	}
 
@@ -212,11 +271,6 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 		cardWrapper.innerHTML += '<p class="error">Failed to load open ideas.</p>';
 		container.innerHTML = "";
 		container.appendChild(cardWrapper);
-		return;
-	}
-
-	if (!ideas || ideas.length === 0) {
-		cardWrapper.innerHTML += "<p>No open ideas from this source.</p>";
 		return;
 	}
 
@@ -235,9 +289,12 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
       </tr>
     </thead>
     <tbody>
-      ${ideas
-				.map(
-					(item) => `
+      ${
+				!ideas || ideas.length === 0
+					? `<tr><td colspan="7">No open ideas from this source.</td></tr>`
+					: ideas
+							.map(
+								(item) => `
         <tr data-id="${item.id}">
           <td>${item.ticker || ""}</td>
           <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(
@@ -272,8 +329,9 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
           </td>
         </tr>
       `,
-				)
-				.join("")}
+							)
+							.join("")
+			}
     </tbody>
   `;
 	cardWrapper.appendChild(table);

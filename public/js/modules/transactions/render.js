@@ -2,6 +2,7 @@
 /** @typedef {import('../../types.js').TransactionWithPrice} TransactionWithPrice */
 /** @typedef {import('../../types.js').Transaction} Transaction */
 import { formatCurrency } from "../../utils/formatters.js";
+import { error, log } from "../../utils/logger.js";
 import { makeTableSortable } from "../../utils/sortUtils.js";
 
 /**
@@ -13,7 +14,7 @@ import { makeTableSortable } from "../../utils/sortUtils.js";
 export function renderPaperTradesForSource(trades, containerId, error = null) {
 	const container = document.getElementById(containerId);
 	if (!container) {
-		console.error(`Container for "Paper Trades" not found.`);
+		error(`Container for "Paper Trades" not found.`);
 		return;
 	}
 
@@ -24,11 +25,6 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 
 	if (error) {
 		container.innerHTML += `<p class="error">Failed to load paper trades.</p>`;
-		return;
-	}
-
-	if (!trades || trades.length === 0) {
-		cardWrapper.innerHTML += "<p>No open paper trades from this source.</p>";
 		return;
 	}
 
@@ -51,9 +47,13 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 	table.innerHTML = `
     <thead><tr>${tableHeaders}</tr></thead>
     <tbody>
-      ${trades
-				.map((trade) => renderTradeRow(trade, true, "Paper Trades"))
-				.join("")}
+      ${
+				!trades || trades.length === 0
+					? `<tr><td colspan="10">No open paper trades from this source.</td></tr>`
+					: trades
+							.map((trade) => renderTradeRow(trade, true, "Paper Trades"))
+							.join("")
+			}
     </tbody>
   `;
 	// Append the table to the card wrapper, then the wrapper to the container
@@ -72,7 +72,7 @@ export function renderPaperTradesForSource(trades, containerId, error = null) {
 export function pct_renderTradesTable(trades, containerId, error = null) {
 	const container = document.getElementById(containerId);
 	if (!container) {
-		console.error(`PCT Container not found: ${containerId}`);
+		error(`PCT Container not found: ${containerId}`);
 		return;
 	}
 
@@ -83,11 +83,6 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
 	if (error) {
 		cardWrapper.innerHTML +=
 			'<p class="error">Failed to load test closed paper trades.</p>';
-		return;
-	}
-
-	if (!trades || trades.length === 0) {
-		cardWrapper.innerHTML += "<p>No test closed paper trades found.</p>";
 		return;
 	}
 
@@ -106,7 +101,11 @@ export function pct_renderTradesTable(trades, containerId, error = null) {
       </tr>
     </thead>
     <tbody>
-      ${trades.map((trade) => renderClosedPaperTradeRow(trade)).join("")}
+      ${
+				!trades || trades.length === 0
+					? `<tr><td colspan="7">No closed paper trades found.</td></tr>`
+					: trades.map((trade) => renderClosedPaperTradeRow(trade)).join("")
+			}
     </tbody>`;
 	cardWrapper.appendChild(table);
 	container.innerHTML = "";
@@ -129,7 +128,7 @@ export function renderOpenTradesForSource(
 ) {
 	const container = document.getElementById(containerId);
 	if (!container) {
-		console.error(`Container for "${title}" not found.`);
+		error(`Container for "${title}" not found.`);
 		return;
 	}
 
@@ -146,11 +145,6 @@ export function renderOpenTradesForSource(
 	const realTrades = trades
 		? trades.filter((trade) => trade.is_paper_trade !== 1)
 		: [];
-
-	if (!realTrades || realTrades.length === 0) {
-		cardWrapper.innerHTML += `<p>No ${title.toLowerCase()} from this source.</p>`;
-		return;
-	}
 
 	const table = document.createElement("table");
 	table.className = "strategy-table";
@@ -171,7 +165,13 @@ export function renderOpenTradesForSource(
 	table.innerHTML = `
     <thead><tr>${tableHeaders}</tr></thead>
     <tbody>
-      ${realTrades.map((trade) => renderTradeRow(trade, false, title)).join("")}
+      ${
+				!realTrades || realTrades.length === 0
+					? `<tr><td colspan="10">No ${title.toLowerCase()} from this source.</td></tr>`
+					: realTrades
+							.map((trade) => renderTradeRow(trade, false, title))
+							.join("")
+			}
     </tbody>
   `;
 	cardWrapper.appendChild(table);
@@ -190,7 +190,7 @@ export function renderOpenTradesForSource(
 export function tct_renderTradesTable(trades, containerId, error = null) {
 	const container = document.getElementById(containerId);
 	if (!container) {
-		console.error(`TCT Container not found: ${containerId}`);
+		error(`TCT Container not found: ${containerId}`);
 		return;
 	}
 
@@ -209,12 +209,6 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
 	const realTrades = trades
 		? trades.filter((trade) => trade.is_paper_trade !== 1)
 		: [];
-	if (!realTrades || realTrades.length === 0) {
-		cardWrapper.innerHTML += "<p>No test trades found.</p>";
-		container.innerHTML = "";
-		container.appendChild(cardWrapper);
-		return;
-	}
 
 	const table = document.createElement("table");
 	table.className = "strategy-table";
@@ -231,9 +225,12 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
     <th>Actions</th>
   `;
 
-	const rowsHtml = realTrades
-		.map((trade) => {
-			return `
+	const rowsHtml =
+		!realTrades || realTrades.length === 0
+			? `<tr><td colspan="7">No trades found.</td></tr>`
+			: realTrades
+					.map((trade) => {
+						return `
       <tr data-id="${trade.id}">
         <td>${trade.ticker || ""}</td>
         <td>${trade.qty_sold}</td>
@@ -250,8 +247,8 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
         </td>
       </tr>
     `;
-		})
-		.join("");
+					})
+					.join("");
 
 	table.innerHTML = `
     <thead><tr>${tableHeaders}</tr></thead>

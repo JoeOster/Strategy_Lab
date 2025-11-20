@@ -1,88 +1,195 @@
-body #sources-panel #source-cards-grid {
-	grid-template-columns: repeat(4, 1fr); /* 4-column layout */
-	gap: 20px;
+/* public/css/strategy-lab.css */
+
+#strategy-lab-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Default hidden state for grid and detail views */
-#sources-panel #source-cards-grid,
-#source-detail-container {
-	display: none;
+/* Sub-Navigation */
+.sub-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
 }
 
-/* Active state for grid and detail views */
-#sources-panel #source-cards-grid.active {
-	display: grid;
+.sub-nav-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
-#source-detail-container.active {
-	display: block;
+.sub-nav-btn.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+  font-weight: bold;
 }
 
-/* --- FIX: Added styles for Strategy Lab cards --- */
+.sub-tab-content {
+  display: none; /* Hidden by default */
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sub-tab-content.active {
+  display: block; /* Shown when active */
+}
+
+/* Sources Panel Grid */
+#source-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
 .source-card {
-	background-color: var(--container-bg);
-	border: 1px solid var(--container-border);
-	border-radius: 8px;
-	padding: 20px;
-	box-shadow: 0 2px 4px var(--shadow-color);
-	transition: box-shadow 0.3s, transform 0.3s;
-	cursor: pointer;
+  background-color: var(--card-background-color);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .source-card:hover {
-	box-shadow: 0 4px 8px var(--shadow-color);
-	transform: translateY(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Source Card Header (Image + Title) --- */
+.source-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 0.75rem;
+}
+
+.source-card-thumbnail {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+  background-color: #fff; /* Fix for transparent PNGs on colored backgrounds */
+  border: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.source-card-info {
+  flex: 1;
 }
 
 .source-card-title {
-	font-size: 1.25rem;
-	font-weight: bold;
-	color: var(--heading-color);
-	margin-bottom: 8px;
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  line-height: 1.2;
 }
 
 .source-card-type {
-	font-size: 0.9rem;
-	font-style: italic;
-	color: var(--text-muted-color);
-	margin-bottom: 15px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  margin-bottom: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .source-card-description {
-	font-size: 1rem;
-	color: var(--text-color);
-}
-/* --- END FIX --- */
-
-/* Styles for source detail grid layout */
-.source-detail-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr; /* Two columns, equal width */
-	gap: 20px; /* Space between grid items */
+  font-size: 0.9rem;
+  color: var(--text-color);
+  flex-grow: 1;
+  /* CSS fallback for truncation if JS fails */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Media query for single column layout on smaller screens or zoomed in */
-@media (max-width: 768px) {
-	/* Adjust this breakpoint as needed */
-	.source-detail-grid {
-		grid-template-columns: 1fr; /* Single column */
-	}
+/* Read More Button Style */
+.read-more-btn {
+  color: var(--primary-color, #007bff);
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 4px;
+  text-decoration: underline;
 }
 
-/* Styles for profile image thumbnail */
-.source-profile-thumbnail {
-	max-width: 100px; /* Thumbnail size */
-	height: auto;
-	border-radius: 8px; /* Slightly rounded corners */
-	cursor: pointer;
-	transition: transform 0.2s ease-in-out;
+.read-more-btn:hover {
+  text-decoration: none;
+  color: #0056b3;
 }
 
-.source-profile-thumbnail:hover {
-	transform: scale(1.05); /* Slightly enlarge on hover */
-}
-
+/* Source Detail Modal */
 .source-profile-image-link {
-	display: inline-block; /* Allows for proper scaling and margin */
-	margin-bottom: 15px; /* Space below the thumbnail */
+  display: block;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 5px;
+  width: fit-content;
+  margin-bottom: 1rem; /* Add some space below the image */
+}
+
+.source-profile-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.source-profile-book-thumbnail {
+  max-width: 150px; /* Thumbnail size for books */
+  max-height: 150px;
+  object-fit: contain;
+}
+
+/* Description Truncation Styles */
+.source-card-description .dots {
+  display: inline;
+}
+
+.source-card-description .more-text {
+  display: none;
+}
+
+.source-card-description .read-more-btn {
+  color: var(--primary-color, #007bff);
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 4px;
+  text-decoration: underline;
+}
+
+.source-card-description .read-more-btn:hover {
+  text-decoration: none;
+  color: #0056b3;
+}
+
+.watched-item-row:hover {
+  background-color: #f8f9fa;
+}
+
+.ticker-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticker-logo-sm {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 1px solid #eee;
 }

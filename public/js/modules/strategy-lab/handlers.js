@@ -1,5 +1,6 @@
 // public/js/modules/strategy-lab/handlers.js
 
+import { error, log } from "../../utils/logger.js";
 import { loadPaperTradesContent } from "./paper-trades/handlers.js";
 // Import the content loaders for each sub-tab
 import { loadSourcesContent } from "./sources/handlers.js";
@@ -14,7 +15,7 @@ export function initializeStrategyLabSubTabs() {
 		"strategy-lab-page-container",
 	);
 	if (!strategyLabContainer) {
-		console.error("Strategy Lab container not found.");
+		error("Strategy Lab container not found.");
 		return;
 	}
 
@@ -67,7 +68,7 @@ export function handleSubTabClick(event) {
 	);
 
 	if (!strategyLabContainer) {
-		console.error("Could not find parent Strategy Lab container.");
+		error("Could not find parent Strategy Lab container.");
 		return;
 	}
 
@@ -99,11 +100,9 @@ export function handleSubTabClick(event) {
 				loadPaperTradesContent();
 				break;
 			default:
-				console.warn(
-					`No content loading function for sub-panel: ${targetPanelId}`,
-				);
+				log(`No content loading function for sub-panel: ${targetPanelId}`);
 		}
 	} else {
-		console.error(`Sub-panel with ID '${targetPanelId}' not found.`);
+		error(`Sub-panel with ID '${targetPanelId}' not found.`);
 	}
 }

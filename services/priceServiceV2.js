@@ -4,7 +4,7 @@ const API_KEY = process.env.FINNHUB_API_KEY;
 
 /**
  * Fetches the current price quote for a given stock ticker.
- * @param {string} ticker 
+ * @param {string} ticker
  * @returns {Promise<object|null>} The quote object {c, d, dp, h, l, o, pc} or null.
  */
 export async function getQuote(ticker) {
@@ -23,7 +23,7 @@ export async function getQuote(ticker) {
 		}
 
 		const data = await response.json();
-		return (data && typeof data.c === "number") ? data : null;
+		return data && typeof data.c === "number" ? data : null;
 	} catch (error) {
 		console.error(`Error fetching quote for ${ticker}:`, error);
 		return null;
@@ -32,7 +32,7 @@ export async function getQuote(ticker) {
 
 /**
  * Fetches static company profile data.
- * @param {string} ticker 
+ * @param {string} ticker
  * @returns {Promise<object|null>} The profile object or null.
  */
 export async function getProfile(ticker) {

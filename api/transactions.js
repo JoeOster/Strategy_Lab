@@ -20,9 +20,10 @@ const initializeStatements = async () => {
 
 	const db = await getDb();
 
-	// OPEN TRADES (REAL)
-	statements.getOpenTrades = await db.prepare(
-		`
+	try {
+		// OPEN TRADES (REAL)
+		statements.getOpenTrades = await db.prepare(
+			`
     SELECT
         t_buy.*,
         SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END) AS sold_quantity
@@ -36,11 +37,11 @@ const initializeStatements = async () => {
     HAVING (t_buy.quantity - SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END)) > 0
     ORDER BY t_buy.transaction_date DESC;
     `,
-	);
+		);
 
-	// OPEN PAPER TRADES
-	statements.getPaperTrades = await db.prepare(
-		`
+		// OPEN PAPER TRADES
+		statements.getPaperTrades = await db.prepare(
+			`
     SELECT
         t_buy.*,
         SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END) AS sold_quantity
@@ -53,11 +54,21 @@ const initializeStatements = async () => {
     HAVING (t_buy.quantity - SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END)) > 0
     ORDER BY t_buy.transaction_date DESC;
     `,
-	);
+		);
 
-	// CLOSED PAPER TRADES: Uses robust subquery to check for full closure regardless of 'status' field.
-	statements.getClosedPaperTrades = await db.prepare(
-		`
+		// ALL PAPER TRADES (for the new sub-tab)
+		statements.getAllPaperTrades = await db.prepare(
+			`
+    SELECT *
+    FROM transactions
+    WHERE is_paper_trade = 1
+    ORDER BY transaction_date DESC;
+    `,
+		);
+
+		// CLOSED PAPER TRADES: Uses robust subquery to check for full closure regardless of 'status' field.
+		statements.getClosedPaperTrades = await db.prepare(
+			`
     SELECT
         t_buy.id AS buy_id,
         t_buy.source_id,
@@ -82,7 +93,12 @@ const initializeStatements = async () => {
       )
     ORDER BY t_sell.transaction_date DESC;
     `,
-	);
+		);
+	} catch (error) {
+		console.error("Error preparing database statements:", error);
+		// Re-throw the error to be caught by the route handler's try-catch
+		throw error;
+	}
 };
 
 /**
@@ -131,6 +147,21 @@ router.get("/closed-paper-trades", async (req, res) => {
 	} catch (error) {
 		console.error("Failed to get closed paper trades:", error);
 		res.status(500).json({ error: "Failed to retrieve closed paper trades" });
+	}
+});
+
+/**
+ * GET /api/transactions/paper-trades/all
+ * Retrieves all paper trades (both open and closed).
+ */
+router.get("/paper-trades/all", async (req, res) => {
+	try {
+		await initializeStatements();
+		const allPaperTrades = await statements.getAllPaperTrades.all();
+		res.json(allPaperTrades);
+	} catch (error) {
+		console.error("Failed to get all paper trades:", error);
+		res.status(500).json({ error: "Failed to retrieve all paper trades" });
 	}
 });
 
@@ -284,6 +315,37 @@ router.post("/sell", async (req, res) => {
 		const logId = transactionId || req.body.id || "unknown"; // Safely get transaction ID for logging
 		console.error(`Failed to sell transaction ${logId}:`, error);
 		res.status(500).json({ error: "Failed to sell trade" });
+	}
+});
+
+/**
+ * DELETE /api/transactions/paper-trades/:tradeId
+ * Deletes a paper trade (both buy and associated sell transactions).
+ */
+router.delete("/paper-trades/:tradeId", async (req, res) => {
+	const { tradeId } = req.params;
+	const db = await getDb();
+	await db.run("BEGIN TRANSACTION");
+	try {
+		// Delete the initial BUY transaction
+		await db.run(
+			"DELETE FROM transactions WHERE id = ? AND is_paper_trade = 1",
+			tradeId,
+		);
+		// Delete any associated SELL transactions
+		await db.run(
+			"DELETE FROM transactions WHERE original_transaction_id = ? AND is_paper_trade = 1",
+			tradeId,
+		);
+
+		await db.run("COMMIT");
+		res.status(200).json({
+			message: "Paper trade and associated transactions deleted successfully.",
+		});
+	} catch (error) {
+		await db.run("ROLLBACK");
+		console.error(`Failed to delete paper trade ${tradeId}:`, error);
+		res.status(500).json({ error: "Failed to delete paper trade." });
 	}
 });
 

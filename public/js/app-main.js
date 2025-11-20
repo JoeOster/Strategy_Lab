@@ -1,22 +1,26 @@
 // public/js/app-main.js
 
 import { initializeNavigation } from "./modules/navigation/index.js";
-// --- START: FIX ---
-// Import directly from the handler file to avoid breaking the app
 import { applyInitialAppearance } from "./modules/settings/appearance.handlers.js";
 import {
 	renderClosedTrades,
 	renderPaperTrades,
-} from "./modules/strategy-lab/paper-trades/new-render.js"; // Import the new render functions
-// ADDED: Re-adding handler import from last step
+} from "./modules/strategy-lab/paper-trades/new-render.js";
 import { initializeEditTradeHandlers } from "./modules/transactions/edit-trade.handlers.js";
-// --- END: FIX ---
 import { initializeUserSelector } from "./modules/user-selector/index.js";
 import { loadHtmlPartial } from "./utils/loadHtmlPartial.js";
+import { log } from "./utils/logger.js";
+
+// Initialize modules
+// import { initializeDashboard } from "./modules/dashboard/index.js"; // Removed as it's not used yet
+// import { initializeDailyReport } from "./modules/daily-report/index.js"; // Removed as it's not used yet
+// import { initializeImports } from "./modules/imports/index.js"; // Removed as it's not used yet
+// import { initializeSettings } from "./modules/settings/index.js"; // Removed as it's not used yet
+// import { initializeStrategyLab } from "./modules/strategy-lab/index.js"; // Removed as it's not used yet
+
+log("Strategy Lab App Main script loaded.");
 
 document.addEventListener("DOMContentLoaded", async () => {
-	console.log("Strategy Lab App Main script loaded.");
-
 	// Dynamically load modal HTML partials first
 	await loadHtmlPartial("/_source-form-modal.html", "app-container");
 	await loadHtmlPartial("/_source-detail-modal.html", "app-container");

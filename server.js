@@ -67,7 +67,18 @@ app.use("/api", apiRouter);
 
 // Catch-all for HTML5 pushState routing
 app.use((req, res) => {
-	res.sendFile(path.join(__dirname, "public", "index.html"));
+	const indexPath = path.join(__dirname, "public", "index.html");
+	fs.readFile(indexPath, "utf8", (err, html) => {
+		if (err) {
+			console.error("Error reading index.html:", err);
+			return res.status(500).send("Error loading the application.");
+		}
+
+		const isDevMode = process.env.NODE_ENV === "development";
+		const scriptToInject = `<script>window.IS_DEV_MODE = ${isDevMode};</script>`;
+		const modifiedHtml = html.replace("<body>", `<body>\n  ${scriptToInject}`);
+		res.send(modifiedHtml);
+	});
 });
 
 const startServer = async () => {
