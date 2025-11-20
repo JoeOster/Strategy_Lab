@@ -1,18 +1,15 @@
-// public/js/modules/strategy-lab/watched-list/api.js
-
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 
 import { api } from "../../../services/apiFetch.js";
 
 /**
- * Fetches the list of watched items (Trade Ideas) from the real API.
- * @returns {Promise<WatchedItem[]>} A promise that resolves to an array of watched items with live prices.
+ * Fetches the list of watched items (Ideas, Paper, Real) enriched with market data.
+ * @returns {Promise<WatchedItem[]>}
  */
 export async function getWatchedList() {
-	// This now calls the real server endpoint
-	return api.get("/api/watched-items/ideas");
+    // CHANGED: Now points to root "/" instead of "/ideas"
+	return api.get("/api/watched-items");
 }
-
 /**
  * Deletes a watched idea.
  * @param {number | string} id - The ID of the idea to delete.

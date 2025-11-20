@@ -131,7 +131,7 @@ function Stop-ProcessesOnPort($port) {
         }
         Write-Log "Processes still found on port $port. Retrying..." -Level "WARN"
     }
-    Write-Log "Failed to stop all processes on port $port after $maxRetries attempts. Some processes may still be running." -Level "ERROR"
+    Write-Log "Failed to stop all processes on port $port after $maxAttempts attempts. Some processes may still be running." -Level "ERROR"
 }
 
 function Start-ServerProcess($port, $dbFile) {
@@ -143,23 +143,34 @@ function Start-ServerProcess($port, $dbFile) {
     return $process.Id # Return PID
 }
 
-function Wait-ForServer($serverPid, $port) { # Changed parameter to serverPid
-    Write-Log "Waiting for the dev server at http://localhost:$port..."
+function Wait-ForServer($serverPid, $port) {
+    # FIX: Explicitly use 127.0.0.1 to avoid IPv6/IPv4 resolution issues on some Windows machines
+    $url = "http://127.0.0.1:$port" 
+    Write-Log "Waiting for the dev server at $url..."
     $maxAttempts = 20
     $attempt = 0
     while ($attempt -lt $maxAttempts) {
         $attempt++
         try {
-            Invoke-WebRequest -Uri "http://localhost:$port" -UseBasicParsing -ErrorAction Stop | Out-Null
+            # FIX: Added checking if the process is actually still running
+            $process = Get-Process -Id $serverPid -ErrorAction SilentlyContinue
+            if (-not $process) {
+                Write-Log "The server process (PID $serverPid) has stopped unexpectedly." -Level "ERROR"
+                return $false
+            }
+
+            Invoke-WebRequest -Uri $url -UseBasicParsing -ErrorAction Stop | Out-Null
             Write-Log "Server is online!"
             return $true
         } catch {
-            Write-Log "($attempt/$maxAttempts) Server not ready, retrying in 1.5s..."
+            # FIX: Show the specific error so we know WHY it's failing (e.g. 404, 500, or Connection Refused)
+            $errorMsg = $_.Exception.Message
+            Write-Log "($attempt/$maxAttempts) Server not ready. Error: $errorMsg"
             Start-Sleep -Milliseconds 1500
         }
     }
 
-    Write-Log "Server failed to start after $maxAttempts attempts. Please check the logs." -Level "ERROR"
+    Write-Log "Server failed to start after $maxAttempts attempts. Please check log\server_stderr.log for details." -Level "ERROR"
     return $false
 }
 
@@ -205,6 +216,14 @@ function Main {
         # If server fails to start, attempt to stop the process
         Stop-ProcessesOnPort -port $port
         Write-Log "Server failed to start. Please check the logs in the 'log' directory." -Level "ERROR"
+        
+        # FIX: Auto-display the stderr log on failure so you see the crash immediately
+        if (Test-Path "$PSScriptRoot\log\server_stderr.log") {
+            Write-Host "`n--- ERROR LOG CONTENT ---" -ForegroundColor Red
+            Get-Content "$PSScriptRoot\log\server_stderr.log" -Tail 20
+            Write-Host "-------------------------" -ForegroundColor Red
+        }
+
         Read-Host -Prompt "Press Enter to exit."
     }
 }
