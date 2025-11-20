@@ -372,4 +372,52 @@ router.get("/sold-quantity/:transactionId", async (req, res) => {
 	}
 });
 
+/**
+ * POST /api/transactions
+ * Creates a new transaction.
+ */
+router.post("/", async (req, res) => {
+	const db = await getDb();
+	await db.run("BEGIN TRANSACTION");
+	try {
+		const { ticker, quantity, price, source_id, is_paper_trade } = req.body;
+
+		if (!ticker || !quantity || !price) {
+			await db.run("ROLLBACK");
+			return res
+				.status(400)
+				.json({ error: "Ticker, quantity, and price are required." });
+		}
+
+		const now = new Date().toISOString();
+		const result = await db.run(
+			`INSERT INTO transactions (
+                source_id, ticker, quantity, price, transaction_date, transaction_type,
+                is_paper_trade, created_date, updated_date, user_id, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			source_id || "manual",
+			ticker,
+			quantity,
+			price,
+			now,
+			"BUY",
+			is_paper_trade ? 1 : 0,
+			now,
+			now,
+			1, // Assuming user_id 1 for now
+			"open",
+		);
+
+		await db.run("COMMIT");
+		res.status(201).json({
+			message: "Trade created successfully",
+			transactionId: result.lastID,
+		});
+	} catch (error) {
+		await db.run("ROLLBACK");
+		console.error("Failed to create transaction:", error);
+		res.status(500).json({ error: "Failed to create transaction" });
+	}
+});
+
 export default router;

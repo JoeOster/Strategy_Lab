@@ -1,15 +1,11 @@
 <!-- Orders Content -->
 <div id="orders-page-container">
   <h2>Orders</h2>
-  <form id="order-form">
-    <label for="order-ticker">Ticker:</label>
-    <input type="text" id="order-ticker" name="ticker" required />
-    <label for="order-quantity">Quantity:</label>
-    <input type="number" id="order-quantity" name="quantity" required />
-    <label for="order-price">Price:</label>
-    <input type="number" id="order-price" name="price" step="0.01" required />
-    <div class="form-actions">
-      <button type="submit" class="btn">Place Order</button>
-    </div>
-  </form>
+  <div class="order-actions">
+    <select id="order-type-select">
+      <option value="real">Real Trade</option>
+      <option value="paper">Paper Trade</option>
+    </select>
+    <button id="open-trade-modal-btn" class="btn">Enter Trade</button>
+  </div>
 </div>

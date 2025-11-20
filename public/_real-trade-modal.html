@@ -1,0 +1,28 @@
+<div id="real-trade-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Enter Real Trade</h3>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="real-trade-form">
+                <input type="hidden" id="real-trade-source-id" name="source_id" value="manual" />
+                <label for="real-trade-ticker">Ticker:</label>
+                <input type="text" id="real-trade-ticker" name="ticker" required />
+
+                <label for="real-trade-quantity">Quantity:</label>
+                <input type="number" id="real-trade-quantity" name="quantity" required />
+
+                <label for="real-trade-price">Price:</label>
+                <input type="number" id="real-trade-price" name="price" step="0.01" required />
+
+                <div class="form-actions">
+                    <button type="submit" class="btn">Save Trade</button>
+                    <button type="button" id="cancel-real-trade-form-btn" class="btn secondary-btn">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
