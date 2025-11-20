@@ -19,23 +19,14 @@ export const loadPageContent = async (tab) => {
 		mainContent.innerHTML = await response.text();
 
 		// Use dynamic import to load the module and call its initializeModule function
-		try {
-			// All modules now follow the same '/index.js' pattern.
-			// --- START: FIX ---
-			// This path will now correctly become '../settings/index.js' when 'settings' is clicked
-			// --- END: FIX ---
-			const modulePath = `../${tab}/index.js`;
-
-			const module = await import(modulePath);
-			// --- THIS IS THE BIOME-SAFE VERSION ---
-			if (module?.initializeModule) {
-				module.initializeModule();
+		const modulePath = `../${tab}/index.js`;
+		const module = await import(modulePath);
+		if (module && typeof module.initializeModule === "function") {
+			module.initializeModule();
+			if (tab === "strategy-lab") {
+				const strategyLabHandlers = await import("../strategy-lab/handlers.js");
+				strategyLabHandlers.initializeStrategyLabSubTabs();
 			}
-		} catch (scriptError) {
-			console.error(
-				`Error loading or initializing module for tab ${tab}:`,
-				scriptError,
-			);
 		}
 	} catch (error) {
 		console.error("Error loading tab:", error);

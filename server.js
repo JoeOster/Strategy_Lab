@@ -66,19 +66,26 @@ app.use("/api", apiRouter);
 // --- ALL app.get('/api...'), app.post('/api...') routes are now REMOVED ---
 
 // Catch-all for HTML5 pushState routing
-app.use((req, res) => {
-	const indexPath = path.join(__dirname, "public", "index.html");
-	fs.readFile(indexPath, "utf8", (err, html) => {
-		if (err) {
-			console.error("Error reading index.html:", err);
-			return res.status(500).send("Error loading the application.");
-		}
+app.get("*", (req, res, next) => {
+	if (req.method === "GET" && !req.path.includes(".")) {
+		const indexPath = path.join(__dirname, "public", "index.html");
+		fs.readFile(indexPath, "utf8", (err, html) => {
+			if (err) {
+				console.error("Error reading index.html:", err);
+				return res.status(500).send("Error loading the application.");
+			}
 
-		const isDevMode = process.env.NODE_ENV === "development";
-		const scriptToInject = `<script>window.IS_DEV_MODE = ${isDevMode};</script>`;
-		const modifiedHtml = html.replace("<body>", `<body>\n  ${scriptToInject}`);
-		res.send(modifiedHtml);
-	});
+			const isDevMode = process.env.NODE_ENV === "development";
+			const scriptToInject = `<script>window.IS_DEV_MODE = ${isDevMode};</script>`;
+			const modifiedHtml = html.replace(
+				"<body>",
+				`<body>\n  ${scriptToInject}`,
+			);
+			res.send(modifiedHtml);
+		});
+	} else {
+		next();
+	}
 });
 
 const startServer = async () => {

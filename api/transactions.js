@@ -380,7 +380,15 @@ router.post("/", async (req, res) => {
 	const db = await getDb();
 	await db.run("BEGIN TRANSACTION");
 	try {
-		const { ticker, quantity, price, source_id, is_paper_trade } = req.body;
+		const {
+			ticker,
+			quantity,
+			price,
+			source_id,
+			is_paper_trade,
+			limit_low,
+			limit_high,
+		} = req.body;
 
 		if (!ticker || !quantity || !price) {
 			await db.run("ROLLBACK");
@@ -393,8 +401,8 @@ router.post("/", async (req, res) => {
 		const result = await db.run(
 			`INSERT INTO transactions (
                 source_id, ticker, quantity, price, transaction_date, transaction_type,
-                is_paper_trade, created_date, updated_date, user_id, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                is_paper_trade, created_date, updated_date, user_id, status, limit_low, limit_high
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			source_id || "manual",
 			ticker,
 			quantity,
@@ -406,6 +414,8 @@ router.post("/", async (req, res) => {
 			now,
 			1, // Assuming user_id 1 for now
 			"open",
+			limit_low || null,
+			limit_high || null,
 		);
 
 		await db.run("COMMIT");

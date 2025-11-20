@@ -3,7 +3,7 @@ import { log } from "../../utils/logger.js";
 
 log("Orders module loaded.");
 
-export function initializeOrders() {
+export function initializeModule() {
 	log("Orders module initialized");
 
 	const openTradeModalBtn = document.getElementById("open-trade-modal-btn");
@@ -12,92 +12,50 @@ export function initializeOrders() {
 			const orderTypeSelect = document.getElementById("order-type-select");
 			// @ts-ignore
 			const selectedValue = orderTypeSelect.value;
-
-			if (selectedValue === "real") {
-				const realTradeModal = document.getElementById("real-trade-modal");
-				if (realTradeModal) {
+			const tradeEntryModal = document.getElementById("trade-entry-modal");
+			if (tradeEntryModal) {
+				const isPaperTradeInput = document.getElementById("is-paper-trade");
+				if (isPaperTradeInput) {
 					// @ts-ignore
-					realTradeModal.style.display = "block";
+					isPaperTradeInput.value = selectedValue === "paper" ? "1" : "0";
 				}
-			} else if (selectedValue === "paper") {
-				const paperTradeModal = document.getElementById("paper-trade-modal");
-				if (paperTradeModal) {
-					// @ts-ignore
-					paperTradeModal.style.display = "block";
-				}
+				// @ts-ignore
+				tradeEntryModal.style.display = "block";
 			}
 		});
 	}
 
-	const realTradeModal = document.getElementById("real-trade-modal");
-	if (realTradeModal) {
-		const closeButton = realTradeModal.querySelector(".close-button");
+	const tradeEntryModal = document.getElementById("trade-entry-modal");
+	if (tradeEntryModal) {
+		const closeButton = tradeEntryModal.querySelector(".close-button");
 		if (closeButton) {
 			closeButton.addEventListener("click", () => {
 				// @ts-ignore
-				realTradeModal.style.display = "none";
+				tradeEntryModal.style.display = "none";
 			});
 		}
 
-		const cancelBtn = document.getElementById("cancel-real-trade-form-btn");
+		const cancelBtn = document.getElementById("cancel-trade-form-btn");
 		if (cancelBtn) {
 			cancelBtn.addEventListener("click", () => {
 				// @ts-ignore
-				realTradeModal.style.display = "none";
+				tradeEntryModal.style.display = "none";
 			});
 		}
 
-		const realTradeForm = document.getElementById("real-trade-form");
-		if (realTradeForm) {
-			realTradeForm.addEventListener("submit", async (event) => {
+		const tradeEntryForm = document.getElementById("trade-entry-form");
+		if (tradeEntryForm) {
+			tradeEntryForm.addEventListener("submit", async (event) => {
 				event.preventDefault();
-				const formData = new FormData(realTradeForm);
+				const formData = new FormData(tradeEntryForm);
 				const tradeData = Object.fromEntries(formData.entries());
 				try {
 					await api.post("/api/transactions", tradeData);
 					// @ts-ignore
-					realTradeModal.style.display = "none";
+					tradeEntryModal.style.display = "none";
 					// Optionally, you can add a success message or refresh the trades list
 				} catch (error) {
-					console.error("Failed to save real trade:", error);
-					// Optionally, you can show an error message to the user
-				}
-			});
-		}
-	}
-
-	const paperTradeModal = document.getElementById("paper-trade-modal");
-	if (paperTradeModal) {
-		const closeButton = paperTradeModal.querySelector(".close-button");
-		if (closeButton) {
-			closeButton.addEventListener("click", () => {
-				// @ts-ignore
-				paperTradeModal.style.display = "none";
-			});
-		}
-
-		const cancelBtn = document.getElementById("cancel-paper-trade-form-btn");
-		if (cancelBtn) {
-			cancelBtn.addEventListener("click", () => {
-				// @ts-ignore
-				paperTradeModal.style.display = "none";
-			});
-		}
-
-		const paperTradeForm = document.getElementById("paper-trade-form");
-		if (paperTradeForm) {
-			paperTradeForm.addEventListener("submit", async (event) => {
-				event.preventDefault();
-				const formData = new FormData(paperTradeForm);
-				const tradeData = Object.fromEntries(formData.entries());
-				tradeData.is_paper_trade = true;
-				try {
-					await api.post("/api/transactions", tradeData);
-					// @ts-ignore
-					paperTradeModal.style.display = "none";
-					// Optionally, you can add a success message or refresh the trades list
-				} catch (error) {
-					console.error("Failed to save paper trade:", error);
+					console.error("Failed to save trade:", error);
 					// Optionally, you can show an error message to the user
 				}
 			});

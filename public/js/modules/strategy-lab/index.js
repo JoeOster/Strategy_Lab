@@ -86,5 +86,5 @@ export function initializeModule() {
 	});
 
 	// Initialize the Strategy Lab sub-tabs
-	handlers.initializeStrategyLabSubTabs();
+	// handlers.initializeStrategyLabSubTabs();
 }
