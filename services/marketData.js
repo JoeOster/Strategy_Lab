@@ -73,10 +73,11 @@ export async function getEnrichedWatchedItems() {
 	// Sync data
 	await Promise.all(tickers.map(row => syncTickerData(row.ticker)));
 
+	// Use UPPER(w.ticker) in the join to fix the crcl vs CRCL issue without breaking the backend
 	const sql = `
         SELECT w.*, t.company_name, t.industry, t.logo_url, t.current_price, t.change_amount, t.change_percent, t.day_high, t.day_low, t.prev_close, t.market_cap, t.website, t.sector, t.description
         FROM watched_items w
-        LEFT JOIN ticker_data t ON w.ticker = t.ticker
+        LEFT JOIN ticker_data t ON UPPER(w.ticker) = t.ticker
         ORDER BY w.updated_date DESC
     `;
 	return db.all(sql);
