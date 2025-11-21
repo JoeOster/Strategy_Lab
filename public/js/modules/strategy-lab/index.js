@@ -26,7 +26,7 @@ export function initializeModule() {
 	}
 
 	// Add delegated listener for source card clicks and sell button clicks
-	strategyLabContainer.addEventListener("click", (event) => {
+	strategyLabContainer.addEventListener("click", async (event) => {
 		// --- START: FIX ---
 		// Add type guard to ensure event.target is an Element
 		if (!(event.target instanceof Element)) {
@@ -70,6 +70,14 @@ export function initializeModule() {
 			const tradeId = sellButton.dataset.id;
 			if (tradeId) {
 				openEditTradeModal({ tradeId: tradeId, isSell: true });
+			}
+		} else if (event.target.classList.contains("clickable-ticker")) {
+			const ticker = event.target.textContent;
+			if (ticker) {
+				const { openTickerModal } = await import(
+					"../dashboard/modal.handlers.js"
+				);
+				openTickerModal(ticker);
 			}
 		}
 	});

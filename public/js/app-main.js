@@ -11,12 +11,13 @@ import { initializeUserSelector } from "./modules/user-selector/index.js";
 import { loadHtmlPartial } from "./utils/loadHtmlPartial.js";
 import { log } from "./utils/logger.js";
 
+import { initializeModule as initializeDailyReport } from "./modules/daily-report/index.js";
 // Initialize modules
-// import { initializeDashboard } from "./modules/dashboard/index.js"; // Removed as it's not used yet
-// import { initializeDailyReport } from "./modules/daily-report/index.js"; // Removed as it's not used yet
-// import { initializeImports } from "./modules/imports/index.js"; // Removed as it's not used yet
-// import { initializeSettings } from "./modules/settings/index.js"; // Removed as it's not used yet
-// import { initializeStrategyLab } from "./modules/strategy-lab/index.js"; // Removed as it's not used yet
+import { initializeModule as initializeDashboard } from "./modules/dashboard/index.js";
+import { initializeImports } from "./modules/imports/index.js";
+import { initializeModule as initializeLedger } from "./modules/ledger/index.js";
+import { initializeModule as initializeSettings } from "./modules/settings/index.js";
+import { initializeModule as initializeStrategyLab } from "./modules/strategy-lab/index.js";
 
 log("Strategy Lab App Main script loaded.");
 
@@ -30,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	await loadHtmlPartial("/_paper-trade-details-modal.html", "app-container");
 	await loadHtmlPartial("/_edit-strategy-modal.html", "app-container");
 	await loadHtmlPartial("/_trade-entry-modal.html", "app-container");
+	await loadHtmlPartial("/_open-ticker-modal.html", "app-container");
 
 	// Then initialize modules that depend on these elements being present
 	// --- START: FIX ---
@@ -43,4 +45,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// ADDED: Re-adding handler initialization from last step
 	initializeEditTradeHandlers();
+
+	document.body.addEventListener("click", async (event) => {
+		if (event.target?.classList.contains("clickable-ticker")) {
+			const ticker = event.target.textContent;
+			if (ticker) {
+				const { openTickerModal } = await import(
+					"./modules/dashboard/modal.handlers.js"
+				);
+				openTickerModal(ticker);
+			}
+		}
+	});
 });

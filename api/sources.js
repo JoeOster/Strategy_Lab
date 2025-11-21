@@ -80,13 +80,29 @@ router.post("/", async (req, res) => {
 		", ",
 	)}) VALUES (${placeholders})`;
 
+	const db = await getDb();
+	await db.run("BEGIN TRANSACTION");
+
 	try {
-		// --- START: FIX ---
-		const db = await getDb(); // Use getDb()
 		const result = await db.run(sql, values);
-		// --- END: FIX ---
-		res.status(201).json({ id: result.lastID, ...sourceData });
+		const sourceId = result.lastID;
+
+		if (sourceData.type === "group" || sourceData.type === "person") {
+			await db.run(
+				"INSERT INTO strategies (source_id, title, description, status) VALUES (?, ?, ?, ?)",
+				[
+					sourceId,
+					"Group/Person",
+					"Default strategy for group/person source",
+					"active",
+				],
+			);
+		}
+
+		await db.run("COMMIT");
+		res.status(201).json({ id: sourceId, ...sourceData });
 	} catch (error) {
+		await db.run("ROLLBACK");
 		console.error("Failed to add source:", error);
 		res.status(500).json({ error: "Failed to add source" });
 	}

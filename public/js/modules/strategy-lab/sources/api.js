@@ -105,4 +105,9 @@ export async function deleteStrategy(strategyId) {
 export async function updateStrategy(strategyId, strategyData) {
 	return api.put(`/api/strategies/${strategyId}`, strategyData);
 }
+
+export async function getDefaultStrategy(sourceId) {
+	const strategies = await getStrategiesForSource(sourceId);
+	return strategies.find((s) => s.title === "Group/Person");
+}
 // --- END: NEW SOURCE-SPECIFIC API FUNCTIONS ---

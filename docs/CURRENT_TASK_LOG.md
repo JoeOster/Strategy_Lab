@@ -1,53 +1,28 @@
-## Source Details Modal Cleanup - Attack Plan
+# Task: Implement Dashboard Feature
 
-**Goal:** Improve the consistency and visual appeal of tables and button
-controls within the Source Details modal.
+- [x] **1. Create Dashboard Sub-tabs:**
+    - [x] a. Create `_dashboard-list-view.html` and `_dashboard-card-view.html` partials.
+    - [x] b. Modify `_dashboard.html` to include sub-tab navigation for "List View" and "Card View".
+    - [x] c. Create `public/js/modules/dashboard/handlers.js` to handle sub-tab switching.
+    - [x] d. Update `public/js/modules/dashboard/index.js` to initialize the sub-tab handlers.
 
-### Phase 1: General Button Styling Consistency
+- [x] **2. Implement List View:**
+    - [x] a. Create `public/js/modules/dashboard/api.js` to fetch open and closed retail trades.
+    - [x] b. Create `public/js/modules/dashboard/render.js` to render the open and closed retail trades tables.
+    - [x] c. Update `public/js/modules/dashboard/handlers.js` to call the render functions when the "List View" sub-tab is active.
 
-- **Problem:** Buttons within the "Actions" columns of various tables
-  (`renderStrategiesTable`, `renderTradeIdeasTable`, `renderOpenIdeasForSource`)
-  use a mix of `btn`, `btn-secondary`, `btn-danger`, and `table-action-btn`
-  classes. The user previously mentioned wanting "buttons inheriting default CSS
-  except for size" and a `.small-btn` class.
-- **Proposed Solution:**
-  1. **Define a `.small-btn` class:** Create a CSS class `.small-btn` in
-      `public/css/components.css` (or `modals.css` if more specific) to control
-      button size. This class will set `padding`, `font-size`, and potentially
-      `min-width`/`height` to achieve a smaller button appearance while
-      inheriting other default button styles.
-  2. **Apply `.small-btn`:** Add the `.small-btn` class to all action buttons
-      within the tables rendered by `renderStrategiesTable`,
-      `renderTradeIdeasTable`, and `renderOpenIdeasForSource`.
-  3. **Review existing button classes:** Ensure that `btn` is always present
-      for default styling, and `btn-secondary`/`btn-danger` are used
-      appropriately for semantic meaning (e.g., primary action, destructive
-      action). Remove redundant or conflicting styling.
-  4. **Standardize button order:** For consistency, establish a standard order
-      for action buttons (e.g., primary action first, then secondary, then
-      destructive).
+- [x] **3. Implement Card View:**
+    - [x] a. Update `public/js/modules/dashboard/api.js` to fetch and process data for the card view.
+    - [x] b. Update `public/js/modules/dashboard/render.js` to render the card view for open retail trades.
+    - [x] c. Update `public/js/modules/dashboard/handlers.js` to call the render function when the "Card View" sub-tab is active.
 
-### Phase 2: Table Structure and Column Consistency (for `renderStrategiesTable`)
+- [x] **4. Implement Open Ticker Modal:**
+    - [x] a. Create `_open-ticker-modal.html` partial.
+    - [x] b. Add logic to `public/js/modules/dashboard/handlers.js` to open the modal when a ticker is clicked.
+    - [x] c. Create `public/js/modules/dashboard/modal.handlers.js` to handle the modal's functionality.
+    - [x] d. Create `public/js/modules/dashboard/modal.render.js` to render the content of the modal.
+    - [x] e. Update `public/js/modules/dashboard/index.js` to initialize the modal handlers.
 
-- **Problem:** The "Actions" column in `renderStrategiesTable` contains "Add
-  Idea", "Edit", and "Delete" buttons. The layout and spacing might be
-  inconsistent.
-- **Proposed Solution:**
-  1. **Review `strategy-table` CSS:** Inspect `public/css/strategy-lab.css` (or
-      other relevant CSS files) for `strategy-table` to ensure proper padding,
-      alignment, and responsiveness.
-  2. **Standardize "Actions" column width:** Ensure the "Actions" column has a
-      consistent and appropriate width across all tables to prevent wrapping or
-      excessive spacing. This might involve setting a `min-width` or `width` on
-      the `<th>` and `<td>` elements for the actions column.
-  3. **Button Grouping (Optional but Recommended):** Consider wrapping action
-      buttons in a container (e.g., a `div` with a class like `table-actions`)
-      to allow for more controlled layout (e.g., using flexbox for spacing and
-      alignment within the cell).
-
-### Phase 3: Review of other tables (after Phase 1 and 2 are approved and implemented)
-
-- **`renderTradeIdeasTable`**: Review its structure and button styling after
-  general button and table action column styling is established.
-- **`renderOpenIdeasForSource`**: Review its structure and button styling after
-  general button and table action column styling is established.
+- [x] **5. Implement "Click on Ticker" Functionality:**
+    - [x] a. Add event listeners to all tables to handle ticker clicks.
+    - [x] b. When a ticker is clicked, open the "Open Ticker Modal" with the corresponding data.

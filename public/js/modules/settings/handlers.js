@@ -2,6 +2,7 @@
 
 import { getExchanges } from "../settings/exchanges.api.js";
 import { convertToPaperTrade, convertToRealTrade } from "./api.js";
+import { initializeAppearanceTab } from "./appearance.handlers.js";
 import { loadExchangesList } from "./exchanges.handlers.js";
 import { updateSettings } from "./general.api.js";
 import { loadSourcesList } from "./sources.handlers.js";
@@ -197,6 +198,9 @@ export function handleMainTabClick(event) {
 				break;
 			case "webapps-panel":
 				loadWebAppsList();
+				break;
+			case "appearance-settings-panel":
+				initializeAppearanceTab();
 				break;
 		}
 	}

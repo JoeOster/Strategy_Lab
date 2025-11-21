@@ -155,7 +155,7 @@ export function renderStrategiesTable(strategies) {
 			const row = document.createElement("tr");
 			row.innerHTML = `
         <td>${strategy.title || ""}</td>
-        <td>${strategy.ticker || ""}</td>
+        <td class="clickable-ticker">${strategy.ticker || ""}</td>
         <td>${strategy.chapter || ""}</td>
         <td>${strategy.page_number || ""}</td>
         <td>${strategy.description || ""}</td>
@@ -222,7 +222,7 @@ export function renderTradeIdeasTable(ideas) {
 		for (const item of ideas) {
 			const row = document.createElement("tr");
 			row.innerHTML = `
-        <td>${item.ticker || ""}</td>
+        <td class="clickable-ticker">${item.ticker || ""}</td>
         <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(
 					item.buy_price_high,
 				)}</td>
@@ -296,7 +296,7 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
 							.map(
 								(item) => `
         <tr data-id="${item.id}">
-          <td>${item.ticker || ""}</td>
+          <td class="clickable-ticker">${item.ticker || ""}</td>
           <td>${formatCurrency(item.buy_price_low)} - ${formatCurrency(
 						item.buy_price_high,
 					)}</td>

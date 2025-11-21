@@ -299,7 +299,7 @@ function renderTradeRow(trade, isPaper, title) {
     `;
 		// UPDATED: Added SL, TP1, and TP2 cells to Paper Trades (Open)
 		rowContent = `
-      <td class="text-center">${trade.ticker}</td>
+      <td class="text-center clickable-ticker">${trade.ticker}</td>
       <td class="text-center">${trade.quantity}</td>
       <td class="text-center">-</td>
       <td class="text-center">${formatCurrency(entryPrice)}</td>
@@ -329,7 +329,7 @@ function renderTradeRow(trade, isPaper, title) {
       <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
     `;
 		rowContent = `
-      <td class="text-center">${trade.ticker || ""}</td>
+      <td class="text-center clickable-ticker">${trade.ticker || ""}</td>
       <td class="text-center">${trade.quantity || ""}</td>
       <td class="text-center">${qtyRemaining}</td>
       <td class="text-center">${formatCurrency(trade.price)}</td>
@@ -368,7 +368,7 @@ function renderTradeRow(trade, isPaper, title) {
 function renderClosedPaperTradeRow(trade) {
 	return `
     <tr data-id="${trade.id}">
-      <td class="text-center">${trade.ticker}</td>
+      <td class="text-center clickable-ticker">${trade.ticker}</td>
       <td class="text-center">${
 				trade.entry_date ? trade.entry_date.split("T")[0] : "N/A"
 			}</td>

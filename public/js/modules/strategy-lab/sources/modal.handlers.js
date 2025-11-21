@@ -202,9 +202,14 @@ export async function openSourceDetailModal(sourceId) {
 				break;
 		}
 
-		const imageFile = source.image_path ? source.image_path : "default.png";
+		const imageFile = source.image_path || "default.png";
+		let finalImagePath;
 
-		const finalImagePath = folderPath + imageFile;
+		if (source.type === "book" && imageFile.startsWith("http")) {
+			finalImagePath = imageFile;
+		} else {
+			finalImagePath = folderPath + imageFile;
+		}
 
 		const genericPlaceholder = "images/contacts/default.png";
 
@@ -309,18 +314,9 @@ export async function openSourceDetailModal(sourceId) {
 			/** @type {HTMLElement} */ (loggedStrategiesContainer),
 		);
 
-		if (source.type === "group" || source.type === "person") {
-			if (ideasPlaceholder) {
-				ideasPlaceholder.style.display = "none";
-			}
-		} else {
-			loadOpenIdeasForSource(sourceId);
-		}
-
+		loadOpenIdeasForSource(sourceId);
 		loadOpenTradesForSource(sourceId);
-
 		pct_loadTrades(sourceId);
-
 		tct_loadTrades(sourceId);
 
 		// @ts-ignore
@@ -469,7 +465,12 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
 	);
 
 	try {
-		if (sourceType === "book" || sourceType === "website") {
+		if (
+			sourceType === "book" ||
+			sourceType === "website" ||
+			sourceType === "person" ||
+			sourceType === "group"
+		) {
 			targetElement.innerHTML = `
         <div class="source-detail-right-header">
           <h3>Logged Strategies</h3>
@@ -480,19 +481,6 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
         </div>
       `;
 			await loadStrategiesForSource(sourceId);
-		} else if (sourceType === "person" || sourceType === "group") {
-			targetElement.innerHTML = `
-        <div class="source-detail-right-header">
-          <h3>Logged Trade Ideas</h3>
-          <button class="btn" id="add-idea-btn" data-source-id="${sourceId}">Add Idea</button>
-        </div>
-        <div id="trade-ideas-table-container">
-          <div id="trade-ideas-table">
-            <p>No trade ideas logged for this source yet.</p>
-          </div>
-        </div>
-      `;
-			await loadTradeIdeasForSource(sourceId);
 		}
 	} catch (e) {
 		error(`Failed to load source detail content for ${sourceId}:`, e);

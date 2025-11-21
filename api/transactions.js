@@ -22,7 +22,7 @@ const initializeStatements = async () => {
 
 	try {
 		// OPEN TRADES (REAL)
-		statements.getOpenTrades = await db.prepare(
+		statements.getOpenTradesBySource = await db.prepare(
 			`
     SELECT
         t_buy.*,
@@ -31,6 +31,23 @@ const initializeStatements = async () => {
     LEFT JOIN transactions t_sell ON t_buy.id = t_sell.original_transaction_id
     WHERE t_buy.source_id = ?
       AND UPPER(t_buy.transaction_type) = 'BUY'
+      AND t_buy.status = 'open'
+      AND t_buy.is_paper_trade = 0 -- Filter for Real Open Trades
+    GROUP BY t_buy.id
+    HAVING (t_buy.quantity - SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END)) > 0
+    ORDER BY t_buy.transaction_date DESC;
+    `,
+		);
+
+		// OPEN REAL TRADES (ALL)
+		statements.getOpenRealTrades = await db.prepare(
+			`
+    SELECT
+        t_buy.*,
+        SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END) AS sold_quantity
+    FROM transactions t_buy
+    LEFT JOIN transactions t_sell ON t_buy.id = t_sell.original_transaction_id
+    WHERE UPPER(t_buy.transaction_type) = 'BUY'
       AND t_buy.status = 'open'
       AND t_buy.is_paper_trade = 0 -- Filter for Real Open Trades
     GROUP BY t_buy.id
@@ -94,12 +111,139 @@ const initializeStatements = async () => {
     ORDER BY t_sell.transaction_date DESC;
     `,
 		);
+
+		// CLOSED REAL TRADES
+		statements.getClosedRealTrades = await db.prepare(
+			`
+    SELECT
+        t_buy.id AS buy_id,
+        t_buy.source_id,
+        t_buy.transaction_date AS buy_date,
+        t_buy.ticker AS symbol,
+        t_buy.quantity AS buy_quantity,
+        t_buy.price AS buy_price,
+        t_sell.id AS sell_id,
+        t_sell.transaction_date AS sell_date,
+        ABS(t_sell.quantity) AS sell_quantity, -- Ensure positive quantity for display
+        t_sell.price AS sell_price,
+        (t_sell.price - t_buy.price) * ABS(t_sell.quantity) AS profit_loss
+    FROM transactions t_sell
+    JOIN transactions t_buy ON t_sell.original_transaction_id = t_buy.id
+    WHERE t_sell.transaction_type = 'sell'
+      AND t_sell.is_paper_trade = 0 -- Filter for Real Closed Trades
+      -- ROBUST CHECK: Is the original position fully sold?
+      AND t_buy.quantity <= (
+        SELECT SUM(ABS(quantity))
+        FROM transactions t_sub
+        WHERE t_sub.original_transaction_id = t_buy.id AND t_sub.transaction_type = 'sell'
+      )
+    ORDER BY t_sell.transaction_date DESC;
+    `,
+		);
+
+		// OPEN REAL TRADES BY TICKER
+		statements.getOpenRealTradesByTicker = await db.prepare(
+			`
+    SELECT
+        t_buy.*,
+        SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END) AS sold_quantity
+    FROM transactions t_buy
+    LEFT JOIN transactions t_sell ON t_buy.id = t_sell.original_transaction_id
+    WHERE t_buy.ticker = ?
+      AND UPPER(t_buy.transaction_type) = 'BUY'
+      AND t_buy.status = 'open'
+      AND t_buy.is_paper_trade = 0 -- Filter for Real Open Trades
+    GROUP BY t_buy.id
+    HAVING (t_buy.quantity - SUM(CASE WHEN t_sell.transaction_type = 'sell' THEN ABS(t_sell.quantity) ELSE 0 END)) > 0
+    ORDER BY t_buy.transaction_date DESC;
+    `,
+		);
+
+		// SALES BY TICKER
+		statements.getSalesByTicker = await db.prepare(
+			`
+    SELECT *
+    FROM transactions
+    WHERE ticker = ?
+      AND transaction_type = 'sell'
+      AND is_paper_trade = 0
+    ORDER BY transaction_date DESC;
+    `,
+		);
 	} catch (error) {
 		console.error("Error preparing database statements:", error);
 		// Re-throw the error to be caught by the route handler's try-catch
 		throw error;
 	}
 };
+
+/**
+ * GET /api/transactions/open-trades/real/:ticker
+ * Retrieves all open real trades for a given ticker.
+ */
+router.get("/open-trades/real/:ticker", async (req, res) => {
+	try {
+		await initializeStatements();
+		const { ticker } = req.params;
+		const positions = await statements.getOpenRealTradesByTicker.all(ticker);
+		res.json(positions);
+	} catch (error) {
+		console.error(
+			`Failed to get open real trades for ticker ${req.params.ticker}:`,
+			error,
+		);
+		res.status(500).json({ error: "Failed to retrieve open real trades" });
+	}
+});
+
+/**
+ * GET /api/transactions/sales/real/:ticker
+ * Retrieves all sales for a given ticker.
+ */
+router.get("/sales/real/:ticker", async (req, res) => {
+	try {
+		await initializeStatements();
+		const { ticker } = req.params;
+		const sales = await statements.getSalesByTicker.all(ticker);
+		res.json(sales);
+	} catch (error) {
+		console.error(
+			`Failed to get sales for ticker ${req.params.ticker}:`,
+			error,
+		);
+		res.status(500).json({ error: "Failed to retrieve sales" });
+	}
+});
+
+/**
+ * GET /api/transactions/closed-trades/real
+ * Retrieves all closed real trades.
+ */
+router.get("/closed-trades/real", async (req, res) => {
+	try {
+		await initializeStatements();
+		const positions = await statements.getClosedRealTrades.all();
+		res.json(positions);
+	} catch (error) {
+		console.error("Failed to get closed real trades:", error);
+		res.status(500).json({ error: "Failed to retrieve closed real trades" });
+	}
+});
+
+/**
+ * GET /api/transactions/open-trades/real
+ * Retrieves all open real trades.
+ */
+router.get("/open-trades/real", async (req, res) => {
+	try {
+		await initializeStatements();
+		const positions = await statements.getOpenRealTrades.all();
+		res.json(positions);
+	} catch (error) {
+		console.error("Failed to get open real trades:", error);
+		res.status(500).json({ error: "Failed to retrieve open real trades" });
+	}
+});
 
 /**
  * GET /api/transactions/open-trades/:sourceId
@@ -109,7 +253,7 @@ router.get("/open-trades/:sourceId", async (req, res) => {
 	try {
 		await initializeStatements();
 		const { sourceId } = req.params;
-		const positions = await statements.getOpenTrades.all(sourceId);
+		const positions = await statements.getOpenTradesBySource.all(sourceId);
 		res.json(positions);
 	} catch (error) {
 		console.error(
@@ -427,6 +571,42 @@ router.post("/", async (req, res) => {
 		await db.run("ROLLBACK");
 		console.error("Failed to create transaction:", error);
 		res.status(500).json({ error: "Failed to create transaction" });
+	}
+});
+
+/**
+ * GET /api/transactions
+ * Retrieves all transactions.
+ */
+router.get("/", async (req, res) => {
+	try {
+		const db = await getDb();
+		const transactions = await db.all(
+			"SELECT * FROM transactions ORDER BY transaction_date DESC",
+		);
+		res.json(transactions);
+	} catch (error) {
+		console.error("Failed to get transactions:", error);
+		res.status(500).json({ error: "Failed to retrieve transactions" });
+	}
+});
+
+/**
+ * DELETE /api/transactions/:transactionId
+ * Deletes a transaction.
+ */
+router.delete("/:transactionId", async (req, res) => {
+	const { transactionId } = req.params;
+	const db = await getDb();
+	await db.run("BEGIN TRANSACTION");
+	try {
+		await db.run("DELETE FROM transactions WHERE id = ?", transactionId);
+		await db.run("COMMIT");
+		res.status(200).json({ message: "Transaction deleted successfully." });
+	} catch (error) {
+		await db.run("ROLLBACK");
+		console.error(`Failed to delete transaction ${transactionId}:`, error);
+		res.status(500).json({ error: "Failed to delete transaction." });
 	}
 });
 

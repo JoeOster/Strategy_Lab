@@ -8,9 +8,11 @@ import {
 	updateWatchedItem,
 } from "../../../api.js";
 
-const addIdeaModal = document.getElementById("add-idea-modal");
-const logIdeaForm = document.getElementById("log-idea-form");
+const tradeEntryModal = document.getElementById("trade-entry-modal");
+const tradeEntryForm = document.getElementById("trade-entry-form");
 const quantityContainer = document.getElementById("quantity-container");
+
+import { getDefaultStrategy } from "./api.js";
 
 /**
  * Opens the add/edit idea modal and populates it if editing.
@@ -33,17 +35,28 @@ export async function handleShowIdeaForm(
 ) {
 	// Reset form fields
 	// @ts-ignore
-	logIdeaForm.reset();
+	tradeEntryForm.reset();
 
 	// Set source and strategy IDs
 	// @ts-ignore
-	document.getElementById("idea-source-id").value = sourceId || "";
-	// @ts-ignore
-	document.getElementById("idea-strategy-id").value = strategyId || "";
+	document.getElementById("trade-source-id").value = sourceId || "";
+	if (strategyId) {
+		// @ts-ignore
+		document.getElementById("idea-strategy-id").value = strategyId;
+	} else if (sourceId) {
+		const defaultStrategy = await getDefaultStrategy(sourceId);
+		if (defaultStrategy) {
+			// @ts-ignore
+			document.getElementById("idea-strategy-id").value = defaultStrategy.id;
+		}
+	} else {
+		// @ts-ignore
+		document.getElementById("idea-strategy-id").value = "";
+	}
 
 	// Set ticker if provided
 	// @ts-ignore
-	document.getElementById("idea-ticker").value = ticker || "";
+	document.getElementById("trade-ticker").value = ticker || "";
 
 	// Show/hide quantity for paper trades
 	if (isPaperTrade) {
@@ -65,7 +78,7 @@ export async function handleShowIdeaForm(
 			if (idea) {
 				// Populate form fields for editing
 				// @ts-ignore
-				document.getElementById("idea-ticker").value = idea.ticker || "";
+				document.getElementById("trade-ticker").value = idea.ticker || "";
 				// @ts-ignore
 				document.getElementById("idea-buy-low").value =
 					idea.buy_price_low || "";
@@ -83,7 +96,7 @@ export async function handleShowIdeaForm(
 				// @ts-ignore
 				document.getElementById("idea-notes").value = idea.notes || "";
 				// @ts-ignore
-				document.getElementById("idea-source-id").value = idea.source_id || "";
+				document.getElementById("trade-source-id").value = idea.source_id || "";
 				// @ts-ignore
 				document.getElementById("idea-strategy-id").value =
 					idea.strategy_id || "";
@@ -95,15 +108,15 @@ export async function handleShowIdeaForm(
 	}
 
 	// @ts-ignore
-	addIdeaModal.style.display = "block";
+	tradeEntryModal.style.display = "block";
 }
 
 // Event listener for adding/editing an idea
-if (logIdeaForm) {
-	logIdeaForm.addEventListener("submit", async (event) => {
+if (tradeEntryForm) {
+	tradeEntryForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 		// @ts-ignore
-		const formData = new FormData(logIdeaForm);
+		const formData = new FormData(tradeEntryForm);
 		const ideaData = Object.fromEntries(formData.entries());
 
 		// Determine if it's an edit or add operation
@@ -132,13 +145,13 @@ if (logIdeaForm) {
 				alert("Idea added successfully!");
 			}
 			// @ts-ignore
-			addIdeaModal.style.display = "none";
+			tradeEntryModal.style.display = "none";
 
 			// --- START: FIX ---
 			// Dispatch a custom event to notify that a trade was created or an idea was updated.
 			// The modal handler will listen for this and refresh the correct tables.
 			// @ts-ignore
-			const sourceId = document.getElementById("idea-source-id").value;
+			const sourceId = document.getElementById("trade-source-id").value;
 			document.dispatchEvent(
 				new CustomEvent("tradeCreated", { detail: { sourceId } }),
 			);
@@ -151,23 +164,25 @@ if (logIdeaForm) {
 }
 
 // Close buttons for modal
-if (addIdeaModal) {
-	addIdeaModal.querySelector(".close-button")?.addEventListener("click", () => {
-		// @ts-ignore
-		addIdeaModal.style.display = "none";
-	});
-	addIdeaModal
-		.querySelector("#cancel-idea-form-btn")
+if (tradeEntryModal) {
+	tradeEntryModal
+		.querySelector(".close-button")
 		?.addEventListener("click", () => {
 			// @ts-ignore
-			addIdeaModal.style.display = "none";
+			tradeEntryModal.style.display = "none";
+		});
+	tradeEntryModal
+		.querySelector("#cancel-trade-form-btn")
+		?.addEventListener("click", () => {
+			// @ts-ignore
+			tradeEntryModal.style.display = "none";
 		});
 }
 
 // Close modal when clicking outside
 window.addEventListener("click", (event) => {
-	if (event.target === addIdeaModal) {
+	if (event.target === tradeEntryModal) {
 		// @ts-ignore
-		addIdeaModal.style.display = "none";
+		tradeEntryModal.style.display = "none";
 	}
 });
