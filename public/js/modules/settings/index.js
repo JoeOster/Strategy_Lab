@@ -24,8 +24,6 @@ import * as webappsHandlers from "./webapps.handlers.js"; // Import new handlers
 export function initializeModule() {
 	console.log("Settings module initialized.");
 
-	initializeAppearanceTab();
-
 	// Initialize handlers for the source settings and modal
 	initializeSourceSettings();
 
@@ -59,9 +57,9 @@ export function initializeModule() {
 		button.addEventListener("click", handlers.handleMainTabClick);
 	}
 
-	// Explicitly activate the default tab (Dashboard) and load its content
+	// Explicitly activate the default tab (General) and load its content
 	const defaultTab = document.querySelector(
-		'.settings-tab[data-tab="dashboard-panel"]',
+		'.settings-tab[data-tab="general-settings-panel"]',
 	);
 	if (defaultTab) {
 		/** @type {HTMLElement} */ (defaultTab).click();
@@ -168,14 +166,22 @@ export function initializeModule() {
 		sourcesContainer.addEventListener("click", (event) => {
 			if (!(event.target instanceof HTMLElement)) return;
 			const target = event.target;
-			// @ts-ignore
-			const sourceId = target.dataset.id;
 
-			if (target.classList.contains("delete-source-btn") && sourceId) {
-				handleDeleteSourceClick(sourceId);
-			}
-			if (target.classList.contains("edit-source-btn") && sourceId) {
-				openSourceFormModal(sourceId);
+			// Find the closest parent with class 'advice-source-item'
+			const sourceItem = target.closest(".advice-source-item");
+
+			if (sourceItem) {
+				// @ts-ignore
+				const sourceId = sourceItem.dataset.id;
+
+				if (target.classList.contains("delete-source-btn") && sourceId) {
+					handleDeleteSourceClick(sourceId);
+				} else if (target.classList.contains("edit-source-btn") && sourceId) {
+					openSourceFormModal(sourceId);
+				} else if (sourceId) {
+					// If it's a click on the source item itself, but not the buttons
+					openSourceDetailModal(sourceId);
+				}
 			}
 		});
 	}

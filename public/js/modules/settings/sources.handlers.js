@@ -81,7 +81,11 @@ export function updateImagePreview(type, filename) {
 	}
 
 	const file = filename || "default.png";
-	previewImg.src = folderPath + file;
+	if (type === "book" && file.startsWith("http")) {
+		previewImg.src = file;
+	} else {
+		previewImg.src = folderPath + file;
+	}
 	previewImg.style.display = "block";
 
 	const genericPlaceholder = "images/contacts/default.png";
@@ -91,6 +95,120 @@ export function updateImagePreview(type, filename) {
 		// @ts-ignore
 		previewImg.src = genericPlaceholder;
 	};
+}
+
+export async function openSourceDetailModal(sourceId) {
+	const modal = document.getElementById("source-detail-modal");
+	if (!modal) {
+		error("Source detail modal not found.");
+		return;
+	}
+
+	try {
+		const source = await getSource(sourceId);
+		if (!source) {
+			error("Source not found for ID:", sourceId);
+			return;
+		}
+
+		// Populate the modal content
+		const profileContainer = document.getElementById(
+			"source-profile-container",
+		);
+		const strategiesContainer = document.getElementById(
+			"logged-strategies-container",
+		);
+		const modalTitle = document.getElementById("source-detail-modal-title");
+
+		if (modalTitle) modalTitle.textContent = `Details for ${source.name}`;
+
+		if (profileContainer) {
+			profileContainer.innerHTML = `
+                <div class="source-profile-image-wrapper">
+                    <img src="${
+											source.image_path || "images/contacts/default.png"
+										}" alt="${source.name}" class="source-profile-image">
+                </div>
+                <div class="source-profile-details">
+                    <h4>${source.name}</h4>
+                    <p><strong>Type:</strong> ${source.type}</p>
+                    ${
+											source.url
+												? `<p><strong>URL:</strong> <a href="${source.url}" target="_blank">${source.url}</a></p>`
+												: ""
+										}
+                    ${
+											source.description
+												? `<p><strong>Description:</strong> ${source.description}</p>`
+												: ""
+										}
+                    ${
+											source.person_email
+												? `<p><strong>Email:</strong> ${source.person_email}</p>`
+												: ""
+										}
+                    ${
+											source.person_phone
+												? `<p><strong>Phone:</strong> ${source.person_phone}</p>`
+												: ""
+										}
+                    ${
+											source.person_app_handle
+												? `<p><strong>App Handle:</strong> ${source.person_app_handle}</p>`
+												: ""
+										}
+                    ${
+											source.group_primary_contact
+												? `<p><strong>Primary Contact:</strong> ${source.group_primary_contact}</p>`
+												: ""
+										}
+                    ${
+											source.group_email
+												? `<p><strong>Group Email:</strong> ${source.group_email}</p>`
+												: ""
+										}
+                    ${
+											source.group_phone
+												? `<p><strong>Group Phone:</strong> ${source.group_phone}</p>`
+												: ""
+										}
+                    ${
+											source.group_app_handle
+												? `<p><strong>Group App Handle:</strong> ${source.group_app_handle}</p>`
+												: ""
+										}
+                    ${
+											source.book_author
+												? `<p><strong>Author:</strong> ${source.book_author}</p>`
+												: ""
+										}
+                    ${
+											source.book_isbn
+												? `<p><strong>ISBN:</strong> ${source.book_isbn}</p>`
+												: ""
+										}
+                    ${
+											source.website_websites
+												? `<p><strong>Websites:</strong> ${source.website_websites}</p>`
+												: ""
+										}
+                </div>
+            `;
+		}
+
+		if (strategiesContainer) {
+			strategiesContainer.innerHTML = `
+                <h4>Logged Strategies</h4>
+                <p>Loading strategies...</p>
+            `;
+			// TODO: Implement actual loading of strategies related to this source
+		}
+
+		// @ts-ignore
+		modal.style.display = "block";
+	} catch (err) {
+		error("Error opening source detail modal:", err);
+	}
 }
 
 /**
