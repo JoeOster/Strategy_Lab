@@ -123,14 +123,14 @@ function renderTradeRow(trade, isPaper, title) {
 	let actions = "";
 	if (isPaper || title === "Closed Trades") {
 		actions = `
-      <button class="btn table-action-btn btn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
-      <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
+      <button class="btn small-btnbtn-secondary paper-details-btn" data-id="${trade.id}">Details</button>
+      <button class="btn small-btnbtn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
     `;
 	} else if (trade.status === "open") {
 		// Only show sell button for open real trades
 		actions = `
-      <button class="btn table-action-btn btn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
-      <button class="btn table-action-btn btn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
+      <button class="btn small-btnbtn-warning real-sell-btn" data-id="${trade.id}">Sell</button>
+      <button class="btn small-btnbtn-secondary real-edit-btn" data-id="${trade.id}">Edit</button>
     `;
 	} else {
 		actions = "N/A"; // No actions for closed real trades

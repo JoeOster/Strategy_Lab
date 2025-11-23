@@ -25,7 +25,7 @@ function renderWebAppsList(webApps, container) {
 		item.innerHTML = `
       <span class="webapp-name">${app.name}</span>
       <div class="webapp-actions">
-        <button class="btn btn-danger table-action-btn delete-webapp-btn" data-id="${app.id}">Delete</button>
+        <button class="btn btn-danger small-btn delete-webapp-btn" data-id="${app.id}">Delete</button>
       </div>
     `;
 		list.appendChild(item);

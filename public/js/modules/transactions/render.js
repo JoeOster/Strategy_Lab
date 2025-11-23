@@ -240,7 +240,7 @@ export function tct_renderTradesTable(trades, containerId, error = null) {
         <td>${trade.realized_pl_pct.toFixed(2)}%</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="btn table-action-btn btn-secondary small-btn" data-id="${
+            <button class="btn small-btnbtn-secondary small-btn" data-id="${
 							trade.id
 						}">Details</button>
           </div>
@@ -293,15 +293,15 @@ function renderTradeRow(trade, isPaper, title) {
 
 	if (isPaper) {
 		actions = `
-      <button class="btn table-action-btn btn-secondary paper-edit-btn" data-id="${trade.id}">Edit</button>
-      <button class="btn table-action-btn btn-danger small-btn paper-trade-close-btn" data-id="${trade.id}">Close</button>
-      <button class="btn table-action-btn btn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
+      <button class="btn small-btnbtn-secondary paper-edit-btn" data-id="${trade.id}">Edit</button>
+      <button class="btn small-btnbtn-danger small-btn paper-trade-close-btn" data-id="${trade.id}">Close</button>
+      <button class="btn small-btnbtn-danger paper-delete-btn" data-id="${trade.id}">Delete</button>
     `;
 		// UPDATED: Added SL, TP1, and TP2 cells to Paper Trades (Open)
 		rowContent = `
       <td class="text-center clickable-ticker">${trade.ticker}</td>
       <td class="text-center">${trade.quantity}</td>
-      <td class="text-center">-</td>
+      <td class="text-center">${qtyRemaining}</td>
       <td class="text-center">${formatCurrency(entryPrice)}</td>
       <td class="text-center">${
 				trade.limit_high ? formatCurrency(trade.limit_high) : "N/A"
@@ -325,8 +325,8 @@ function renderTradeRow(trade, isPaper, title) {
 	} else {
 		// Real Trades (Open Trades)
 		actions = `
-      <button class="btn table-action-btn btn-secondary small-btn open-trade-edit-btn" data-id="${trade.id}">Edit</button>
-      <button class="btn table-action-btn btn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
+      <button class="btn small-btnbtn-secondary small-btn open-trade-edit-btn" data-id="${trade.id}">Edit</button>
+      <button class="btn small-btnbtn-danger small-btn open-trade-sell-btn" data-id="${trade.id}">Sell</button>
     `;
 		rowContent = `
       <td class="text-center clickable-ticker">${trade.ticker || ""}</td>

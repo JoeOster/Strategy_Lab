@@ -48,17 +48,7 @@
 	gap: 5px; /* Space between buttons */
 }
 
-/* Table Action Buttons */
-.table-action-btn {
-	/* Inherit from .btn */
-	padding: 5px 8px; /* Smaller padding */
-	font-size: 0.8rem; /* Smaller font size */
-	border-radius: 3px; /* Slightly smaller border-radius */
-}
 
-.table-action-btn:hover {
-	background-color: var(--primary-hover); /* Example: using primary hover color */
-}
 
 .small-btn {
 	/* Inherit from .btn */
@@ -202,11 +192,7 @@
 	border-bottom: none;
 }
 
-/* Tweak for buttons inside tables to ensure alignment */
-.strategy-table .table-action-btn {
-	margin-right: 4px;
-	margin-bottom: 0; /* Ensure no extra margin */
-}
+
 
 /* Actions column styling */
 .actions-column {

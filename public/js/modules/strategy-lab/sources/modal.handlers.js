@@ -51,129 +51,155 @@ import { error, log } from "../../../utils/logger.js";
 
 let tradeCreatedHandler = null;
 
-export async function pct_loadTrades(sourceId) {
+export async function pct_loadTrades(/** @type {number | string} */ sourceId) {
 	const openContainerId = "paper-trades-table-placeholder";
-
 	const closedContainerId = "pct-closed-paper-trades-table-placeholder";
 
 	try {
-		const allPaperTransactions = await getPaperTradesForSource(sourceId);
+		/** @type {Transaction[]} */
+		const allTransactions = await getPaperTradesForSource(sourceId);
 
-		const closedTradeIds = new Set(
-			allPaperTransactions
-
-				.filter((t) => t.transaction_type === "sell")
-
-				.map((t) => t.original_transaction_id),
+		const buyTransactions = allTransactions.filter(
+			(t) => t.transaction_type === "buy",
+		);
+		const sellTransactions = allTransactions.filter(
+			(t) => t.transaction_type === "sell",
 		);
 
-		const openPaperTrades = allPaperTransactions.filter(
-			(t) => t.transaction_type === "BUY" && !closedTradeIds.has(t.id),
-		);
+		// Create a map of original transaction IDs to their total sold quantity
+		const soldQuantities = sellTransactions.reduce((acc, sell) => {
+			if (sell.original_transaction_id) {
+				acc[sell.original_transaction_id] =
+					(acc[sell.original_transaction_id] || 0) + Math.abs(sell.quantity);
+			}
+			return acc;
+		}, {});
 
-		const closedPaperTrades = allPaperTransactions
+		const openPaperTrades = [];
+		const closedPaperTrades = [];
 
-			.filter((t) => t.transaction_type === "sell")
+		for (const buy of buyTransactions) {
+			const totalSold = soldQuantities[buy.id] || 0;
+			const remainingQty = buy.quantity - totalSold;
 
-			.map((sellTrade) => {
-				const buyTrade = allPaperTransactions.find(
-					(t) => t.id === sellTrade.original_transaction_id,
-				);
+			if (remainingQty > 0) {
+				// This is an open trade
+				openPaperTrades.push({
+					...buy,
+					sold_quantity: totalSold, // for rendering
+				});
+			}
+		}
 
-				if (!buyTrade) return null;
-
-				const pnl = (sellTrade.price - buyTrade.price) * buyTrade.quantity;
-
-				const return_pct = (pnl / (buyTrade.price * buyTrade.quantity)) * 100;
-
-				return {
-					id: buyTrade.id,
-
-					ticker: buyTrade.ticker,
-
+		for (const sell of sellTransactions) {
+			const buyTrade = buyTransactions.find(
+				(b) => b.id === sell.original_transaction_id,
+			);
+			if (buyTrade) {
+				const pnl = (sell.price - buyTrade.price) * Math.abs(sell.quantity);
+				const return_pct =
+					(pnl / (buyTrade.price * Math.abs(sell.quantity))) * 100;
+				closedPaperTrades.push({
+					...buyTrade, // base info from the buy
+					id: sell.id, // Use sell id for any actions on this closed trade view
 					entry_date: buyTrade.transaction_date,
-
-					exit_date: sellTrade.transaction_date,
-
+					exit_date: sell.transaction_date,
+					exit_price: sell.price,
 					entry_price: buyTrade.price,
-
-					exit_price: sellTrade.price,
-
+					quantity: Math.abs(sell.quantity), // show the sold quantity
 					pnl,
-
 					return_pct,
-				};
-			})
-
-			.filter(Boolean);
+					ticker: buyTrade.ticker,
+				});
+			}
+		}
 
 		renderPaperTradesForSource(openPaperTrades, openContainerId);
-
 		pct_renderTradesTable(closedPaperTrades, closedContainerId);
 	} catch (err) {
 		const e = err instanceof Error ? err : new Error(String(err));
-
 		renderPaperTradesForSource(null, openContainerId, e);
-
 		pct_renderTradesTable(null, closedContainerId, e);
 	}
 }
 
-export async function openSourceDetailModal(sourceId) {
-	const modal = document.getElementById("source-detail-modal");
+export async function openSourceDetailModal(/** @type {number | string} */ sourceId) {
 
-	const profileContainer = document.getElementById("source-profile-container");
+	const modal = /** @type {HTMLElement | null} */ (document.getElementById("source-detail-modal"));
 
-	const loggedStrategiesContainer = document.getElementById(
-		"logged-strategies-container",
+	const profileContainer = /** @type {HTMLElement | null} */ (document.getElementById("source-profile-container"));
+
+	const loggedStrategiesContainer = /** @type {HTMLElement | null} */ (
+
+		document.getElementById("logged-strategies-container")
+
 	);
 
 	const closeButton = modal?.querySelector(".close-button");
 
-	const ideasPlaceholder = document.getElementById(
-		"open-ideas-table-placeholder",
-	);
+	const ideasPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("open-ideas-table-placeholder"));
 
-	const openTradesPlaceholder = document.getElementById(
-		"open-trades-table-placeholder",
-	);
+	const openTradesPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("open-trades-table-placeholder"));
 
-	const testClosedTradesPlaceholder = document.getElementById(
-		"test-closed-trades-table-placeholder",
-	);
+	const testClosedTradesPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("test-closed-trades-table-placeholder"));
+
+
 
 	if (ideasPlaceholder) {
+
 		ideasPlaceholder.style.display = "block";
 
 		ideasPlaceholder.innerHTML = "<h3>Open Ideas</h3><p>Loading...</p>";
+
 	}
+
+
 
 	if (openTradesPlaceholder) {
+
 		openTradesPlaceholder.innerHTML =
+
 			"<h3>Retail Trades - Open</h3><p>Loading...</p>";
+
 	}
+
+
 
 	if (testClosedTradesPlaceholder) {
+
 		testClosedTradesPlaceholder.innerHTML =
+
 			"<h3>Test Closed Trades</h3><p>Loading...</p>";
+
 	}
 
+
+
 	if (
+
 		!modal ||
+
 		!profileContainer ||
+
 		!loggedStrategiesContainer ||
+
 		!closeButton
+
 	) {
+
 		error(
+
 			"Source detail modal elements not found. One or more elements are null.",
+
 		);
 
 		return;
+
 	}
 
-	// @ts-ignore
 
-	modal.dataset.sourceId = sourceId;
+
+	modal.dataset.sourceId = String(sourceId);
 
 	try {
 		const source = await getSource(sourceId);
@@ -459,7 +485,11 @@ export function closeSourceDetailModal() {
 	}
 }
 
-async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
+async function loadSourceDetailContent(
+	/** @type {number | string} */ sourceId,
+	/** @type {string} */ sourceType,
+	/** @type {HTMLElement} */ targetElement,
+) {
 	log(
 		`Loading content for source detail right panel for source ${sourceId}...`,
 	);
@@ -488,7 +518,7 @@ async function loadSourceDetailContent(sourceId, sourceType, targetElement) {
 	}
 }
 
-export async function loadStrategiesForSource(sourceId) {
+export async function loadStrategiesForSource(/** @type {number | string} */ sourceId) {
 	log(`Loading strategies for source ${sourceId}...`);
 	try {
 		const strategies = await getStrategiesForSource(sourceId);
@@ -502,7 +532,7 @@ export async function loadStrategiesForSource(sourceId) {
 	}
 }
 
-export async function loadTradeIdeasForSource(sourceId) {
+export async function loadTradeIdeasForSource(/** @type {number | string} */ sourceId) {
 	log(`Loading trade ideas for source ${sourceId}...`);
 	try {
 		const ideas = await getOpenIdeasForSource(sourceId);
@@ -516,7 +546,7 @@ export async function loadTradeIdeasForSource(sourceId) {
 	}
 }
 
-export async function loadOpenIdeasForSource(sourceId) {
+export async function loadOpenIdeasForSource(/** @type {number | string} */ sourceId) {
 	const containerId = "open-ideas-table-placeholder";
 	try {
 		const ideas = await getOpenIdeasForSource(sourceId);
@@ -528,7 +558,7 @@ export async function loadOpenIdeasForSource(sourceId) {
 	}
 }
 
-export async function loadOpenTradesForSource(sourceId) {
+export async function loadOpenTradesForSource(/** @type {number | string} */ sourceId) {
 	const containerId = "open-trades-table-placeholder";
 	try {
 		const trades = await getOpenTradesForSource(sourceId);
@@ -545,7 +575,7 @@ export async function loadOpenTradesForSource(sourceId) {
 	}
 }
 
-export async function loadPaperTradesForSource(sourceId) {
+export async function loadPaperTradesForSource(/** @type {number | string} */ sourceId) {
 	const containerId = "paper-trades-table-placeholder";
 	try {
 		/** @type {PaperTradeSummary[]} */
@@ -558,7 +588,7 @@ export async function loadPaperTradesForSource(sourceId) {
 	}
 }
 
-async function tct_loadTrades(sourceId) {
+async function tct_loadTrades(/** @type {number | string} */ sourceId) {
 	const containerId = "test-closed-trades-table-placeholder";
 	try {
 		const trades = await tct_getTradesForSource(sourceId);
@@ -573,7 +603,7 @@ async function tct_loadTrades(sourceId) {
 import { openEditTradeModal } from "../../transactions/edit-trade.handlers.js";
 import { openPaperTradeDetailsModal } from "../../transactions/paper-trade-details.handlers.js";
 
-async function handleModalBottomPanelClicks(event) {
+async function handleModalBottomPanelClicks(/** @type {MouseEvent} */ event) {
 	if (!(event.target instanceof HTMLElement)) return;
 	const target = event.target;
 
@@ -621,8 +651,7 @@ async function handleModalBottomPanelClicks(event) {
 		openEditTradeModal({ tradeId: id });
 	}
 
-	// @ts-ignore
-	const sourceId = event.target.closest("#source-detail-modal")?.dataset
+	const sourceId = /** @type {HTMLElement} */ (event.target.closest("#source-detail-modal"))?.dataset
 		.sourceId;
 
 	if (sourceId) {
@@ -635,7 +664,7 @@ async function handleModalBottomPanelClicks(event) {
 	}
 }
 
-async function handleStrategyTableClicks(event) {
+async function handleStrategyTableClicks(/** @type {MouseEvent} */ event) {
 	if (!(event.target instanceof HTMLElement)) return;
 	const target = event.target;
 
@@ -645,10 +674,9 @@ async function handleStrategyTableClicks(event) {
 	const strategyId = button.dataset.strategyId;
 	if (!strategyId) return;
 
-	const modal = event.target.closest("#source-detail-modal");
+	const modal = /** @type {HTMLElement | null} */ (event.target.closest("#source-detail-modal"));
 	if (!modal) return;
 
-	// @ts-ignore
 	const sourceId = modal.dataset.sourceId;
 	const ticker = button.dataset.ticker;
 
@@ -656,12 +684,15 @@ async function handleStrategyTableClicks(event) {
 		await handleDeleteStrategyClick(strategyId, sourceId);
 	} else if (button.classList.contains("strategy-edit-btn")) {
 		handleShowEditStrategyForm(strategyId);
-	} else if (button.classList.contains("table-action-btn")) {
+	} else if (button.classList.contains("small-btn")) {
 		handleShowIdeaForm(event, sourceId, strategyId, false, false, ticker);
 	}
 }
 
-async function handleDeleteStrategyClick(strategyId, sourceId) {
+async function handleDeleteStrategyClick(
+	/** @type {number | string} */ strategyId,
+	/** @type {number | string} */ sourceId,
+) {
 	if (!confirm("Are you sure you want to delete this strategy?")) {
 		return;
 	}

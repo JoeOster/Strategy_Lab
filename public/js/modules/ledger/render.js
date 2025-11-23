@@ -46,7 +46,7 @@ export function renderLedgerTable(transactions) {
                     <td>${transaction.transaction_type}</td>
                     <td class="actions-column">
                         <div class="table-actions">
-                            <button class="btn table-action-btn btn-danger small-btn delete-transaction-btn" data-id="${
+                            <button class="btn btn-danger small-btn delete-transaction-btn" data-id="${
 															transaction.id
 														}">Delete</button>
                         </div>

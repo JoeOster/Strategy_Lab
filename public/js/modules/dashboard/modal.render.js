@@ -66,10 +66,10 @@ export function renderOpenOrdersTable(trades) {
             <td>${trade.exchange}</td>
             <td class="actions-column">
                 <div class="table-actions">
-                    <button class="btn table-action-btn btn-secondary small-btn open-trade-sell-btn" data-id="${
+                    <button class="btn small-btnbtn-secondary small-btn open-trade-sell-btn" data-id="${
 											trade.id
 										}">Sell</button>
-                    <button class="btn table-action-btn btn-secondary small-btn real-edit-btn" data-id="${
+                    <button class="btn small-btnbtn-secondary small-btn real-edit-btn" data-id="${
 											trade.id
 										}">Edit</button>
                 </div>

@@ -25,7 +25,7 @@ function renderExchangesList(exchanges, container) {
 		item.innerHTML = `
       <span class="exchange-name">${exchange.name}</span>
       <div class="exchange-actions">
-        <button class="btn btn-danger table-action-btn delete-exchange-btn" data-id="${exchange.id}">Delete</button>
+        <button class="btn btn-danger small-btn delete-exchange-btn" data-id="${exchange.id}">Delete</button>
       </div>
     `;
 		list.appendChild(item);

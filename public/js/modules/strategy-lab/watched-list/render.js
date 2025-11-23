@@ -53,7 +53,7 @@ export function renderWatchedList(watchedList, error = null) {
 
 					const isWatching = item.status === "WATCHING";
 					const actionContent = isWatching
-						? `<button class="btn table-action-btn btn-danger idea-delete-btn" data-id="${item.id}" title="Delete Idea">Delete</button>`
+						? `<button class="btn small-btn btn-danger idea-delete-btn" data-id="${item.id}" title="Delete Idea">Delete</button>`
 						: "";
 
 					const displayTicker = (item.ticker || "").toUpperCase();

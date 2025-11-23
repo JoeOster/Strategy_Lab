@@ -162,13 +162,13 @@ export function renderStrategiesTable(strategies) {
         <td>${strategy.pdf_path || ""}</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="table-action-btn btn btn-secondary small-btn" data-strategy-id="${
+            <button class="small-btnbtn btn-secondary small-btn" data-strategy-id="${
 							strategy.id
 						}" data-ticker="${strategy.ticker || ""}">Add Idea</button>
-            <button class="table-action-btn btn btn-secondary small-btn strategy-edit-btn" data-strategy-id="${
+            <button class="small-btnbtn btn-secondary small-btn strategy-edit-btn" data-strategy-id="${
 							strategy.id
 						}">Edit</button>
-            <button class="table-action-btn btn btn-danger small-btn strategy-delete-btn" data-strategy-id="${
+            <button class="small-btnbtn btn-danger small-btn strategy-delete-btn" data-strategy-id="${
 							strategy.id
 						}">Delete</button>
           </div>
@@ -233,10 +233,10 @@ export function renderTradeIdeasTable(ideas) {
         <td>${item.status || "WATCHING"}</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="btn table-action-btn small-btn idea-edit-btn" data-id="${
+            <button class="btn small-btnsmall-btn idea-edit-btn" data-id="${
 							item.id
 						}">Edit</button>
-            <button class="btn table-action-btn btn-danger small-btn idea-delete-btn" data-id="${
+            <button class="btn small-btnbtn-danger small-btn idea-delete-btn" data-id="${
 							item.id
 						}">Delete</button>
           </div>
@@ -311,18 +311,18 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
             ${
 							item.status === "EXECUTED" // If the idea has been actioned
 								? item.executed_trade_type === "paper"
-									? `<button class="btn table-action-btn btn-secondary small-btn" disabled>&#10004; Paper</button>` // It became a paper trade
-									: `<button class="btn table-action-btn btn-success small-btn" disabled>&#10004; Bought</button>` // It became a real trade
+									? `<button class="btn small-btnbtn-secondary small-btn" disabled>&#10004; Paper</button>` // It became a paper trade
+									: `<button class="btn small-btnbtn-success small-btn" disabled>&#10004; Bought</button>` // It became a real trade
 								: // Otherwise, show the Buy and Paper buttons
 									`
-              <button class="btn table-action-btn small-btn idea-buy-btn" data-id="${item.id}">Buy</button>
-              <button class="btn table-action-btn btn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
+              <button class="btn small-btnsmall-btn idea-buy-btn" data-id="${item.id}">Buy</button>
+              <button class="btn small-btnbtn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
             `
 						}
-            <button class="btn table-action-btn btn-secondary small-btn idea-edit-btn" data-id="${
+            <button class="btn small-btnbtn-secondary small-btn idea-edit-btn" data-id="${
 							item.id
 						}">Edit</button>
-            <button class="btn table-action-btn btn-danger small-btn idea-delete-btn" data-id="${
+            <button class="btn small-btnbtn-danger small-btn idea-delete-btn" data-id="${
 							item.id
 						}">Delete</button>
             </div>

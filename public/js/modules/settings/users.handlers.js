@@ -32,13 +32,13 @@ function renderAccountHoldersList(holders, container) {
 				holder.is_default ? "(Default)" : ""
 			}</span>
       <div class="holder-actions">
-        <button class="btn btn-secondary table-action-btn set-default-holder-btn" data-id="${
+        <button class="btn btn-secondary small-btnset-default-holder-btn" data-id="${
 					holder.id
 				}" ${holder.is_default ? "disabled" : ""}>Set Default</button>
-        <button class="btn btn-secondary table-action-btn manage-subscriptions-btn" data-id="${
+        <button class="btn btn-secondary small-btnmanage-subscriptions-btn" data-id="${
 					holder.id
 				}" style="display:none;">Manage Subscriptions</button>
-        <button class="btn btn-danger table-action-btn delete-holder-btn" data-id="${
+        <button class="btn btn-danger small-btndelete-holder-btn" data-id="${
 					holder.id
 				}">Delete</button>
       </div>

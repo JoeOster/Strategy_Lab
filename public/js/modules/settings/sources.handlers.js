@@ -39,8 +39,8 @@ function renderSourcesList(sources, container) {
 		const actionsDiv = document.createElement("div");
 		actionsDiv.classList.add("source-actions");
 		actionsDiv.innerHTML = `
-      <button class="edit-source-btn table-action-btn btn-secondary" data-id="${source.id}">Edit</button>
-      <button class="delete-source-btn table-action-btn btn-danger" data-id="${source.id}">Delete</button>
+      <button class="edit-source-btn btn small-btn btn-secondary" data-id="${source.id}">Edit</button>
+      <button class="delete-source-btn btn small-btn btn-danger" data-id="${source.id}">Delete</button>
     `;
 		sourceElement.appendChild(actionsDiv);
 		container.appendChild(sourceElement);
@@ -81,7 +81,7 @@ export function updateImagePreview(type, filename) {
 	}
 
 	const file = filename || "default.png";
-	if (type === "book" && file.startsWith("http")) {
+	if (file.startsWith("http://") || file.startsWith("https://")) {
 		previewImg.src = file;
 	} else {
 		previewImg.src = folderPath + file;
@@ -123,11 +123,34 @@ export async function openSourceDetailModal(sourceId) {
 		if (modalTitle) modalTitle.textContent = `Details for ${source.name}`;
 
 		if (profileContainer) {
+			let folderPath = "images/";
+			switch (source.type) {
+				case "person":
+					folderPath = "images/contacts/";
+					break;
+				case "group":
+					folderPath = "images/group/";
+					break;
+				case "book":
+					folderPath = "images/books/";
+					break;
+				case "website":
+					folderPath = "images/url/";
+					break;
+			}
+			const imageFile = source.image_path || "default.png";
+			let finalImagePath;
+
+			if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
+				finalImagePath = imageFile;
+			} else {
+				finalImagePath = folderPath + imageFile;
+			}
+			const genericPlaceholder = "images/contacts/default.png";
+
 			profileContainer.innerHTML = `
                 <div class="source-profile-image-wrapper">
-                    <img src="${
-											source.image_path || "images/contacts/default.png"
-										}" alt="${source.name}" class="source-profile-image">
+                    <img src="${finalImagePath}" alt="${source.name}" class="source-profile-image" onerror="this.onerror=null; this.src='${genericPlaceholder}';">
                 </div>
                 <div class="source-profile-details">
                     <h4>${source.name}</h4>
@@ -477,6 +500,7 @@ export async function openSourceFormModal(sourceId = null) {
  * Handles the submission of the form.
  */
 export async function handleSourceFormSubmit(event) {
+	console.log("handleSourceFormSubmit called");
 	event.preventDefault();
 	const form = /** @type {HTMLFormElement} */ (event.target);
 	const formData = new FormData(form);
@@ -494,8 +518,8 @@ export async function handleSourceFormSubmit(event) {
 		cachedSources = null;
 		loadSourcesList();
 		closeSourceFormModal();
-	} catch (error) {
-		error("Error saving source:", error);
+	} catch (e) {
+		error("Error saving source:", e);
 		alert("Error saving source. See console for details.");
 	}
 }
@@ -535,6 +559,10 @@ export function closeSourceFormModal() {
 }
 
 export function initializeSourceSettings() {
+	console.log("initializeSourceSettings called");
+	if (window.APP_VERSION) {
+		console.log(`Client-side App Version: ${window.APP_VERSION}`);
+	}
 	const clearBtn = document.getElementById("clear-source-form-btn");
 	if (clearBtn) clearBtn.remove();
 
@@ -545,6 +573,7 @@ export function initializeSourceSettings() {
 
 	const form = document.getElementById("source-form-form");
 	if (form) {
+		console.log("Attaching submit listener to source-form-form");
 		form.addEventListener("submit", handleSourceFormSubmit);
 	}
 
