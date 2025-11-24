@@ -109,11 +109,8 @@
 	border: 2px solid var(--container-border); /* Subtle border */
 }
 
-/* Styling for the "Book" section (logged-strategies-container) */
-#logged-strategies-container {
-	background-color: white; /* White background */
-	border: 1px solid #ccc; /* Light grey border */
-	padding: 20px;
-	border-radius: 8px;
+.source-detail-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-

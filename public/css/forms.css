@@ -22,7 +22,8 @@
 #add-webapp-form,
 #log-strategy-form,
 #log-idea-form,
-#edit-source-form {
+#edit-source-form,
+#add-strategy-form {
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
@@ -34,7 +35,8 @@
 #add-exchange-form label,
 #add-holder-form label,
 #log-strategy-form label,
-#edit-source-form label {
+#edit-source-form label,
+#add-strategy-form label {
 	font-weight: bold;
 	margin-bottom: -10px;
 	color: var(--heading-color);
@@ -52,7 +54,10 @@
 #log-strategy-form textarea,
 #edit-source-form input,
 #edit-source-form select,
-#edit-source-form textarea {
+#edit-source-form textarea,
+#add-strategy-form input,
+#add-strategy-form select,
+#add-strategy-form textarea {
 	padding: 10px;
 	border: 1px solid var(--container-border);
 	background-color: var(--info-panel-bg);
@@ -60,6 +65,12 @@
 	border-radius: 5px;
 	width: 100%;
 	box-sizing: border-box;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
 }
 
 #appearance-settings-form select {

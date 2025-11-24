@@ -7,11 +7,6 @@ import {
 	moveIdeaToRealTrade,
 	updateWatchedItem,
 } from "../../../api.js";
-
-const tradeEntryModal = document.getElementById("trade-entry-modal");
-const tradeEntryForm = document.getElementById("trade-entry-form");
-const quantityContainer = document.getElementById("quantity-container");
-
 import { getDefaultStrategy } from "./api.js";
 
 /**
@@ -33,6 +28,15 @@ export async function handleShowIdeaForm(
 	ticker = null,
 	ideaId = null,
 ) {
+	const tradeEntryModal = document.getElementById("trade-entry-modal");
+	const tradeEntryForm = document.getElementById("trade-entry-form");
+	const quantityContainer = document.getElementById("quantity-container");
+
+	if (!tradeEntryModal || !tradeEntryForm || !quantityContainer) {
+		console.error("Trade entry modal elements not found.");
+		return;
+	}
+
 	// Reset form fields
 	// @ts-ignore
 	tradeEntryForm.reset();
@@ -109,11 +113,8 @@ export async function handleShowIdeaForm(
 
 	// @ts-ignore
 	tradeEntryModal.style.display = "block";
-}
 
-// Event listener for adding/editing an idea
-if (tradeEntryForm) {
-	tradeEntryForm.addEventListener("submit", async (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 		// @ts-ignore
 		const formData = new FormData(tradeEntryForm);
@@ -160,29 +161,32 @@ if (tradeEntryForm) {
 			console.error("Failed to save idea:", error);
 			alert("Failed to save idea.");
 		}
-	});
-}
+	};
 
-// Close buttons for modal
-if (tradeEntryModal) {
+	tradeEntryForm.addEventListener("submit", handleSubmit);
+
+	// Close buttons for modal
 	tradeEntryModal
 		.querySelector(".close-button")
 		?.addEventListener("click", () => {
 			// @ts-ignore
 			tradeEntryModal.style.display = "none";
+			tradeEntryForm.removeEventListener("submit", handleSubmit);
 		});
 	tradeEntryModal
 		.querySelector("#cancel-trade-form-btn")
 		?.addEventListener("click", () => {
 			// @ts-ignore
 			tradeEntryModal.style.display = "none";
+			tradeEntryForm.removeEventListener("submit", handleSubmit);
 		});
-}
 
-// Close modal when clicking outside
-window.addEventListener("click", (event) => {
-	if (event.target === tradeEntryModal) {
-		// @ts-ignore
-		tradeEntryModal.style.display = "none";
-	}
-});
+	// Close modal when clicking outside
+	window.addEventListener("click", (event) => {
+		if (event.target === tradeEntryModal) {
+			// @ts-ignore
+			tradeEntryModal.style.display = "none";
+			tradeEntryForm.removeEventListener("submit", handleSubmit);
+		}
+	});
+}

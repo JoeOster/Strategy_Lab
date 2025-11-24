@@ -1,4 +1,5 @@
 import { error, log } from "../../utils/logger.js";
+import { loadHtmlPartial } from "../../utils/loadHtmlPartial.js";
 import {
 	addSource,
 	deleteSource,
@@ -95,6 +96,27 @@ export function updateImagePreview(type, filename) {
 		// @ts-ignore
 		previewImg.src = genericPlaceholder;
 	};
+}
+
+async function toggleAddStrategyForm(sourceId) {
+	const formContainer = document.getElementById("add-strategy-form-container");
+	if (!formContainer) return;
+
+	const isVisible = formContainer.style.display !== "none";
+	if (isVisible) {
+		formContainer.style.display = "none";
+	} else {
+		await loadHtmlPartial(
+			"_add-strategy-form.html",
+			"add-strategy-form-container",
+		);
+		const sourceIdField = document.getElementById("strategy-source-id");
+		if (sourceIdField) {
+			// @ts-ignore
+			sourceIdField.value = sourceId;
+		}
+		formContainer.style.display = "block";
+	}
 }
 
 export async function openSourceDetailModal(sourceId) {
@@ -225,6 +247,13 @@ export async function openSourceDetailModal(sourceId) {
                 <p>Loading strategies...</p>
             `;
 			// TODO: Implement actual loading of strategies related to this source
+		}
+
+		const addStrategyBtn = document.getElementById("add-strategy-btn");
+		if (addStrategyBtn) {
+			addStrategyBtn.addEventListener("click", () =>
+				toggleAddStrategyForm(sourceId),
+			);
 		}
 
 		// @ts-ignore

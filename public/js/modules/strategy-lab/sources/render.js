@@ -10,6 +10,7 @@ import {
 } from "../../../utils/formatters.js";
 import { error, log } from "../../../utils/logger.js";
 import { makeTableSortable } from "../../../utils/sortUtils.js";
+import { addReadMoreFunctionality } from "../../../utils/readMore.js";
 
 /**
  * Renders the list of advice sources as cards in the grid.
@@ -58,8 +59,14 @@ export function renderSourceCards(sources, error = null) {
 				folderPath = "images/url/";
 				break;
 		}
-		const imageFile = source.image_path ? source.image_path : "default.png";
-		const finalImagePath = folderPath + imageFile;
+		const imageFile = source.image_path || "default.png";
+		let finalImagePath;
+
+		if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
+			finalImagePath = imageFile;
+		} else {
+			finalImagePath = folderPath + imageFile;
+		}
 		const genericPlaceholder = "images/contacts/default.png";
 		// --- END: Image Path Logic ---
 
@@ -87,29 +94,7 @@ export function renderSourceCards(sources, error = null) {
 		grid.appendChild(card);
 	}
 
-	// Add event listeners for "See more" buttons after all cards are rendered
-	for (const button of grid.querySelectorAll(".read-more-btn")) {
-		button.addEventListener("click", (event) => {
-			const target = /** @type {HTMLElement} */ (event.target);
-			const descriptionContainer = target.closest(".source-card-description");
-			if (descriptionContainer) {
-				const dots = descriptionContainer.querySelector(".dots");
-				const moreText = descriptionContainer.querySelector(".more-text");
-
-				if (dots && moreText) {
-					if (moreText.style.display === "none") {
-						moreText.style.display = "inline";
-						dots.style.display = "none";
-						target.textContent = "See less";
-					} else {
-						moreText.style.display = "none";
-						dots.style.display = "inline";
-						target.textContent = "See more";
-					}
-				}
-			}
-		});
-	}
+	addReadMoreFunctionality(grid);
 }
 /**
  * Renders the table of logged strategies for a source.
@@ -134,7 +119,6 @@ export function renderStrategiesTable(strategies) {
     <thead>
       <tr>
         <th class="sortable" data-sort-key="title">Title</th>
-        <th class="sortable" data-sort-key="ticker">Ticker</th>
         <th class="sortable" data-sort-key="chapter">Chapter</th>
         <th class="sortable" data-sort-key="page_number">Page</th>
         <th class="sortable" data-sort-key="description">Description</th>
@@ -153,22 +137,22 @@ export function renderStrategiesTable(strategies) {
 	if (tbody) {
 		for (const strategy of strategies) {
 			const row = document.createElement("tr");
+			const descriptionHtml = formatDescriptionWithReadMore(strategy.description);
 			row.innerHTML = `
         <td>${strategy.title || ""}</td>
-        <td class="clickable-ticker">${strategy.ticker || ""}</td>
         <td>${strategy.chapter || ""}</td>
         <td>${strategy.page_number || ""}</td>
-        <td>${strategy.description || ""}</td>
+        <td class="strategy-description">${descriptionHtml}</td>
         <td>${strategy.pdf_path || ""}</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="small-btnbtn btn-secondary small-btn" data-strategy-id="${
+            <button class="btn btn-secondary small-btn strategy-add-idea-btn" data-strategy-id="${
 							strategy.id
 						}" data-ticker="${strategy.ticker || ""}">Add Idea</button>
-            <button class="small-btnbtn btn-secondary small-btn strategy-edit-btn" data-strategy-id="${
+            <button class="btn btn-secondary small-btn strategy-edit-btn" data-strategy-id="${
 							strategy.id
 						}">Edit</button>
-            <button class="small-btnbtn btn-danger small-btn strategy-delete-btn" data-strategy-id="${
+            <button class="btn btn-danger small-btn strategy-delete-btn" data-strategy-id="${
 							strategy.id
 						}">Delete</button>
           </div>
@@ -177,6 +161,7 @@ export function renderStrategiesTable(strategies) {
 			tbody.appendChild(row);
 		}
 	}
+	addReadMoreFunctionality(table);
 	makeTableSortable(table);
 }
 
@@ -233,10 +218,10 @@ export function renderTradeIdeasTable(ideas) {
         <td>${item.status || "WATCHING"}</td>
         <td class="actions-column">
           <div class="table-actions">
-            <button class="btn small-btnsmall-btn idea-edit-btn" data-id="${
+            <button class="btn small-btn idea-edit-btn" data-id="${
 							item.id
 						}">Edit</button>
-            <button class="btn small-btnbtn-danger small-btn idea-delete-btn" data-id="${
+            <button class="btn btn-danger small-btn idea-delete-btn" data-id="${
 							item.id
 						}">Delete</button>
           </div>
@@ -311,18 +296,18 @@ export function renderOpenIdeasForSource(ideas, containerId, error = null) {
             ${
 							item.status === "EXECUTED" // If the idea has been actioned
 								? item.executed_trade_type === "paper"
-									? `<button class="btn small-btnbtn-secondary small-btn" disabled>&#10004; Paper</button>` // It became a paper trade
-									: `<button class="btn small-btnbtn-success small-btn" disabled>&#10004; Bought</button>` // It became a real trade
+									? `<button class="btn btn-secondary small-btn" disabled>&#10004; Paper</button>` // It became a paper trade
+									: `<button class="btn btn-success small-btn" disabled>&#10004; Bought</button>` // It became a real trade
 								: // Otherwise, show the Buy and Paper buttons
 									`
-              <button class="btn small-btnsmall-btn idea-buy-btn" data-id="${item.id}">Buy</button>
-              <button class="btn small-btnbtn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
+              <button class="btn small-btn idea-buy-btn" data-id="${item.id}">Buy</button>
+              <button class="btn btn-secondary small-btn idea-paper-btn" data-id="${item.id}">Paper</button>
             `
 						}
-            <button class="btn small-btnbtn-secondary small-btn idea-edit-btn" data-id="${
+            <button class="btn btn-secondary small-btn idea-edit-btn" data-id="${
 							item.id
 						}">Edit</button>
-            <button class="btn small-btnbtn-danger small-btn idea-delete-btn" data-id="${
+            <button class="btn btn-danger small-btn idea-delete-btn" data-id="${
 							item.id
 						}">Delete</button>
             </div>

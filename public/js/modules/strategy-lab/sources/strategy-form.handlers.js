@@ -3,16 +3,19 @@
 import { addStrategy, getStrategy, updateStrategy } from "./api.js";
 import { loadStrategiesForSource } from "./modal.handlers.js"; // To refresh the table
 
-const addStrategyModal = document.getElementById("add-strategy-modal");
-const editStrategyModal = document.getElementById("edit-strategy-modal");
-const logStrategyForm = document.getElementById("log-strategy-form");
-const editStrategyForm = document.getElementById("edit-strategy-form");
-
 /**
  * Opens the add strategy modal.
  * @param {Event} event
  */
 export function handleShowStrategyForm(event) {
+	const addStrategyModal = document.getElementById("add-strategy-modal");
+	const logStrategyForm = document.getElementById("log-strategy-form");
+
+	if (!addStrategyModal || !logStrategyForm) {
+		console.error("Add strategy modal elements not found.");
+		return;
+	}
+
 	// @ts-ignore
 	const sourceId = event.target.dataset.sourceId;
 	if (!sourceId) {
@@ -27,6 +30,56 @@ export function handleShowStrategyForm(event) {
 	logStrategyForm.reset();
 	// @ts-ignore
 	addStrategyModal.style.display = "block";
+
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		// @ts-ignore
+		const formData = new FormData(logStrategyForm);
+		const strategyData = Object.fromEntries(formData.entries());
+
+		try {
+			await addStrategy(strategyData);
+			alert("Strategy added successfully!");
+			// @ts-ignore
+			addStrategyModal.style.display = "none";
+			// Refresh strategies table in the source detail modal
+			// @ts-ignore
+			const sourceId = document.getElementById("strategy-source-id").value;
+			if (sourceId) {
+				loadStrategiesForSource(sourceId);
+			}
+		} catch (error) {
+			console.error("Failed to add strategy:", error);
+			alert("Failed to add strategy.");
+		}
+	};
+
+	logStrategyForm.addEventListener("submit", handleSubmit);
+
+	// Close buttons for modals
+	addStrategyModal
+		.querySelector(".close-button")
+		?.addEventListener("click", () => {
+			// @ts-ignore
+			addStrategyModal.style.display = "none";
+			logStrategyForm.removeEventListener("submit", handleSubmit);
+		});
+	addStrategyModal
+		.querySelector("#cancel-strategy-form-btn")
+		?.addEventListener("click", () => {
+			// @ts-ignore
+			addStrategyModal.style.display = "none";
+			logStrategyForm.removeEventListener("submit", handleSubmit);
+		});
+
+	// Close modals when clicking outside
+	window.addEventListener("click", (event) => {
+		if (event.target === addStrategyModal) {
+			// @ts-ignore
+			addStrategyModal.style.display = "none";
+			logStrategyForm.removeEventListener("submit", handleSubmit);
+		}
+	});
 }
 
 /**
@@ -34,6 +87,17 @@ export function handleShowStrategyForm(event) {
  * @param {string} strategyId
  */
 export async function handleShowEditStrategyForm(strategyId) {
+	const editStrategyModal = document.getElementById("edit-strategy-modal");
+	const editStrategyForm = document.getElementById("edit-strategy-form");
+
+    console.log('editStrategyModal:', editStrategyModal);
+    console.log('editStrategyForm:', editStrategyForm);
+
+	if (!editStrategyModal || !editStrategyForm) {
+		console.error("Edit strategy modal elements not found.");
+		return;
+	}
+
 	try {
 		const strategy = await getStrategy(strategyId);
 		if (!strategy) {
@@ -67,105 +131,60 @@ export async function handleShowEditStrategyForm(strategyId) {
 
 		// @ts-ignore
 		editStrategyModal.style.display = "block";
+
+		const handleSubmit = async (event) => {
+			event.preventDefault();
+			// @ts-ignore
+			const formData = new FormData(editStrategyForm);
+			const strategyData = Object.fromEntries(formData.entries());
+			// @ts-ignore
+			const strategyId = document.getElementById("edit-strategy-id").value;
+
+			try {
+				await updateStrategy(strategyId, strategyData);
+				alert("Strategy updated successfully!");
+				// @ts-ignore
+				editStrategyModal.style.display = "none";
+				// Refresh strategies table in the source detail modal
+				// @ts-ignore
+				const sourceId = document.getElementById("edit-strategy-source-id").value;
+				if (sourceId) {
+					loadStrategiesForSource(sourceId);
+				}
+			} catch (error) {
+				console.error("Failed to update strategy:", error);
+				alert("Failed to update strategy.");
+			}
+		};
+
+		editStrategyForm.addEventListener("submit", handleSubmit);
+
+		// Close buttons for modals
+		editStrategyModal
+			.querySelector(".close-button")
+			?.addEventListener("click", () => {
+				// @ts-ignore
+				editStrategyModal.style.display = "none";
+				editStrategyForm.removeEventListener("submit", handleSubmit);
+			});
+		editStrategyModal
+			.querySelector("#cancel-edit-strategy-form-btn")
+			?.addEventListener("click", () => {
+				// @ts-ignore
+				editStrategyModal.style.display = "none";
+				editStrategyForm.removeEventListener("submit", handleSubmit);
+			});
+
+		// Close modals when clicking outside
+		window.addEventListener("click", (event) => {
+			if (event.target === editStrategyModal) {
+				// @ts-ignore
+				editStrategyModal.style.display = "none";
+				editStrategyForm.removeEventListener("submit", handleSubmit);
+			}
+		});
 	} catch (error) {
 		console.error(`Failed to load strategy ${strategyId} for editing:`, error);
 		alert("Failed to load strategy for editing.");
 	}
 }
-
-// Event listener for adding a strategy
-if (logStrategyForm) {
-	logStrategyForm.addEventListener("submit", async (event) => {
-		event.preventDefault();
-		// @ts-ignore
-		const formData = new FormData(logStrategyForm);
-		const strategyData = Object.fromEntries(formData.entries());
-
-		try {
-			await addStrategy(strategyData);
-			alert("Strategy added successfully!");
-			// @ts-ignore
-			addStrategyModal.style.display = "none";
-			// Refresh strategies table in the source detail modal
-			// @ts-ignore
-			const sourceId = document.getElementById("strategy-source-id").value;
-			if (sourceId) {
-				loadStrategiesForSource(sourceId);
-			}
-		} catch (error) {
-			console.error("Failed to add strategy:", error);
-			alert("Failed to add strategy.");
-		}
-	});
-}
-
-// Event listener for editing a strategy
-if (editStrategyForm) {
-	editStrategyForm.addEventListener("submit", async (event) => {
-		event.preventDefault();
-		// @ts-ignore
-		const formData = new FormData(editStrategyForm);
-		const strategyData = Object.fromEntries(formData.entries());
-		// @ts-ignore
-		const strategyId = document.getElementById("edit-strategy-id").value;
-
-		try {
-			await updateStrategy(strategyId, strategyData);
-			alert("Strategy updated successfully!");
-			// @ts-ignore
-			editStrategyModal.style.display = "none";
-			// Refresh strategies table in the source detail modal
-			// @ts-ignore
-			const sourceId = document.getElementById("edit-strategy-source-id").value;
-			if (sourceId) {
-				loadStrategiesForSource(sourceId);
-			}
-		} catch (error) {
-			console.error("Failed to update strategy:", error);
-			alert("Failed to update strategy.");
-		}
-	});
-}
-
-// Close buttons for modals
-if (addStrategyModal) {
-	addStrategyModal
-		.querySelector(".close-button")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			addStrategyModal.style.display = "none";
-		});
-	addStrategyModal
-		.querySelector("#cancel-strategy-form-btn")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			addStrategyModal.style.display = "none";
-		});
-}
-
-if (editStrategyModal) {
-	editStrategyModal
-		.querySelector(".close-button")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			editStrategyModal.style.display = "none";
-		});
-	editStrategyModal
-		.querySelector("#cancel-edit-strategy-form-btn")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			editStrategyModal.style.display = "none";
-		});
-}
-
-// Close modals when clicking outside
-window.addEventListener("click", (event) => {
-	if (event.target === addStrategyModal) {
-		// @ts-ignore
-		addStrategyModal.style.display = "none";
-	}
-	if (event.target === editStrategyModal) {
-		// @ts-ignore
-		editStrategyModal.style.display = "none";
-	}
-});

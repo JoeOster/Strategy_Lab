@@ -231,11 +231,12 @@ export async function openSourceDetailModal(/** @type {number | string} */ sourc
 		const imageFile = source.image_path || "default.png";
 		let finalImagePath;
 
-		if (source.type === "book" && imageFile.startsWith("http")) {
+		if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
 			finalImagePath = imageFile;
 		} else {
 			finalImagePath = folderPath + imageFile;
 		}
+
 
 		const genericPlaceholder = "images/contacts/default.png";
 
@@ -502,7 +503,7 @@ async function loadSourceDetailContent(
 			sourceType === "group"
 		) {
 			targetElement.innerHTML = `
-        <div class="source-detail-right-header">
+        <div class="source-detail-right-header source-detail-header-flex">
           <h3>Logged Strategies</h3>
           <button class="btn" id="add-strategy-btn" data-source-id="${sourceId}">Add Strategy</button>
         </div>
@@ -684,7 +685,7 @@ async function handleStrategyTableClicks(/** @type {MouseEvent} */ event) {
 		await handleDeleteStrategyClick(strategyId, sourceId);
 	} else if (button.classList.contains("strategy-edit-btn")) {
 		handleShowEditStrategyForm(strategyId);
-	} else if (button.classList.contains("small-btn")) {
+	} else if (button.classList.contains("strategy-add-idea-btn")) {
 		handleShowIdeaForm(event, sourceId, strategyId, false, false, ticker);
 	}
 }
