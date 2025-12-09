@@ -51,6 +51,11 @@ router.post("/", async (req, res) => {
 		return res.status(400).json({ error: "Name and type are required" });
 	}
 
+	// If it's a new source, don't include the id in the insert statement
+	if (!sourceData.id) {
+		delete sourceData.id;
+	}
+
 	const columns = [
 		"name",
 		"type",
@@ -74,6 +79,7 @@ router.post("/", async (req, res) => {
 	const validKeys = Object.keys(sourceData).filter((key) =>
 		columns.includes(key),
 	);
+
 	const placeholders = validKeys.map(() => "?").join(", ");
 	const values = validKeys.map((key) => sourceData[key]);
 	const sql = `INSERT INTO advice_sources (${validKeys.join(
@@ -88,13 +94,16 @@ router.post("/", async (req, res) => {
 		const sourceId = result.lastID;
 
 		if (sourceData.type === "group" || sourceData.type === "person") {
+			const now = new Date().toISOString();
 			await db.run(
-				"INSERT INTO strategies (source_id, title, description, status) VALUES (?, ?, ?, ?)",
+				"INSERT INTO strategies (source_id, title, description, status, created_date, updated_date) VALUES (?, ?, ?, ?, ?, ?)",
 				[
 					sourceId,
 					"Group/Person",
 					"Default strategy for group/person source",
 					"active",
+					now,
+					now,
 				],
 			);
 		}

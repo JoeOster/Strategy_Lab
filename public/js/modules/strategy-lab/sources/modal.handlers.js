@@ -10,6 +10,8 @@ import { getSource } from "../../settings/sources.api.js";
 
 import { openSourceFormModal } from "../../settings/sources.handlers.js";
 
+import { openAddStrategyModal } from "../../settings/strategies.handlers.js"; // Import openAddStrategyModal
+
 import {
 	pct_renderTradesTable,
 	renderOpenTradesForSource,
@@ -350,7 +352,13 @@ export async function openSourceDetailModal(/** @type {number | string} */ sourc
 
 		modal.style.display = "block";
 
-		/** @type {HTMLElement} */ (closeButton).onclick = closeSourceDetailModal;
+		// Add a single click listener to the modal for the close button
+		modal.addEventListener("click", (event) => {
+			if (event.target instanceof HTMLElement && event.target.classList.contains("close-button")) {
+				closeSourceDetailModal();
+			}
+		});
+
 
 		/** @param {MouseEvent} event */
 
@@ -369,7 +377,9 @@ export async function openSourceDetailModal(/** @type {number | string} */ sourc
 			loggedStrategiesContainer.querySelector("#add-idea-btn");
 
 		if (addStrategyButton) {
-			addStrategyButton.addEventListener("click", handleShowStrategyForm);
+			addStrategyButton.addEventListener("click", () =>
+				openAddStrategyModal(source.id),
+			);
 		} else if (addIdeaButton) {
 			addIdeaButton.addEventListener("click", (event) => {
 				if (!modal) return;

@@ -31,8 +31,9 @@ export async function handleShowIdeaForm(
 	const tradeEntryModal = document.getElementById("trade-entry-modal");
 	const tradeEntryForm = document.getElementById("trade-entry-form");
 	const quantityContainer = document.getElementById("quantity-container");
+	const tradeQuantityInput = /** @type {HTMLInputElement | null} */ (document.getElementById("trade-quantity"));
 
-	if (!tradeEntryModal || !tradeEntryForm || !quantityContainer) {
+	if (!tradeEntryModal || !tradeEntryForm || !quantityContainer || !tradeQuantityInput) {
 		console.error("Trade entry modal elements not found.");
 		return;
 	}
@@ -66,10 +67,13 @@ export async function handleShowIdeaForm(
 	if (isPaperTrade) {
 		// @ts-ignore
 		quantityContainer.style.display = "block";
+		tradeQuantityInput.required = true; // Make required when visible
 	} else {
 		// @ts-ignore
 		quantityContainer.style.display = "none";
+		tradeQuantityInput.required = false; // Not required when hidden
 	}
+
 
 	// --- START: FIX ---
 	// Set the idea ID for conversions (Buy/Paper) or edits.
@@ -131,6 +135,8 @@ export async function handleShowIdeaForm(
 		try {
 			if (isTradeConversion) {
 				if (isPaperTrade) {
+					// Set exchange to 'paper' for paper trades
+					ideaData.exchange = "paper";
 					await moveIdeaToPaperTrade(ideaId, ideaData);
 					alert("Paper trade executed successfully!");
 				} else {

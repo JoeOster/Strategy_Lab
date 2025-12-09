@@ -18,6 +18,7 @@ import {
 	initializeSourceSettings,
 	openSourceFormModal,
 } from "./sources.handlers.js";
+import { initializeStrategyHandlers } from "./strategies.handlers.js";
 import * as usersHandlers from "./users.handlers.js";
 import * as webappsHandlers from "./webapps.handlers.js"; // Import new handlers
 
@@ -26,6 +27,7 @@ export function initializeModule() {
 
 	// Initialize handlers for the source settings and modal
 	initializeSourceSettings();
+	initializeStrategyHandlers();
 
 	// Initialize the handlers for the "ideas" or "watched items" functionality
 	initializeIdeasHandlers();

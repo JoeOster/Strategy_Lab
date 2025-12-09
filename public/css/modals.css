@@ -31,12 +31,18 @@
 	position: relative; /* For absolute positioning of close button */
 }
 
+.modal-header {
+  position: relative; /* Establish positioning context for absolute children */
+}
+
 .close-button {
 	/* --- START: FIX --- */
 	/* Use theme variable for muted text */
 	color: var(--text-muted-color);
 	/* --- END: FIX --- */
-	float: right;
+	position: absolute; /* Position relative to the parent .modal-header */
+	top: 10px;
+	right: 15px;
 	font-size: 28px;
 	font-weight: bold;
 	cursor: pointer;

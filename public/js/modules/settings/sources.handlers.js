@@ -1,5 +1,5 @@
 import { error, log } from "../../utils/logger.js";
-import { loadHtmlPartial } from "../../utils/loadHtmlPartial.js";
+
 import {
 	addSource,
 	deleteSource,
@@ -9,6 +9,7 @@ import {
 } from "./sources.api.js";
 import { handleFetchIsbnInfo } from "./sources_books.handlers.js";
 import { getWebApps } from "./webapps.api.js";
+import { openAddStrategyModal } from "./strategies.handlers.js"; // Import the new function
 
 /** @typedef {import('../../types.js').Source} Source */
 
@@ -98,170 +99,9 @@ export function updateImagePreview(type, filename) {
 	};
 }
 
-async function toggleAddStrategyForm(sourceId) {
-	const formContainer = document.getElementById("add-strategy-form-container");
-	if (!formContainer) return;
 
-	const isVisible = formContainer.style.display !== "none";
-	if (isVisible) {
-		formContainer.style.display = "none";
-	} else {
-		await loadHtmlPartial(
-			"_add-strategy-form.html",
-			"add-strategy-form-container",
-		);
-		const sourceIdField = document.getElementById("strategy-source-id");
-		if (sourceIdField) {
-			// @ts-ignore
-			sourceIdField.value = sourceId;
-		}
-		formContainer.style.display = "block";
-	}
-}
 
-export async function openSourceDetailModal(sourceId) {
-	const modal = document.getElementById("source-detail-modal");
-	if (!modal) {
-		error("Source detail modal not found.");
-		return;
-	}
 
-	try {
-		const source = await getSource(sourceId);
-		if (!source) {
-			error("Source not found for ID:", sourceId);
-			return;
-		}
-
-		// Populate the modal content
-		const profileContainer = document.getElementById(
-			"source-profile-container",
-		);
-		const strategiesContainer = document.getElementById(
-			"logged-strategies-container",
-		);
-		const modalTitle = document.getElementById("source-detail-modal-title");
-
-		if (modalTitle) modalTitle.textContent = `Details for ${source.name}`;
-
-		if (profileContainer) {
-			let folderPath = "images/";
-			switch (source.type) {
-				case "person":
-					folderPath = "images/contacts/";
-					break;
-				case "group":
-					folderPath = "images/group/";
-					break;
-				case "book":
-					folderPath = "images/books/";
-					break;
-				case "website":
-					folderPath = "images/url/";
-					break;
-			}
-			const imageFile = source.image_path || "default.png";
-			let finalImagePath;
-
-			if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
-				finalImagePath = imageFile;
-			} else {
-				finalImagePath = folderPath + imageFile;
-			}
-			const genericPlaceholder = "images/contacts/default.png";
-
-			profileContainer.innerHTML = `
-                <div class="source-profile-image-wrapper">
-                    <img src="${finalImagePath}" alt="${source.name}" class="source-profile-image" onerror="this.onerror=null; this.src='${genericPlaceholder}';">
-                </div>
-                <div class="source-profile-details">
-                    <h4>${source.name}</h4>
-                    <p><strong>Type:</strong> ${source.type}</p>
-                    ${
-											source.url
-												? `<p><strong>URL:</strong> <a href="${source.url}" target="_blank">${source.url}</a></p>`
-												: ""
-										}
-                    ${
-											source.description
-												? `<p><strong>Description:</strong> ${source.description}</p>`
-												: ""
-										}
-                    ${
-											source.person_email
-												? `<p><strong>Email:</strong> ${source.person_email}</p>`
-												: ""
-										}
-                    ${
-											source.person_phone
-												? `<p><strong>Phone:</strong> ${source.person_phone}</p>`
-												: ""
-										}
-                    ${
-											source.person_app_handle
-												? `<p><strong>App Handle:</strong> ${source.person_app_handle}</p>`
-												: ""
-										}
-                    ${
-											source.group_primary_contact
-												? `<p><strong>Primary Contact:</strong> ${source.group_primary_contact}</p>`
-												: ""
-										}
-                    ${
-											source.group_email
-												? `<p><strong>Group Email:</strong> ${source.group_email}</p>`
-												: ""
-										}
-                    ${
-											source.group_phone
-												? `<p><strong>Group Phone:</strong> ${source.group_phone}</p>`
-												: ""
-										}
-                    ${
-											source.group_app_handle
-												? `<p><strong>Group App Handle:</strong> ${source.group_app_handle}</p>`
-												: ""
-										}
-                    ${
-											source.book_author
-												? `<p><strong>Author:</strong> ${source.book_author}</p>`
-												: ""
-										}
-                    ${
-											source.book_isbn
-												? `<p><strong>ISBN:</strong> ${source.book_isbn}</p>`
-												: ""
-										}
-                    ${
-											source.website_websites
-												? `<p><strong>Websites:</strong> ${source.website_websites}</p>`
-												: ""
-										}
-                </div>
-            `;
-		}
-
-		if (strategiesContainer) {
-			strategiesContainer.innerHTML = `
-                <h4>Logged Strategies</h4>
-                <p>Loading strategies...</p>
-            `;
-			// TODO: Implement actual loading of strategies related to this source
-		}
-
-		const addStrategyBtn = document.getElementById("add-strategy-btn");
-		if (addStrategyBtn) {
-			addStrategyBtn.addEventListener("click", () =>
-				toggleAddStrategyForm(sourceId),
-			);
-		}
-
-		// @ts-ignore
-		modal.style.display = "block";
-	} catch (err) {
-		error("Error opening source detail modal:", err);
-	}
-}
 
 /**
  * Populates the app type dropdowns.
@@ -523,6 +363,10 @@ export async function openSourceFormModal(sourceId = null) {
 
 	// @ts-ignore
 	modal.style.display = "block";
+
+	// Remove any existing listener to prevent duplicates, then add it.
+	form.removeEventListener("submit", handleSourceFormSubmit);
+	form.addEventListener("submit", handleSourceFormSubmit);
 }
 
 /**
@@ -592,18 +436,12 @@ export function initializeSourceSettings() {
 	if (window.APP_VERSION) {
 		console.log(`Client-side App Version: ${window.APP_VERSION}`);
 	}
-	const clearBtn = document.getElementById("clear-source-form-btn");
+	const clearBtn = document.getElementById("source-form-clear-btn");
 	if (clearBtn) clearBtn.remove();
 
 	const addSourceBtn = document.getElementById("open-add-source-btn");
 	if (addSourceBtn) {
 		addSourceBtn.addEventListener("click", () => openSourceFormModal(null));
-	}
-
-	const form = document.getElementById("source-form-form");
-	if (form) {
-		console.log("Attaching submit listener to source-form-form");
-		form.addEventListener("submit", handleSourceFormSubmit);
 	}
 
 	const modal = document.getElementById("source-form-modal");

@@ -92,8 +92,13 @@ function renderTradesTable(trades, containerId, title, isClosed) {
             </thead>
             <tbody>
                 ${trades
-									.map(
-										(trade) => `
+									.map((trade) => {
+										const pnl =
+											(trade.current_price - trade.price) *
+											trade.quantity;
+										const return_pct =
+											pnl / (trade.price * trade.quantity);
+										return `
                     <tr data-id="${trade.id}">
                         <td>${trade.ticker}</td>
                         <td>${trade.quantity}</td>
@@ -103,11 +108,11 @@ function renderTradesTable(trades, containerId, title, isClosed) {
 												).toLocaleDateString()}</td>
                         <td>${formatCurrency(trade.current_price)}</td>
                         <td class="${
-													trade.pnl >= 0 ? "text-success" : "text-danger"
-												}">${formatCurrency(trade.pnl)}</td>
+													pnl >= 0 ? "text-success" : "text-danger"
+												}">${formatCurrency(pnl)}</td>
                         <td class="${
-													trade.pnl >= 0 ? "text-success" : "text-danger"
-												}">${formatPercentage(trade.return_pct)}</td>
+													pnl >= 0 ? "text-success" : "text-danger"
+												}">${formatPercentage(return_pct)}</td>
                         <td class="actions-column">
                             <div class="table-actions">
                                 <button class="btn small-btnbtn-secondary small-btn open-trade-sell-btn" data-id="${
@@ -119,8 +124,8 @@ function renderTradesTable(trades, containerId, title, isClosed) {
                             </div>
                         </td>
                     </tr>
-                `,
-									)
+                `;
+									})
 									.join("")}
             </tbody>
         `;

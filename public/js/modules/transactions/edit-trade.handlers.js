@@ -66,6 +66,10 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 		document.querySelector('label[for="edit-trade-limit-high"]')
 	);
 
+	const priceLabel = /** @type {HTMLLabelElement | null} */ (
+		document.querySelector('label[for="edit-trade-price"]')
+	);
+
 	// Reset form and ticker state
 	form.reset();
 	tickerInput.readOnly = false;
@@ -100,6 +104,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 			const trade = await getTransaction(tradeId);
 			if (isSell) {
 				// --- SELL MODE ---
+				if (priceLabel) priceLabel.textContent = "Exit Price:"; // Dynamically change label
 				modalTitle.textContent = isPaper ? "Close Paper Trade" : "Sell Trade";
 				submitButton.textContent = "Confirm Sell";
 				submitButton.dataset.action = "sell"; // Set action for the handler
@@ -135,6 +140,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 				exchangeSelect.removeAttribute("required");
 			} else {
 				// --- EDIT MODE ---
+				if (priceLabel) priceLabel.textContent = "Entry Price:"; // Dynamically change label
 				modalTitle.textContent = "Edit Trade";
 				submitButton.textContent = "Save Changes";
 				submitButton.dataset.action = "save"; // Set action for the handler
@@ -151,6 +157,7 @@ export async function openEditTradeModal({ tradeId, ideaId, isPaper, isSell }) {
 			}
 		} else if (ideaId) {
 			// --- NEW TRADE MODE ---
+			if (priceLabel) priceLabel.textContent = "Entry Price:"; // Always entry for new trades
 			modalTitle.textContent = isPaper ? "New Paper Trade" : "New Real Trade";
 			submitButton.textContent = "Execute Trade";
 			submitButton.dataset.action = "create"; // Set action for the handler
