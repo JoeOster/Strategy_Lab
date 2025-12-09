@@ -6,23 +6,19 @@
 /** @typedef {import('../../../types.js').TransactionWithPrice} TransactionWithPrice */
 /** @typedef {import('../../../types.js').WatchedItem} WatchedItem */
 
+import { showModal, hideModal } from "../../../services/modal.js";
+import { loadHtmlPartial } from "../../../utils/loadHtmlPartial.js";
 import { getSource } from "../../settings/sources.api.js";
-
 import { openSourceFormModal } from "../../settings/sources.handlers.js";
-
-import { openAddStrategyModal } from "../../settings/strategies.handlers.js"; // Import openAddStrategyModal
-
+import { openAddStrategyModal } from "../../settings/strategies.handlers.js";
 import {
 	pct_renderTradesTable,
 	renderOpenTradesForSource,
 	renderPaperTradesForSource,
 	tct_renderTradesTable,
 } from "../../transactions/render.js";
-
 import { handleDeletePaperTradeClick } from "../paper-trades/handlers.js";
-
 import * as watchedListHandlers from "../watched-list/handlers.js";
-
 import {
 	deleteStrategy,
 	getOpenIdeasForSource,
@@ -31,25 +27,18 @@ import {
 	getStrategiesForSource,
 	tct_getTradesForSource,
 } from "./api.js";
-
 import { handleShowIdeaForm } from "./idea-form.handlers.js";
-
 import {
 	renderOpenIdeasForSource,
 	renderStrategiesTable,
 	renderTradeIdeasTable,
 } from "./render.js";
-
 import {
 	handleShowEditStrategyForm,
 	handleShowStrategyForm,
 } from "./strategy-form.handlers.js";
-
 import { formatDescriptionWithReadMore } from "../../../utils/formatters.js";
-
 import { error, log } from "../../../utils/logger.js";
-
-/** @type {EventListener | null} */
 
 let tradeCreatedHandler = null;
 
@@ -126,374 +115,187 @@ export async function pct_loadTrades(/** @type {number | string} */ sourceId) {
 }
 
 export async function openSourceDetailModal(/** @type {number | string} */ sourceId) {
+    const modalBodyHtml = await loadHtmlPartial("_source-detail-content.html");
+
+    try {
+        const source = await getSource(sourceId);
+
+        showModal({
+            title: `Source Details: ${source.name}`,
+            body: modalBodyHtml,
+            actions: [],
+        });
+
+        const profileContainer = document.getElementById("source-profile-container");
+        const loggedStrategiesContainer = document.getElementById("logged-strategies-container");
+        const ideasPlaceholder = document.getElementById("open-ideas-table-placeholder");
+        const openTradesPlaceholder = document.getElementById("open-trades-table-placeholder");
+        const testClosedTradesPlaceholder = document.getElementById("test-closed-trades-table-placeholder");
+
+        if (ideasPlaceholder) {
+            ideasPlaceholder.style.display = "block";
+            ideasPlaceholder.innerHTML = "<h3>Open Ideas</h3><p>Loading...</p>";
+        }
+
+        if (openTradesPlaceholder) {
+            openTradesPlaceholder.innerHTML = "<h3>Retail Trades - Open</h3><p>Loading...</p>";
+        }
+
+        if (testClosedTradesPlaceholder) {
+            testClosedTradesPlaceholder.innerHTML = "<h3>Test Closed Trades</h3><p>Loading...</p>";
+        }
+
+        if (!profileContainer || !loggedStrategiesContainer) {
+            error("Source detail modal content elements not found.");
+            return;
+        }
+
+        let folderPath = "images/";
+        switch (source.type) {
+            case "person":
+                folderPath = "images/contacts/";
+                break;
+            case "group":
+                folderPath = "images/group/";
+                break;
+            case "book":
+                folderPath = "images/books/";
+                break;
+            case "website":
+                folderPath = "images/url/";
+                break;
+        }
+
+        const imageFile = source.image_path || "default.png";
+        let finalImagePath;
+
+        if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
+            finalImagePath = imageFile;
+        } else {
+            finalImagePath = folderPath + imageFile;
+        }
+
+        const genericPlaceholder = "images/contacts/default.png";
+        const descriptionHtml = formatDescriptionWithReadMore(source.description, 200);
+
+        profileContainer.innerHTML = `
+            <a href="${finalImagePath}" target="_blank" class="source-profile-image-link">
+                <img src="${finalImagePath}" alt="${source.name}" class="source-profile-image ${source.type === "book" ? "source-profile-book-thumbnail" : ""}" onerror="this.onerror=null; this.src='${genericPlaceholder}';">
+            </a>
+            <h3>${source.name}</h3>
+            <p>Type: ${source.type}</p>
+            ${descriptionHtml}
+            ${source.url ? `<p>URL: <a href="${source.url}" target="_blank">${source.url}</a></p>` : ""}
+            ${source.book_author ? `<p>Author: ${source.book_author}</p>` : ""}
+            ${source.book_isbn ? `<p>ISBN: ${source.book_isbn}</p>` : ""}
+            ${source.person_email ? `<p>Email: ${source.person_email}</p>` : ""}
+            ${source.person_phone ? `<p>Phone: ${source.person_phone}</p>` : ""}
+            ${source.group_primary_contact ? `<p>Primary Contact: ${source.group_primary_contact}</p>` : ""}
+            <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
+        `;
+
+        const readMoreBtn = profileContainer.querySelector(".read-more-btn");
+        if (readMoreBtn) {
+            readMoreBtn.addEventListener("click", (event) => {
+                const target = /** @type {HTMLElement} */ (event.target);
+                const descriptionContainer = target.closest(".source-card-description");
+                if (descriptionContainer) {
+                    const dots = descriptionContainer.querySelector(".dots");
+                    const moreText = descriptionContainer.querySelector(".more-text");
+                    if (dots && moreText) {
+                        if (moreText.style.display === "none") {
+                            moreText.style.display = "inline";
+                            dots.style.display = "none";
+                            target.textContent = "See less";
+                        } else {
+                            moreText.style.display = "none";
+                            dots.style.display = "inline";
+                            target.textContent = "See more";
+                        }
+                    }
+                }
+            });
+        }
 
-	const modal = /** @type {HTMLElement | null} */ (document.getElementById("source-detail-modal"));
-
-	const profileContainer = /** @type {HTMLElement | null} */ (document.getElementById("source-profile-container"));
-
-	const loggedStrategiesContainer = /** @type {HTMLElement | null} */ (
-
-		document.getElementById("logged-strategies-container")
-
-	);
-
-	const closeButton = modal?.querySelector(".close-button");
-
-	const ideasPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("open-ideas-table-placeholder"));
-
-	const openTradesPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("open-trades-table-placeholder"));
-
-	const testClosedTradesPlaceholder = /** @type {HTMLElement | null} */ (document.getElementById("test-closed-trades-table-placeholder"));
-
-
-
-	if (ideasPlaceholder) {
-
-		ideasPlaceholder.style.display = "block";
-
-		ideasPlaceholder.innerHTML = "<h3>Open Ideas</h3><p>Loading...</p>";
-
-	}
-
-
-
-	if (openTradesPlaceholder) {
-
-		openTradesPlaceholder.innerHTML =
-
-			"<h3>Retail Trades - Open</h3><p>Loading...</p>";
-
-	}
-
-
-
-	if (testClosedTradesPlaceholder) {
-
-		testClosedTradesPlaceholder.innerHTML =
-
-			"<h3>Test Closed Trades</h3><p>Loading...</p>";
-
-	}
-
-
-
-	if (
-
-		!modal ||
-
-		!profileContainer ||
-
-		!loggedStrategiesContainer ||
-
-		!closeButton
-
-	) {
-
-		error(
-
-			"Source detail modal elements not found. One or more elements are null.",
-
-		);
-
-		return;
-
-	}
-
-
-
-	modal.dataset.sourceId = String(sourceId);
-
-	try {
-		const source = await getSource(sourceId);
-
-		let folderPath = "images/";
-
-		switch (source.type) {
-			case "person":
-				folderPath = "images/contacts/";
-
-				break;
-
-			case "group":
-				folderPath = "images/group/";
-
-				break;
-
-			case "book":
-				folderPath = "images/books/";
-
-				break;
-
-			case "website":
-				folderPath = "images/url/";
-
-				break;
-		}
-
-		const imageFile = source.image_path || "default.png";
-		let finalImagePath;
-
-		if ((source.type === "book" || source.type === "website") && imageFile.startsWith("http")) {
-			finalImagePath = imageFile;
-		} else {
-			finalImagePath = folderPath + imageFile;
-		}
-
-
-		const genericPlaceholder = "images/contacts/default.png";
-
-		const descriptionHtml = formatDescriptionWithReadMore(
-			source.description,
-			200,
-		); // Use a larger maxLength for modal
-
-		// Populate profile container
-
-		// Added style="background-color: #fff; ..." to the image link to fix transparency issues
-
-		profileContainer.innerHTML = `
-
-      <a href="${finalImagePath}" target="_blank" class="source-profile-image-link">
-
-        <img
-
-          src="${finalImagePath}"
-
-          alt="${source.name}"
-
-          class="source-profile-image ${
-						source.type === "book" ? "source-profile-book-thumbnail" : ""
-					}"
-
-          onerror="this.onerror=null; this.src='${genericPlaceholder}';"
-
-        >
-
-      </a>
-
-      <h3>${source.name}</h3>
-
-      <p>Type: ${source.type}</p>
-
-      ${descriptionHtml}
-
-      ${
-				source.url
-					? `<p>URL: <a href="${source.url}" target="_blank">${source.url}</a></p>`
-					: ""
-			}
-
-      ${source.book_author ? `<p>Author: ${source.book_author}</p>` : ""}
-
-      ${source.book_isbn ? `<p>ISBN: ${source.book_isbn}</p>` : ""}
-
-      ${source.person_email ? `<p>Email: ${source.person_email}</p>` : ""}
-
-      ${source.person_phone ? `<p>Phone: ${source.person_phone}</p>` : ""}
-
-      ${
-				source.group_primary_contact
-					? `<p>Primary Contact: ${source.group_primary_contact}</p>`
-					: ""
-			}
-
-      <button class="btn" id="edit-source-btn" data-source-id="${source.id}">Edit</button>
-
-    `;
-
-		// Add event listener for "See more" button in the modal
-
-		const readMoreBtn = profileContainer.querySelector(".read-more-btn");
-
-		if (readMoreBtn) {
-			readMoreBtn.addEventListener("click", (event) => {
-				const target = /** @type {HTMLElement} */ (event.target);
-
-				const descriptionContainer = target.closest(".source-card-description");
-
-				if (descriptionContainer) {
-					const dots = descriptionContainer.querySelector(".dots");
-
-					const moreText = descriptionContainer.querySelector(".more-text");
-
-					if (dots && moreText) {
-						if (moreText.style.display === "none") {
-							moreText.style.display = "inline";
-
-							dots.style.display = "none";
-
-							target.textContent = "See less";
-						} else {
-							moreText.style.display = "none";
-
-							dots.style.display = "inline";
-
-							target.textContent = "See more";
-						}
-					}
-				}
-			});
-		}
-
-		await loadSourceDetailContent(
-			sourceId,
-
-			source.type,
-
-			/** @type {HTMLElement} */ (loggedStrategiesContainer),
-		);
-
+        await loadSourceDetailContent(sourceId, source.type, loggedStrategiesContainer);
 		loadOpenIdeasForSource(sourceId);
 		loadOpenTradesForSource(sourceId);
 		pct_loadTrades(sourceId);
 		tct_loadTrades(sourceId);
 
-		// @ts-ignore
+        const editButton = profileContainer.querySelector("#edit-source-btn");
+        if (editButton) {
+            editButton.addEventListener("click", (e) => {
+                if (!(e.target instanceof HTMLElement)) return;
+                const sourceId = e.target.dataset.sourceId;
+                if (sourceId) {
+                    openSourceFormModal(sourceId);
+                }
+            });
+        }
 
-		modal.style.display = "block";
+        const addStrategyButton = loggedStrategiesContainer.querySelector("#add-strategy-btn");
+        if (addStrategyButton) {
+            addStrategyButton.addEventListener("click", () => openAddStrategyModal(source.id));
+        }
 
-		// Add a single click listener to the modal for the close button
-		modal.addEventListener("click", (event) => {
-			if (event.target instanceof HTMLElement && event.target.classList.contains("close-button")) {
-				closeSourceDetailModal();
-			}
-		});
+        const addIdeaButton = loggedStrategiesContainer.querySelector("#add-idea-btn");
+        if (addIdeaButton) {
+            addIdeaButton.addEventListener("click", (event) => {
+                handleShowIdeaForm(event, source.id, null, false, false);
+            });
+        }
 
+        const modalBody = document.getElementById("global-modal-body");
+        if (modalBody) {
+            modalBody.addEventListener("click", handleModalBottomPanelClicks);
+        }
 
-		/** @param {MouseEvent} event */
+        const strategyTable = loggedStrategiesContainer.querySelector("#strategy-table");
+        if (strategyTable) {
+            strategyTable.addEventListener("click", handleStrategyTableClicks);
+        }
 
-		window.onclick = (event) => {
-			if (event.target === modal) {
-				closeSourceDetailModal();
-			}
-		};
-
-		const editButton = profileContainer.querySelector("#edit-source-btn");
-
-		const addStrategyButton =
-			loggedStrategiesContainer.querySelector("#add-strategy-btn");
-
-		const addIdeaButton =
-			loggedStrategiesContainer.querySelector("#add-idea-btn");
-
-		if (addStrategyButton) {
-			addStrategyButton.addEventListener("click", () =>
-				openAddStrategyModal(source.id),
-			);
-		} else if (addIdeaButton) {
-			addIdeaButton.addEventListener("click", (event) => {
-				if (!modal) return;
-
-				// @ts-ignore
-
-				const currentSourceId = modal.dataset.sourceId || null;
-
-				handleShowIdeaForm(event, currentSourceId, null, false, false);
-			});
-		}
-
-		if (editButton) {
-			editButton.addEventListener("click", handleEditSource);
-		}
-
-		const modalBody = modal.querySelector(".modal-body");
-
-		if (modalBody) {
-			modalBody.addEventListener("click", handleModalBottomPanelClicks);
-		}
-
-		const strategyTable =
-			loggedStrategiesContainer.querySelector("#strategy-table");
-
-		if (strategyTable) {
-			strategyTable.addEventListener("click", handleStrategyTableClicks);
-		}
-
-		tradeCreatedHandler = (/** @type {Event} */ e) => {
+        tradeCreatedHandler = (/** @type {Event} */ e) => {
 			if (e instanceof CustomEvent) {
 				const { sourceId: eventSourceId } = e.detail;
-
-				// @ts-ignore
-
-				const currentSourceId = modal.dataset.sourceId;
-
-				if (eventSourceId === currentSourceId) {
-					if (currentSourceId) {
-						loadOpenTradesForSource(currentSourceId);
-
-						loadOpenIdeasForSource(currentSourceId);
-					}
-				}
+                const modal = document.getElementById("global-modal");
+                if (modal && modal.dataset.sourceId === eventSourceId) {
+                    loadOpenTradesForSource(eventSourceId);
+                    loadOpenIdeasForSource(eventSourceId);
+                }
 			}
 		};
 
 		document.addEventListener("tradeCreated", tradeCreatedHandler);
-	} catch (e) {
-		error(
-			`Failed to load source details for modal ${sourceId}:`,
 
-			e,
-		);
+        const globalModal = document.getElementById("global-modal");
+        if(globalModal) {
+            globalModal.dataset.sourceId = String(sourceId);
 
-		profileContainer.innerHTML =
-			'<p class="error">Failed to load source details.</p>';
-	}
-}
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        if (globalModal.style.display === 'none') {
+                            if (tradeCreatedHandler) {
+                                document.removeEventListener("tradeCreated", tradeCreatedHandler);
+                            }
+                            observer.disconnect();
+                        }
+                    }
+                });
+            });
 
-function handleEditSource(event) {
-	if (!(event.target instanceof HTMLElement)) return;
-	// @ts-ignore
-	const sourceId = event.target.dataset.sourceId;
-	if (sourceId) {
-		openSourceFormModal(sourceId);
-	} else {
-		error("Edit button clicked without a source ID.");
-	}
-}
-
-export function closeSourceDetailModal() {
-	const modal = document.getElementById("source-detail-modal");
-	if (modal) {
-		// @ts-ignore
-		modal.style.display = "none";
-		const profile = document.getElementById("source-profile-container");
-		if (profile) profile.innerHTML = "";
-		const loggedStrategies = document.getElementById(
-			"logged-strategies-container",
-		);
-		if (loggedStrategies) loggedStrategies.innerHTML = "";
-		const openIdeas = document.getElementById("open-ideas-table-placeholder");
-		if (openIdeas) {
-			openIdeas.innerHTML = "";
-			openIdeas.style.display = "block";
-		}
-		const openTrades = document.getElementById("open-trades-table-placeholder");
-		if (openTrades) openTrades.innerHTML = "";
-		const pctClosedPaperTrades = document.getElementById(
-			"pct-closed-paper-trades-table-placeholder",
-		);
-		if (pctClosedPaperTrades) pctClosedPaperTrades.innerHTML = "";
-
-		const testClosedTrades = document.getElementById(
-			"test-closed-trades-table-placeholder",
-		);
-		if (testClosedTrades) testClosedTrades.innerHTML = "";
-
-		const modalBody = modal.querySelector(".modal-body");
-		if (modalBody) {
-			modalBody.removeEventListener("click", handleModalBottomPanelClicks);
-		}
-		const strategyTable = modal.querySelector("#strategy-table");
-		if (strategyTable) {
-			strategyTable.removeEventListener("click", handleStrategyTableClicks);
-		}
-		// @ts-ignore
-		modal.dataset.sourceId = "";
-
-		if (tradeCreatedHandler) {
-			document.removeEventListener("tradeCreated", tradeCreatedHandler);
-		}
-	}
+            observer.observe(globalModal, { attributes: true });
+        }
+    } catch (e) {
+        error(`Failed to load source details for modal ${sourceId}:`, e);
+        showModal({
+            title: "Error",
+            body: "<p>Failed to load source details.</p>",
+            actions: [{ label: "Close", onClick: hideModal }],
+        });
+    }
 }
 
 async function loadSourceDetailContent(
@@ -518,7 +320,7 @@ async function loadSourceDetailContent(
           <button class="btn" id="add-strategy-btn" data-source-id="${sourceId}">Add Strategy</button>
         </div>
         <div id="strategy-table-container">
-          <div id="strategy-table"></div> 
+          <div id="strategy-table"></div>
         </div>
       `;
 			await loadStrategiesForSource(sourceId);
@@ -662,7 +464,7 @@ async function handleModalBottomPanelClicks(/** @type {MouseEvent} */ event) {
 		openEditTradeModal({ tradeId: id });
 	}
 
-	const sourceId = /** @type {HTMLElement} */ (event.target.closest("#source-detail-modal"))?.dataset
+	const sourceId = /** @type {HTMLElement} */ (event.target.closest("#global-modal"))?.dataset
 		.sourceId;
 
 	if (sourceId) {
@@ -685,7 +487,7 @@ async function handleStrategyTableClicks(/** @type {MouseEvent} */ event) {
 	const strategyId = button.dataset.strategyId;
 	if (!strategyId) return;
 
-	const modal = /** @type {HTMLElement | null} */ (event.target.closest("#source-detail-modal"));
+	const modal = /** @type {HTMLElement | null} */ (event.target.closest("#global-modal"));
 	if (!modal) return;
 
 	const sourceId = modal.dataset.sourceId;
@@ -717,3 +519,4 @@ async function handleDeleteStrategyClick(
 		alert("Failed to delete strategy. Please check the console.");
 	}
 }
+

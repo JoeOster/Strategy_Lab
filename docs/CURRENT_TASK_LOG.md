@@ -1,28 +1,45 @@
-# Task: Implement Dashboard Feature
+# Task: Refactor Modals to a Reusable System
 
-- [x] **1. Create Dashboard Sub-tabs:**
-    - [x] a. Create `_dashboard-list-view.html` and `_dashboard-card-view.html` partials.
-    - [x] b. Modify `_dashboard.html` to include sub-tab navigation for "List View" and "Card View".
-    - [x] c. Create `public/js/modules/dashboard/handlers.js` to handle sub-tab switching.
-    - [x] d. Update `public/js/modules/dashboard/index.js` to initialize the sub-tab handlers.
+This document outlines the plan for refactoring the existing modals into a single, reusable modal system.
 
-- [x] **2. Implement List View:**
-    - [x] a. Create `public/js/modules/dashboard/api.js` to fetch open and closed retail trades.
-    - [x] b. Create `public/js/modules/dashboard/render.js` to render the open and closed retail trades tables.
-    - [x] c. Update `public/js/modules/dashboard/handlers.js` to call the render functions when the "List View" sub-tab is active.
+## Plan
 
-- [x] **3. Implement Card View:**
-    - [x] a. Update `public/js/modules/dashboard/api.js` to fetch and process data for the card view.
-    - [x] b. Update `public/js/modules/dashboard/render.js` to render the card view for open retail trades.
-    - [x] c. Update `public/js/modules/dashboard/handlers.js` to call the render function when the "Card View" sub-tab is active.
+1.  **Create Generic Modal Shell**
+    -   [x] Add a generic modal container to `public/index.html`.
+    -   [x] The modal will have placeholders for the title, body, and footer.
+    -   [x] The modal will be hidden by default.
 
-- [x] **4. Implement Open Ticker Modal:**
-    - [x] a. Create `_open-ticker-modal.html` partial.
-    - [x] b. Add logic to `public/js/modules/dashboard/handlers.js` to open the modal when a ticker is clicked.
-    - [x] c. Create `public/js/modules/dashboard/modal.handlers.js` to handle the modal's functionality.
-    - [x] d. Create `public/js/modules/dashboard/modal.render.js` to render the content of the modal.
-    - [x] e. Update `public/js/modules/dashboard/index.js` to initialize the modal handlers.
+2.  **Create `modal.js` Service**
+    -   [x] Create a new file: `public/js/services/modal.js`.
+    -   [x] Export `showModal` and `hideModal` functions.
+    -   [x] `showModal` will accept `title`, `body` content, and an array of `actions` for the footer buttons.
+    -   [x] `hideModal` will hide the modal and clear its content.
+    -   [x] The module will handle closing the modal via the 'X' button and background clicks.
 
-- [x] **5. Implement "Click on Ticker" Functionality:**
-    - [x] a. Add event listeners to all tables to handle ticker clicks.
-    - [x] b. When a ticker is clicked, open the "Open Ticker Modal" with the corresponding data.
+3.  **Refactor "Add New Strategy" Modal**
+    -   [x] Remove the old modal HTML from `public/_strategy-form-modal.html` and convert it to a content-only partial.
+    -   [x] Modify `public/js/modules/settings/strategies.handlers.js` to use the new modal service.
+    -   [x] `openAddStrategyModal` will call `showModal`, passing the form content and "Save"/"Cancel" actions.
+
+4.  **Refactor "Source Detail" Modal**
+    -   [x] Refactor the "Source Detail" modal to use the new system.
+    -   [x] This will involve modifying `public/js/modules/strategy-lab/sources/modal.handlers.js`.
+
+5.  **Refactor "Trade Entry" Modal**
+    -   [x] Refactor the "Trade Entry" modal to use the new system.
+    -   [x] This will involve modifying `public/js/modules/strategy-lab/sources/idea-form.handlers.js`.
+
+6.  **Cleanup**
+    -   [x] Remove old, now-unused modal HTML files.
+    -   [x] Remove old modal handling logic.
+
+---
+## Progress Log
+
+*   **2025-12-08:** Task started. Plan created.
+*   **2025-12-08:** Step 1 complete. Generic modal shell added to `index.html`.
+*   **2025-12-08:** Step 2 complete. `modal.js` service created.
+*   **2025-12-08:** Step 3 complete. "Add New Strategy" modal refactored.
+*   **2025-12-08:** Step 4 complete. "Source Detail" modal refactored.
+*   **2025-12-08:** Step 5 complete. "Trade Entry" modal refactored.
+*   **2025-12-08:** Step 6 complete. Cleanup of old modal files and logic.

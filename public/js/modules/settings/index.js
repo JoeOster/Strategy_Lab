@@ -15,19 +15,19 @@ import * as handlers from "./handlers.js";
 import {
 	handleDeleteSourceClick,
 	handleSourceTypeChange,
-	initializeSourceSettings,
 	openSourceFormModal,
 } from "./sources.handlers.js";
-import { initializeStrategyHandlers } from "./strategies.handlers.js";
+
 import * as usersHandlers from "./users.handlers.js";
 import * as webappsHandlers from "./webapps.handlers.js"; // Import new handlers
 
 export function initializeModule() {
 	console.log("Settings module initialized.");
 
-	// Initialize handlers for the source settings and modal
-	initializeSourceSettings();
-	initializeStrategyHandlers();
+	const addSourceBtn = document.getElementById("open-add-source-btn");
+	if (addSourceBtn) {
+		addSourceBtn.addEventListener("click", () => openSourceFormModal(null));
+	}
 
 	// Initialize the handlers for the "ideas" or "watched items" functionality
 	initializeIdeasHandlers();

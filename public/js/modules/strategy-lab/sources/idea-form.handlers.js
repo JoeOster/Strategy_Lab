@@ -1,5 +1,7 @@
 // public/js/modules/strategy-lab/sources/idea-form.handlers.js
 
+import { showModal, hideModal } from "../../../services/modal.js";
+import { loadHtmlPartial } from "../../../utils/loadHtmlPartial.js";
 import {
 	createWatchedItem,
 	getWatchedItem,
@@ -28,12 +30,29 @@ export async function handleShowIdeaForm(
 	ticker = null,
 	ideaId = null,
 ) {
-	const tradeEntryModal = document.getElementById("trade-entry-modal");
+    const formHtml = await loadHtmlPartial("_trade-entry-content.html");
+
+    const onSave = () => {
+        const form = document.getElementById("trade-entry-form");
+        if (form) {
+            form.requestSubmit();
+        }
+    };
+
+    showModal({
+        title: isEdit ? "Edit Idea" : "Add New Idea",
+        body: formHtml,
+        actions: [
+            { label: "Save", onClick: onSave, className: "btn" },
+            { label: "Cancel", onClick: hideModal, className: "btn secondary-btn" },
+        ],
+    });
+
 	const tradeEntryForm = document.getElementById("trade-entry-form");
 	const quantityContainer = document.getElementById("quantity-container");
 	const tradeQuantityInput = /** @type {HTMLInputElement | null} */ (document.getElementById("trade-quantity"));
 
-	if (!tradeEntryModal || !tradeEntryForm || !quantityContainer || !tradeQuantityInput) {
+	if (!tradeEntryForm || !quantityContainer || !tradeQuantityInput) {
 		console.error("Trade entry modal elements not found.");
 		return;
 	}
@@ -115,9 +134,6 @@ export async function handleShowIdeaForm(
 		}
 	}
 
-	// @ts-ignore
-	tradeEntryModal.style.display = "block";
-
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		// @ts-ignore
@@ -151,8 +167,8 @@ export async function handleShowIdeaForm(
 				await createWatchedItem(ideaData);
 				alert("Idea added successfully!");
 			}
-			// @ts-ignore
-			tradeEntryModal.style.display = "none";
+			
+            hideModal();
 
 			// --- START: FIX ---
 			// Dispatch a custom event to notify that a trade was created or an idea was updated.
@@ -170,29 +186,4 @@ export async function handleShowIdeaForm(
 	};
 
 	tradeEntryForm.addEventListener("submit", handleSubmit);
-
-	// Close buttons for modal
-	tradeEntryModal
-		.querySelector(".close-button")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			tradeEntryModal.style.display = "none";
-			tradeEntryForm.removeEventListener("submit", handleSubmit);
-		});
-	tradeEntryModal
-		.querySelector("#cancel-trade-form-btn")
-		?.addEventListener("click", () => {
-			// @ts-ignore
-			tradeEntryModal.style.display = "none";
-			tradeEntryForm.removeEventListener("submit", handleSubmit);
-		});
-
-	// Close modal when clicking outside
-	window.addEventListener("click", (event) => {
-		if (event.target === tradeEntryModal) {
-			// @ts-ignore
-			tradeEntryModal.style.display = "none";
-			tradeEntryForm.removeEventListener("submit", handleSubmit);
-		}
-	});
 }
